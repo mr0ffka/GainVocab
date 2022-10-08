@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "GainVocab.API": {
+    "GainVocab.API.App": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

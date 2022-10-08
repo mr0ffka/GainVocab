@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
-using GainVocab.Core.Extensions;
+using GainVocab.API.Core.Extensions;
 
-namespace GainVocab.Core.Models.Users
+namespace GainVocab.API.Core.Models.Users
 {
     public class APIUserModel
     {

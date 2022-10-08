@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
-using GainVocab.Data;
-using GainVocab.Core.Models;
+using GainVocab.API.Data;
+using GainVocab.API.Core.Models;
 using System.Diagnostics.Metrics;
-using GainVocab.Data.Models;
-using GainVocab.Core.Models.Users;
+using GainVocab.API.Data.Models;
+using GainVocab.API.Core.Models.Users;
 
-namespace GainVocab.Core.Configurations
+namespace GainVocab.API.Core.Configurations
 {
     public class MapperConfig : Profile
     {

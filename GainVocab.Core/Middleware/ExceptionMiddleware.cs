@@ -1,4 +1,4 @@
-﻿using GainVocab.Core.Exceptions;
+﻿using GainVocab.API.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -9,7 +9,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Core.Middleware
+namespace GainVocab.API.Core.Middleware
 {
     public class ExceptionMiddleware
     {

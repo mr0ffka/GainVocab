@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using GainVocab.Core.Interfaces;
-using GainVocab.Data;
-using GainVocab.Core.Models.Users;
+using GainVocab.API.Core.Interfaces;
+using GainVocab.API.Data;
+using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,9 +9,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using GainVocab.Data.Models;
+using GainVocab.API.Data.Models;
 
-namespace GainVocab.Core.Repository
+namespace GainVocab.API.Core.Repository
 {
     public class AuthManager : IAuthManager
     {

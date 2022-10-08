@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Core.Models.Users
+namespace GainVocab.API.Core.Models.Users
 {
     public class AuthResponseModel
     {

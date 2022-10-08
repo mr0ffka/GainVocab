@@ -1,9 +1,9 @@
-using GainVocab.Core.Configurations;
-using GainVocab.Core.Interfaces;
-using GainVocab.Core.Middleware;
-using GainVocab.Core.Repository;
-using GainVocab.Data;
-using GainVocab.Data.Models;
+using GainVocab.API.Core.Configurations;
+using GainVocab.API.Core.Interfaces;
+using GainVocab.API.Core.Middleware;
+using GainVocab.API.Core.Repository;
+using GainVocab.API.Data;
+using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

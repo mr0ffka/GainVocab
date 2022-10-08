@@ -1,9 +1,9 @@
-﻿using GainVocab.Core.Interfaces;
-using GainVocab.Core.Models.Users;
+﻿using GainVocab.API.Core.Interfaces;
+using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GainVocab.API.Controllers
+namespace GainVocab.API.App.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Data.Configurations
+namespace GainVocab.API.Data.Configurations
 {
     public class RoleConfiguration : IEntityTypeConfiguration<IdentityRole>
     {

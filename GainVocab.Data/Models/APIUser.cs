@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Data.Models
+namespace GainVocab.API.Data.Models
 {
     public class APIUser : IdentityUser
     {

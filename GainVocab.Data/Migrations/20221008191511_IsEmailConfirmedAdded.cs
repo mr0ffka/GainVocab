@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace GainVocab.Data.Migrations
+namespace GainVocab.API.Data.Migrations
 {
     public partial class IsEmailConfirmedAdded : Migration
     {

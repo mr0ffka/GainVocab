@@ -3,13 +3,13 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Diagnostics.Metrics;
-using GainVocab.Core.Interfaces;
-using GainVocab.Core.Exceptions;
-using GainVocab.Core.Models.Pager;
-using GainVocab.Core.Models.Core;
-using GainVocab.Data;
+using GainVocab.API.Core.Interfaces;
+using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Models.Pager;
+using GainVocab.API.Core.Models.Core;
+using GainVocab.API.Data;
 
-namespace GainVocab.Core.Repository
+namespace GainVocab.API.Core.Repository
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

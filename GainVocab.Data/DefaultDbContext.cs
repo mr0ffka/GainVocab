@@ -1,5 +1,5 @@
-﻿using GainVocab.Data.Configurations;
-using GainVocab.Data.Models;
+﻿using GainVocab.API.Data.Configurations;
+using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Data
+namespace GainVocab.API.Data
 {
     public class DefaultDbContext : IdentityDbContext<APIUser>
     {

@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using System.ComponentModel.DataAnnotations;
 
-namespace GainVocab.Core.Extensions
+namespace GainVocab.API.Core.Extensions
 {
     public static class Validation
     {

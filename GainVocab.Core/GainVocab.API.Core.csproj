@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GainVocab.Data\GainVocab.Data.csproj" />
+    <ProjectReference Include="..\GainVocab.Data\GainVocab.API.Data.csproj" />
   </ItemGroup>
 
 </Project>

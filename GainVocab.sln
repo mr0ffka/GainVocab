@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.32922.545
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GainVocab.API", "GainVocab.API\GainVocab.API.csproj", "{7170CDFC-72BF-430E-8937-62B2D0740563}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GainVocab.API.App", "GainVocab.API\GainVocab.API.App.csproj", "{7170CDFC-72BF-430E-8937-62B2D0740563}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GainVocab.Data", "GainVocab.Data\GainVocab.Data.csproj", "{3DC76525-F9A8-478D-AD40-26BEBF0D8019}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GainVocab.API.Data", "GainVocab.Data\GainVocab.API.Data.csproj", "{3DC76525-F9A8-478D-AD40-26BEBF0D8019}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GainVocab.Core", "GainVocab.Core\GainVocab.Core.csproj", "{E52A3D98-2CFD-4505-96CE-73EB73F1EED7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GainVocab.API.Core", "GainVocab.Core\GainVocab.API.Core.csproj", "{E52A3D98-2CFD-4505-96CE-73EB73F1EED7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

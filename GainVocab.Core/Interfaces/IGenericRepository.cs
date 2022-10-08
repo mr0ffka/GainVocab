@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GainVocab.Core.Models;
-using GainVocab.Core.Models.Core;
-using GainVocab.Core.Models.Pager;
+using GainVocab.API.Core.Models;
+using GainVocab.API.Core.Models.Core;
+using GainVocab.API.Core.Models.Pager;
 
-namespace GainVocab.Core.Interfaces
+namespace GainVocab.API.Core.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {

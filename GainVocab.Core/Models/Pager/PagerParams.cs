@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GainVocab.Core.Models.Pager
+namespace GainVocab.API.Core.Models.Pager
 {
     public class PagerParams
     {
