@@ -2,17 +2,20 @@
 using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
-    public class AccountController : ControllerBase
+    public class AuthController : ControllerBase
     {
         private readonly IAuthManager _authManager;
-        private readonly ILogger<AccountController> _logger;
+        private readonly ILogger<AuthController> _logger;
 
-        public AccountController(IAuthManager authManager, ILogger<AccountController> logger)
+        public AuthController(IAuthManager authManager, ILogger<AuthController> logger)
         {
             this._authManager = authManager;
             this._logger = logger;
@@ -47,7 +50,7 @@ namespace GainVocab.API.App.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> Login([FromBody] LoginModel loginModel)
+        public async Task<ActionResult<FrontUserModel>> Login([FromBody] LoginModel loginModel)
         {
             _logger.LogInformation($"Login Attempt for {loginModel.Email} ");
             var authResponse = await _authManager.Login(loginModel);
@@ -57,13 +60,38 @@ namespace GainVocab.API.App.Controllers
                 return Unauthorized();
             }
 
-            return Ok(authResponse);
+            //Response.Cookies.Append("X-Logged-In", true, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+
+            return Ok(new
+            {
+                status = "Success",
+                user = new FrontUserModel
+                {
+                    Id = authResponse.UserId,
+                    Email = loginModel.Email,
+                    IsAuthenticated = true,
+                    IsAdmin = authResponse.Roles.Any(r => r == Enum.GetName(typeof(UserRoles), UserRoles.Administrator)),
+                    Roles = authResponse.Roles,
+                }
+            });
 
         }
 
-        // POST: api/Account/refreshtoken
+        [HttpGet("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult> Logout()
+        {
+            Response.Cookies.Append("X-Access-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
+            //Response.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append("X-Refresh-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
+
+            return Ok();
+        }
+
         [HttpPost]
-        [Route("refreshtoken")]
+        [Route("refresh")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -76,7 +104,11 @@ namespace GainVocab.API.App.Controllers
                 return Unauthorized();
             }
 
-            return Ok(authResponse);
+            Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict});
+            //Response.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict});
+
+            return Ok();
         }
     }
 }

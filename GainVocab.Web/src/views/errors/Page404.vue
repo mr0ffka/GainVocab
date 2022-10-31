@@ -2,8 +2,9 @@
 </script>
 
 <template>
-Not found 404
+    <p>404</p>
 </template>
 
 <style scoped>
+
 </style>

@@ -9,7 +9,7 @@ using GainVocab.API.Core.Models.Pager;
 
 namespace GainVocab.API.Core.Interfaces
 {
-    public interface IGenericRepository<T> where T : class
+    public interface IGenericService<T> where T : class
     {
         Task<T> GetAsync(int? id);
         Task<TResult> GetAsync<TResult>(int? id);

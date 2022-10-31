@@ -15,9 +15,9 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Configuration.AddJsonFile("secret.json", optional: false, reloadOnChange: true);
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultDatabase");
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
 
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<DefaultDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
 
@@ -60,36 +60,60 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-builder.Services.AddCors(options => 
-{
-    options.AddPolicy("AllowAll",
-        b => b.AllowAnyHeader()
-            .AllowAnyOrigin()
-            .AllowAnyMethod());
-});
+builder.Services.AddCors();
 
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
-builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 
 builder.Services.AddAuthentication(options => 
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // "Bearer"
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options => {
-    options.TokenValidationParameters = new TokenValidationParameters
+})
+.AddCookie()
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        ValidateIssuer = true,
+        ValidateActor = false,
         ValidateAudience = true,
         ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero,
+        ValidateIssuerSigningKey = true,
+        ValidateIssuer = true,
         ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
         ValidAudience = builder.Configuration["JwtSettings:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]))
     };
+    options.Events = new JwtBearerEvents();
+    options.Events.OnMessageReceived = context =>
+    {
+
+        if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+        {
+            context.Token = context.Request.Cookies["X-Access-Token"];
+        }
+
+        return Task.CompletedTask;
+    };
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "X-Access-Token";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+    options.SlidingExpiration = true;
+});
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.Name = "X-Refresh-Token";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
+    options.SlidingExpiration = true;
 });
 
 builder.Services.AddResponseCaching(options =>
@@ -109,11 +133,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseMiddleware<ExceptionMiddleware>();
+//app.UseHttpsRedirection();
 
-app.UseHttpsRedirection();
-
-app.UseCors("AllowAll");
+app.UseCors(builder =>
+{
+    builder
+    .WithOrigins(new string[] { "http://localhost:4000", "http://localhost:4001" })
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .AllowCredentials();
+});
 
 app.UseResponseCaching();
 
@@ -136,5 +165,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseMiddleware<ExceptionMiddleware>();
 
 app.Run();

@@ -11,12 +11,12 @@ using GainVocab.API.Data;
 
 namespace GainVocab.API.Core.Repository
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericService<T> : IGenericService<T> where T : class
     {
         private readonly DefaultDbContext _context;
         private readonly IMapper _mapper;
 
-        public GenericRepository(DefaultDbContext context, IMapper mapper)
+        public GenericService(DefaultDbContext context, IMapper mapper)
         {
             this._context = context;
             this._mapper = mapper;

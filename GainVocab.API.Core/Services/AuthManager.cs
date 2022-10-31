@@ -59,7 +59,8 @@ namespace GainVocab.API.Core.Repository
             {
                 Token = token,
                 UserId = _user.Id,
-                RefreshToken = await CreateRefreshToken()
+                Roles = (await _userManager.GetRolesAsync(_user)).ToList(),
+                RefreshToken = await CreateRefreshToken(),
             };
         }
 
