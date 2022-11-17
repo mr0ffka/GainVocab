@@ -353,3 +353,4 @@ secret.json
 
 .vscode
 .logs
+GainVocab.Web/.env

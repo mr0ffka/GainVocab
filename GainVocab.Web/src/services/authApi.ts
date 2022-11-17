@@ -3,6 +3,7 @@ import type {
     GenericResponse,
     ILoginModel,
     ILoginResponse,
+    IOAuthLoginModel,
     IRegisterModel,
     IUser,
     IUserResponse,
@@ -36,13 +37,16 @@ export const refreshAccessTokenFn = async () => {
 //     }
 // );
 
-export const signUpUserFn = async (user: IRegisterModel) => {
-    const response = await authApi.post<GenericResponse>('auth/register', user);
-    return response.data;
+export const registerUserFn = async (user: IRegisterModel) => {
+    return (await authApi.post<IUserResponse>('auth/register', user)).data;
 };
 
 export const loginUserFn = async (user: ILoginModel) => {
     return (await authApi.post<IUserResponse>('auth/login', user)).data;
+};
+
+export const oAuthGoogleLoginFn = async (oauth: IOAuthLoginModel) => {
+    return (await authApi.post<IUserResponse>('auth/googleLogin', oauth)).data;
 };
 
 export const verifyEmailFn = async (verificationCode: string) => {

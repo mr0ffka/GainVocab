@@ -1,7 +1,7 @@
 using GainVocab.API.Core.Configurations;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Middleware;
-using GainVocab.API.Core.Repository;
+using GainVocab.API.Core.Services;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -21,8 +21,8 @@ var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 builder.Services.AddEntityFrameworkNpgsql().AddDbContext<DefaultDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
 
-builder.Services.AddIdentityCore<APIUser>()
-    .AddRoles<IdentityRole>()
+builder.Services.AddIdentity<APIUser, IdentityRole>()
+    //.AddRoles<IdentityRole>()
     .AddTokenProvider<DataProtectorTokenProvider<APIUser>>(builder.Configuration["JwtSettings:Issuer"])
     .AddEntityFrameworkStores<DefaultDbContext>()
     .AddDefaultTokenProviders();

@@ -21,16 +21,22 @@ export interface ILoginModel {
     password: string;
 }
 
+export interface IOAuthLoginModel {
+    token: string;
+    provider: string;
+}
+
 export interface ILoginResponse {
     status: string;
-    access_token: string;
+    accessToken: string;
 }
 
 export interface IRegisterModel {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
     password: string;
-    password_confirm: string;
+    passwordConfirm: string;
 }
 
 export interface IRegisterResponse {

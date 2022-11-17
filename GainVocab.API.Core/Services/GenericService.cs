@@ -9,7 +9,7 @@ using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Core.Models.Core;
 using GainVocab.API.Data;
 
-namespace GainVocab.API.Core.Repository
+namespace GainVocab.API.Core.Services
 {
     public class GenericService<T> : IGenericService<T> where T : class
     {

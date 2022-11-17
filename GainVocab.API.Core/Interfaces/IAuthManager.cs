@@ -5,14 +5,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Auth;
 
 namespace GainVocab.API.Core.Interfaces
 {
     public interface IAuthManager
     {
-        Task<IEnumerable<IdentityError>> Register(RegistrationModel userModel);
-        Task<AuthResponseModel> Login(LoginModel loginDto);
+        Task<IEnumerable<IdentityError>> Register(RegisterModel userModel);
+        Task<AuthResponseModel> Login(LoginModel model);
+        Task Logout();
         Task<string> CreateRefreshToken();
         Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request);
+        Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel);
     }
 }

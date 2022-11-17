@@ -12,7 +12,7 @@ namespace GainVocab.API.Core.Configurations
         public MapperConfig()
         {
             CreateMap<APIUserModel, APIUser>().ReverseMap();
-            CreateMap<RegistrationModel, APIUser>().ReverseMap();
+            CreateMap<RegisterModel, APIUser>().ReverseMap();
         }
     }
 }
