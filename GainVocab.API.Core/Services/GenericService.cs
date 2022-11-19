@@ -13,30 +13,30 @@ namespace GainVocab.API.Core.Services
 {
     public class GenericService<T> : IGenericService<T> where T : class
     {
-        private readonly DefaultDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly DefaultDbContext Context;
+        private readonly IMapper Mapper;
 
         public GenericService(DefaultDbContext context, IMapper mapper)
         {
-            this._context = context;
-            this._mapper = mapper;
+            this.Context = context;
+            this.Mapper = mapper;
         }
 
         public async Task<T> AddAsync(T entity)
         {
-            await _context.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await Context.AddAsync(entity);
+            await Context.SaveChangesAsync();
             return entity;
         }
 
         public async Task<TResult> AddAsync<TSource, TResult>(TSource source)
         {
-            var entity = _mapper.Map<T>(source);
+            var entity = Mapper.Map<T>(source);
 
-            await _context.AddAsync(entity);
-            await _context.SaveChangesAsync();
+            await Context.AddAsync(entity);
+            await Context.SaveChangesAsync();
 
-            return _mapper.Map<TResult>(entity);
+            return Mapper.Map<TResult>(entity);
         }
 
         public async Task DeleteAsync(int id)
@@ -48,8 +48,8 @@ namespace GainVocab.API.Core.Services
                 throw new NotFoundException(typeof(T).Name, id);
             }
 
-            _context.Set<T>().Remove(entity);
-            await _context.SaveChangesAsync();
+            Context.Set<T>().Remove(entity);
+            await Context.SaveChangesAsync();
         }
 
         public async Task<bool> Exists(int id)
@@ -60,16 +60,16 @@ namespace GainVocab.API.Core.Services
 
         public async Task<List<T>> GetAllAsync()
         {
-            return await _context.Set<T>().ToListAsync();
+            return await Context.Set<T>().ToListAsync();
         }
 
         public async Task<PagedResult<TResult>> GetAllAsync<TResult>(PagerParams pagerParams)
         {
-            var totalSize = await _context.Set<T>().CountAsync();
-            var items = await _context.Set<T>()
+            var totalSize = await Context.Set<T>().CountAsync();
+            var items = await Context.Set<T>()
                 .Skip(pagerParams.StartIndex)
                 .Take(pagerParams.PageSize)
-                .ProjectTo<TResult>(_mapper.ConfigurationProvider)
+                .ProjectTo<TResult>(Mapper.ConfigurationProvider)
                 .ToListAsync();
 
             return new PagedResult<TResult>
@@ -83,8 +83,8 @@ namespace GainVocab.API.Core.Services
 
         public async Task<List<TResult>> GetAllAsync<TResult>()
         {
-            return await _context.Set<T>()
-                .ProjectTo<TResult>(_mapper.ConfigurationProvider)
+            return await Context.Set<T>()
+                .ProjectTo<TResult>(Mapper.ConfigurationProvider)
                 .ToListAsync();
         }
 
@@ -95,24 +95,24 @@ namespace GainVocab.API.Core.Services
                 return null;
             }
 
-            return await _context.Set<T>().FindAsync(id);
+            return await Context.Set<T>().FindAsync(id);
         }
 
         public async Task<TResult> GetAsync<TResult>(int? id)
         {
-            var result = await _context.Set<T>().FindAsync(id);
+            var result = await Context.Set<T>().FindAsync(id);
             if (result is null)
             {
                 throw new NotFoundException(typeof(T).Name, id.HasValue ? id : "No Key Provided");
             }
 
-            return _mapper.Map<TResult>(result);
+            return Mapper.Map<TResult>(result);
         }
 
         public async Task UpdateAsync(T entity)
         {
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
+            Context.Update(entity);
+            await Context.SaveChangesAsync();
         }
 
         public async Task UpdateAsync<TSource>(int id, TSource source) where TSource : IBaseModel
@@ -129,9 +129,9 @@ namespace GainVocab.API.Core.Services
                 throw new NotFoundException(typeof(T).Name, id);
             }
 
-            _mapper.Map(source, entity);
-            _context.Update(entity);
-            await _context.SaveChangesAsync();
+            Mapper.Map(source, entity);
+            Context.Update(entity);
+            await Context.SaveChangesAsync();
         }
     }
 }

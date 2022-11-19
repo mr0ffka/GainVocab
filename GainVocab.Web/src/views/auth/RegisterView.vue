@@ -3,12 +3,9 @@ import { onBeforeUpdate, reactive, ref } from 'vue';
 import { loginUserFn, registerUserFn } from '@/services/authApi';
 import type { IRegisterModel } from '@/services/types';
 import { ElMessage, FormInstance } from 'element-plus';
-import { UserRolesEnum } from '@/helpers/enums/UserRolesEnum';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query';
 import router from '@/router';
 import { IUserResponse } from '@/services/types';
-import { useAuthUser } from '@/services/authQueries';
-import { CallbackTypes, GoogleLogin } from 'vue3-google-login';
 
 const formRef = ref<FormInstance>();
 const queryClient = useQueryClient();
@@ -34,12 +31,14 @@ const loginMutation = useMutation(
     {
         onError: (error: any) => {
             let message = "";
-            console.log("dupa");
             if ((error as any).response.data.title != null) {
                 message = (error as any).response.data.title;
             }
-            else {
+            else if ((error as any).response.data[0] != null) {
                 message = (error as any).response.data[0].description;
+            }
+            else {
+                message = (error as any).response.data.ErrorMessage;
             }
             ElMessage({
                 showClose: true,
@@ -68,11 +67,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     await formEl.validate((valid, fields) => {
         if (valid) {
             loginMutation.mutate({
-                firstName: registerModel.first_name,
-                lastName: registerModel.last_name,
+                firstName: registerModel.firstName,
+                lastName: registerModel.lastName,
                 email: registerModel.email,
                 password: registerModel.password,
-                passwordConfirm: registerModel.password_confirm,
+                passwordConfirm: registerModel.passwordConfirm,
             });
         } else {
             console.log('error submit!', fields)
@@ -88,11 +87,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             <el-form label-position="top" ref="formRef" :model="registerModel" class="text-right" :rules="rules">
                 <el-form-item prop="email">
                     <label for="Email">First name</label>
-                    <el-input v-model="registerModel.first_name" placeholder="First name" clearable size="large" />
+                    <el-input v-model="registerModel.firstName" placeholder="First name" clearable size="large" />
                 </el-form-item>
                 <el-form-item prop="email">
                     <label for="Email">Last name</label>
-                    <el-input v-model="registerModel.last_name" placeholder="Last name" clearable size="large" />
+                    <el-input v-model="registerModel.lastName" placeholder="Last name" clearable size="large" />
                 </el-form-item>
                 <el-form-item prop="email">
                     <label for="Email">Email</label>
@@ -103,9 +102,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
                     <el-input v-model="registerModel.password" type="password" placeholder="Password" show-password
                         size="large" />
                 </el-form-item>
-                <el-form-item class="text-lg" prop="password_confirm">
+                <el-form-item class="text-lg" prop="passwordConfirm">
                     <label>Password confirmation</label>
-                    <el-input v-model="registerModel.password_confirm" type="password" placeholder="Password"
+                    <el-input v-model="registerModel.passwordConfirm" type="password" placeholder="Password"
                         show-password size="large" />
                 </el-form-item>
                 <el-button @click="submitForm(formRef)" class="">Register new account</el-button>

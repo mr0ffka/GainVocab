@@ -11,11 +11,12 @@ namespace GainVocab.API.Core.Interfaces
 {
     public interface IAuthManager
     {
-        Task<IEnumerable<IdentityError>> Register(RegisterModel userModel);
+        Task<IEnumerable<IdentityError>> Register(RegisterModel userModel, string emailConfirmationCallback);
         Task<AuthResponseModel> Login(LoginModel model);
         Task Logout();
         Task<string> CreateRefreshToken();
         Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request);
         Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel);
+        Task<IdentityResult> ConfirmEmailAddress(string userId, string code);
     }
 }

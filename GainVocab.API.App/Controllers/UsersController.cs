@@ -14,15 +14,15 @@ namespace GainVocab.API.App.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IAuthManager _authManager;
-        private readonly UserManager<APIUser> _userManager;
-        private readonly ILogger<UsersController> _logger;
+        private readonly IAuthManager AuthManager;
+        private readonly UserManager<APIUser> UserManager;
+        private readonly ILogger<UsersController> Logger;
 
         public UsersController(IAuthManager authManager, UserManager<APIUser> userManager, ILogger<UsersController> logger)
         {
-            this._authManager = authManager;
-            this._logger = logger;
-            this._userManager = userManager;
+            this.AuthManager = authManager;
+            this.Logger = logger;
+            this.UserManager = userManager;
         }
 
         [HttpGet]
@@ -32,10 +32,9 @@ namespace GainVocab.API.App.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<FrontUserModel>> GetMe()
         {
-            
             if (User.Identities.Any())
             {
-                _logger.LogInformation($"[api/users/me] {User.Identity.Name}");
+                Logger.LogInformation($"[api/users/me] {User.Identity.Name}");
 
                 var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
                 var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();

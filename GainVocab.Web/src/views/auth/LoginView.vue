@@ -27,9 +27,19 @@ const loginMutation = useMutation(
   (credentials: ILoginModel) => loginUserFn(credentials),
   {
     onError: (error: any) => {
+      let message = "";
+      if ((error as any).response.data.title != null) {
+        message = (error as any).response.data.title;
+      }
+      else if ((error as any).response.data[0] != null) {
+        message = (error as any).response.data[0].description;
+      }
+      else {
+        message = (error as any).response.data.ErrorMessage;
+      }
       ElMessage({
         showClose: true,
-        message: (error as any).response.data.title,
+        message: message,
         type: "error"
       });
     },

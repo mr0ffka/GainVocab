@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Interfaces;
-using GainVocab.API.Data;
 using GainVocab.API.Core.Models.Users;
+using GainVocab.API.Data.Models;
+using Google.Apis.Auth;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -9,21 +12,18 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using GainVocab.API.Data.Models;
-using Google.Apis.Auth;
-using GainVocab.API.Core.Exceptions;
-using Microsoft.AspNetCore.Authentication;
 
 namespace GainVocab.API.Core.Services
 {
     public class AuthManager : IAuthManager
     {
-        private readonly IMapper mapper;
-        private readonly UserManager<APIUser> userManager;
-        private readonly SignInManager<APIUser> signInManager;
-        private readonly IConfiguration configuration;
-        private readonly ILogger<AuthManager> logger;
-        private APIUser user;
+        private readonly IMapper Mapper;
+        private readonly UserManager<APIUser> UserManager;
+        private readonly SignInManager<APIUser> SignInManager;
+        private readonly IConfiguration Configuration;
+        private readonly IEmailService EmailService;
+        private readonly ILogger<AuthManager> Logger;
+        private APIUser User;
 
         private string loginProvider = "GainVocabApi";
         private const string refreshToken = "RefreshToken";
@@ -32,46 +32,48 @@ namespace GainVocab.API.Core.Services
             IMapper mapper, 
             UserManager<APIUser> userManager, 
             SignInManager<APIUser> signInManager, 
-            IConfiguration configuration, 
+            IConfiguration configuration,
+            IEmailService emailService,
             ILogger<AuthManager> logger)
         {
-            this.mapper = mapper;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.configuration = configuration;
-            this.logger = logger;
+            Mapper = mapper;
+            UserManager = userManager;
+            SignInManager = signInManager;
+            Configuration = configuration;
+            EmailService = emailService;
+            Logger = logger;
         }
 
         public async Task<string> CreateRefreshToken()
         {
-            await userManager.RemoveAuthenticationTokenAsync(user, loginProvider, refreshToken);
-            var newRefreshToken = await userManager.GenerateUserTokenAsync(user, loginProvider, refreshToken);
-            var result = await userManager.SetAuthenticationTokenAsync(user, loginProvider, refreshToken, newRefreshToken);
+            await UserManager.RemoveAuthenticationTokenAsync(User, loginProvider, refreshToken);
+            var newRefreshToken = await UserManager.GenerateUserTokenAsync(User, loginProvider, refreshToken);
+            var result = await UserManager.SetAuthenticationTokenAsync(User, loginProvider, refreshToken, newRefreshToken);
             return newRefreshToken;
         }
 
         private async Task<string> GenerateToken()
         {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]));
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:Key"]));
             var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddMinutes(double.Parse(configuration["JwtSettings:DurationInMinutes"]));
+            var expires = DateTime.UtcNow.AddMinutes(double.Parse(Configuration["JwtSettings:DurationInMinutes"]));
 
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = await UserManager.GetRolesAsync(User);
             var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
-            var userClaims = await userManager.GetClaimsAsync(user);
+            var userClaims = await UserManager.GetClaimsAsync(User);
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, User.Email),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("uid", user.Id),
+                new Claim(JwtRegisteredClaimNames.Email, User.Email),
+                new Claim("uid", User.Id),
             }
             .Union(userClaims).Union(roleClaims);
 
             var token = new JwtSecurityToken(
-                issuer: configuration["JwtSettings:Issuer"],
-                audience: configuration["JwtSettings:Audience"],
+                issuer: Configuration["JwtSettings:Issuer"],
+                audience: Configuration["JwtSettings:Audience"],
                 claims: claims,
                 expires: expires,
                 signingCredentials: credentials
@@ -82,27 +84,32 @@ namespace GainVocab.API.Core.Services
 
         public async Task<AuthResponseModel> Login(LoginModel model)
         {
-            user = await userManager.FindByEmailAsync(model.Email);
-            bool isValidUser = await userManager.CheckPasswordAsync(user, model.Password);
-            var result = await signInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
+            User = await UserManager.FindByEmailAsync(model.Email);
+            if (User == null) return null;
+            if (!User.EmailConfirmed)
+            {
+                throw new AuthException(AuthException.EmailNotConfirmed);
+            }
+            bool isValidUser = await UserManager.CheckPasswordAsync(User, model.Password);
+            var result = await SignInManager.PasswordSignInAsync(User, model.Password, model.RememberMe, true);
 
             if (!result.Succeeded)
             {
                 return null;
             }
-            if (await userManager.IsLockedOutAsync(user) && isValidUser)
+            if (await UserManager.IsLockedOutAsync(User) && isValidUser)
             {
                 throw new UnauthorizedAccessException("Locked Account");
             }
 
             var token = await GenerateToken();
             var refreshToken = await CreateRefreshToken();
-            var rolesUserList = (await userManager.GetRolesAsync(user)).ToList();
+            var rolesUserList = (await UserManager.GetRolesAsync(User)).ToList();
 
             return new AuthResponseModel
             {
                 Token = token,
-                UserId = user.Id,
+                UserId = User.Id,
                 Roles = rolesUserList,
                 RefreshToken = refreshToken,
             };
@@ -110,21 +117,24 @@ namespace GainVocab.API.Core.Services
 
         public async Task Logout()
         {
-            await signInManager.SignOutAsync();
+            await SignInManager.SignOutAsync();
         }
 
-        public async Task<IEnumerable<IdentityError>> Register(RegisterModel registrationModel)
+        public async Task<IEnumerable<IdentityError>> Register(RegisterModel registrationModel, string emailConfirmationCallback)
         {
-            user = mapper.Map<APIUser>(registrationModel);
-            user.UserName = registrationModel.Email;
-            user.IsEmailConfirmed = false;
+            User = Mapper.Map<APIUser>(registrationModel);
+            User.UserName = registrationModel.Email;
+            User.EmailConfirmed = false;
 
-            var result = await userManager.CreateAsync(user, registrationModel.Password);
+            var result = await UserManager.CreateAsync(User, registrationModel.Password);
 
             if (result.Succeeded)
             {
-                await userManager.AddToRoleAsync(user, "User");
+                await UserManager.AddToRoleAsync(User, "User");
             }
+
+            if (!result.Errors.Any())
+                await EmailService.SendEmailConfirmation(User, emailConfirmationCallback);
 
             return result.Errors;
         }
@@ -134,14 +144,14 @@ namespace GainVocab.API.Core.Services
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
             var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
-            user = await userManager.FindByNameAsync(username);
+            User = await UserManager.FindByNameAsync(username);
 
-            if (user == null || user.Id != request.UserId)
+            if (User == null || User.Id != request.UserId)
             {
                 return null;
             }
 
-            var isValidRefreshToken = await userManager.VerifyUserTokenAsync(user, loginProvider, refreshToken, request.RefreshToken);
+            var isValidRefreshToken = await UserManager.VerifyUserTokenAsync(User, loginProvider, refreshToken, request.RefreshToken);
 
             if (isValidRefreshToken)
             {
@@ -149,12 +159,12 @@ namespace GainVocab.API.Core.Services
                 return new AuthResponseModel
                 {
                     Token = token,
-                    UserId = user.Id,
+                    UserId = User.Id,
                     RefreshToken = await CreateRefreshToken()
                 };
             }
 
-            await userManager.UpdateSecurityStampAsync(user);
+            await UserManager.UpdateSecurityStampAsync(User);
             return null;
         }
 
@@ -167,21 +177,21 @@ namespace GainVocab.API.Core.Services
             }
             var info = new UserLoginInfo(oauthModel.Provider, payload.Subject, oauthModel.Provider);
 
-            var user = await userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+            var user = await UserManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
 
             if (user == null)
             {
-                user = await userManager.FindByEmailAsync(payload.Email);
+                user = await UserManager.FindByEmailAsync(payload.Email);
                 if (user == null)
                 {
                     user = new APIUser { Email = payload.Email, UserName = payload.Email, LastName = payload.FamilyName, FirstName = payload.GivenName };
 
-                    await userManager.CreateAsync(user);
-                    await userManager.AddLoginAsync(user, info);
+                    await UserManager.CreateAsync(user);
+                    await UserManager.AddLoginAsync(user, info);
                 }
                 else
                 {
-                    await userManager.AddLoginAsync(user, info);
+                    await UserManager.AddLoginAsync(user, info);
                 }
             }
             if (user == null)
@@ -189,7 +199,7 @@ namespace GainVocab.API.Core.Services
 
             var token = await GenerateToken();
             var refreshToken = await CreateRefreshToken();
-            var rolesUserList = (await userManager.GetRolesAsync(user)).ToList();
+            var rolesUserList = (await UserManager.GetRolesAsync(user)).ToList();
 
             return new AuthResponseModel
             {
@@ -206,7 +216,7 @@ namespace GainVocab.API.Core.Services
             {
                 var settings = new GoogleJsonWebSignature.ValidationSettings()
                 {
-                    Audience = new List<string>() { configuration["OAuth2Settings:Google:ClientId"] }
+                    Audience = new List<string>() { Configuration["OAuth2Settings:Google:ClientId"] }
                 };
                 var payload = await GoogleJsonWebSignature.ValidateAsync(oauthModel.Token, settings);
                 return payload;
@@ -219,12 +229,21 @@ namespace GainVocab.API.Core.Services
 
         public AuthenticationProperties ConfigureExternalAuthProp(string provider, string redirectUrl)
         {
-            return signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
         }
         public async Task<ExternalLoginInfo> GetExternalLoginInfo()
         {
-            return await signInManager.GetExternalLoginInfoAsync();
+            return await SignInManager.GetExternalLoginInfoAsync();
 
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAddress(string userId, string code)
+        {
+            var user = await UserManager.FindByIdAsync(userId);
+            if (user == null)
+                return IdentityResult.Failed();
+
+            return await UserManager.ConfirmEmailAsync(user, code);
         }
     }
 }

@@ -10,6 +10,7 @@ namespace GainVocab.API.Core.Exceptions
     {
         public const string InvalidCode = "Invalid code";
         public const string UserAlreadyExist = "User already exist";
+        public const string EmailNotConfirmed = "Email address is not confirmed!";
 
         public AuthException(string message) : base(message)
         {

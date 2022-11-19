@@ -16,10 +16,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultDatabase");
+var allowedOrigins = builder.Configuration.GetSection("AllowOrigins");
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 
-builder.Services.AddEntityFrameworkNpgsql().AddDbContext<DefaultDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
+builder.Services.AddDbContext<DefaultDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
 
 builder.Services.AddIdentity<APIUser, IdentityRole>()
     //.AddRoles<IdentityRole>()
@@ -67,6 +68,7 @@ builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration
 builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped<IAuthManager, AuthManager>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddAuthentication(options => 
 {
@@ -133,7 +135,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
 
 app.UseCors(builder =>
 {
@@ -159,6 +160,8 @@ app.Use(async (context, next) =>
 
     await next();
 });
+
+// app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
