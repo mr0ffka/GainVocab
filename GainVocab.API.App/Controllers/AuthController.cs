@@ -32,8 +32,7 @@ namespace GainVocab.API.App.Controllers
         {
             Logger.LogInformation($"Registration Attempt for {registrationModel.Email}");
 
-            var emailConfirmationCallback = Request.Scheme + "://" + Request.Host + Url.Action("ConfirmEmail");
-            var errors = await AuthManager.Register(registrationModel, emailConfirmationCallback);
+            var errors = await AuthManager.Register(registrationModel);
 
             if (errors.Any())
             {
@@ -48,7 +47,7 @@ namespace GainVocab.API.App.Controllers
         [Route("verifyemail")]
         public async Task<ActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
         {
-            if (userId == null || code == null)
+                if (userId == null || code == null)
             {
                 return BadRequest("Invalid email confirmation url");
             }

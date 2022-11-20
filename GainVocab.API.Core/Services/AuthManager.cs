@@ -120,7 +120,7 @@ namespace GainVocab.API.Core.Services
             await SignInManager.SignOutAsync();
         }
 
-        public async Task<IEnumerable<IdentityError>> Register(RegisterModel registrationModel, string emailConfirmationCallback)
+        public async Task<IEnumerable<IdentityError>> Register(RegisterModel registrationModel)
         {
             User = Mapper.Map<APIUser>(registrationModel);
             User.UserName = registrationModel.Email;
@@ -134,7 +134,7 @@ namespace GainVocab.API.Core.Services
             }
 
             if (!result.Errors.Any())
-                await EmailService.SendEmailConfirmation(User, emailConfirmationCallback);
+                await EmailService.SendEmailConfirmation(User);
 
             return result.Errors;
         }

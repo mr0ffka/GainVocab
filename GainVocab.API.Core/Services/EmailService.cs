@@ -8,6 +8,8 @@ using MimeKit.Text;
 using Microsoft.AspNetCore.Identity;
 using GainVocab.API.Data.Models;
 using Microsoft.EntityFrameworkCore.Migrations.Internal;
+using System.Security.Policy;
+using System.Web;
 
 namespace GainVocab.API.Core.Services
 {
@@ -37,14 +39,14 @@ namespace GainVocab.API.Core.Services
             smtp.Disconnect(true);
         }
 
-        public async Task SendEmailConfirmation(APIUser user, string callbackUrl)
+        public async Task SendEmailConfirmation(APIUser user)
         {
             var model = new EmailSendModel();
 
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(user);
-            var emailBody = "Please confirm your email address <a href=\"#URL#\">Click here!</a>";
-            var link = callbackUrl + "code=" + code;
-            var body = emailBody.Replace("#URL#", System.Text.Encodings.Web.HtmlEncoder.Default.Encode(link));
+            var code = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(user));
+            var emailBody = "Please confirm your email address <a target=\"_blank\" href=\"#URL#\">Click here!</a>";
+            var link = Configuration["OriginUrl"] + "/auth/verifyemail?userid=" + user.Id + "&code=" + code;
+            var body = emailBody.Replace("#URL#", link);
 
             model.To = user.Email;
             model.Subject = "GainVocab: Email confirmation";

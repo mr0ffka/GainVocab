@@ -1,4 +1,5 @@
 export interface GenericResponse {
+    succeeded: any;
     status: string;
     message: string;
 }

@@ -7,6 +7,6 @@ namespace GainVocab.API.Core.Interfaces
     {
         void SendEmail(EmailSendModel request);
 
-        Task SendEmailConfirmation(APIUser user, string callbackUrl);
+        Task SendEmailConfirmation(APIUser user);
     }
 }

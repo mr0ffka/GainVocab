@@ -1,4 +1,6 @@
 import axios from 'axios';
+import merge from 'lodash/merge';
+
 import type {
     GenericResponse,
     ILoginModel,
@@ -49,10 +51,13 @@ export const oAuthGoogleLoginFn = async (oauth: IOAuthLoginModel) => {
     return (await authApi.post<IUserResponse>('auth/googleLogin', oauth)).data;
 };
 
-export const verifyEmailFn = async (verificationCode: string) => {
-    const response = await authApi.get<GenericResponse>(
-        `auth/verifyemail/${verificationCode}`
-    );
+export const verifyEmailFn = async (userId: string, verificationCode: string) => {
+    const response = await authApi.get<GenericResponse>('auth/verifyemail', {
+        params: {
+            userId: userId,
+            code: verificationCode
+        }
+    });
     return response.data;
 };
 
