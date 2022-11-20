@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Web;
 
 namespace GainVocab.API.Core.Services
 {
@@ -86,15 +87,16 @@ namespace GainVocab.API.Core.Services
         {
             User = await UserManager.FindByEmailAsync(model.Email);
             if (User == null) return null;
-            if (!User.EmailConfirmed)
-            {
-                throw new AuthException(AuthException.EmailNotConfirmed);
-            }
+
             bool isValidUser = await UserManager.CheckPasswordAsync(User, model.Password);
             var result = await SignInManager.PasswordSignInAsync(User, model.Password, model.RememberMe, true);
 
             if (!result.Succeeded)
             {
+                if (isValidUser && !User.EmailConfirmed)
+                {
+                    throw new UnauthorizedAccessException(AuthException.EmailNotConfirmed);
+                }
                 return null;
             }
             if (await UserManager.IsLockedOutAsync(User) && isValidUser)
@@ -134,7 +136,10 @@ namespace GainVocab.API.Core.Services
             }
 
             if (!result.Errors.Any())
-                await EmailService.SendEmailConfirmation(User);
+            {
+                var emailVerificationCode = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(User));
+                await EmailService.SendEmailConfirmationEmail(User, emailVerificationCode);
+            }
 
             return result.Errors;
         }
@@ -244,6 +249,27 @@ namespace GainVocab.API.Core.Services
                 return IdentityResult.Failed();
 
             return await UserManager.ConfirmEmailAsync(user, code);
+        }
+
+        public async Task<IdentityResult> ForgotPassword(string email)
+        {
+            var user = await UserManager.FindByEmailAsync(email);
+            if (user == null)
+                return IdentityResult.Failed();
+
+            var forgorPasswordCode = HttpUtility.UrlEncode(await UserManager.GeneratePasswordResetTokenAsync(user));
+            await EmailService.SendForgotPasswordEmail(user, forgorPasswordCode);
+
+            return IdentityResult.Success;
+        }
+
+        public async Task<IdentityResult> ResetPassword(ResetPasswordModel resetPassword)
+        {
+            var user = await UserManager.FindByIdAsync(resetPassword.UserId);
+            if (user == null)
+                return IdentityResult.Failed();
+
+            return await UserManager.ResetPasswordAsync(user, resetPassword.ResetToken, resetPassword.NewPassword);
         }
     }
 }

@@ -18,5 +18,7 @@ namespace GainVocab.API.Core.Interfaces
         Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request);
         Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel);
         Task<IdentityResult> ConfirmEmailAddress(string userId, string code);
+        Task<IdentityResult> ForgotPassword(string email);
+        Task<IdentityResult> ResetPassword(ResetPasswordModel resetPasswordModel);
     }
 }

@@ -1,11 +1,6 @@
 ﻿using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Users;
-using GainVocab.API.Core.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
 {
@@ -47,7 +42,7 @@ namespace GainVocab.API.App.Controllers
         [Route("verifyemail")]
         public async Task<ActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string code)
         {
-                if (userId == null || code == null)
+            if (userId == null || code == null)
             {
                 return BadRequest("Invalid email confirmation url");
             }
@@ -57,7 +52,7 @@ namespace GainVocab.API.App.Controllers
             return Ok(status);
         }
 
-            // POST: api/Account/login
+        // POST: api/Account/login
         [HttpPost]
         [Route("login")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -73,7 +68,6 @@ namespace GainVocab.API.App.Controllers
                 return Unauthorized();
             }
 
-            //Response.Cookies.Append("X-Logged-In", true, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
@@ -96,10 +90,9 @@ namespace GainVocab.API.App.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult> Logout()
         {
-            AuthManager.Logout();
+            await AuthManager.Logout();
 
             Response.Cookies.Append("X-Access-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
-            //Response.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
 
             return Ok();
@@ -120,7 +113,6 @@ namespace GainVocab.API.App.Controllers
             }
 
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            //Response.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
             return Ok();
@@ -152,6 +144,29 @@ namespace GainVocab.API.App.Controllers
                     Roles = authResponse.Roles,
                 }
             });
+        }
+
+        [HttpPost]
+        [Route("forgotpassword")]
+        public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            if (model == null)
+            {
+                return BadRequest();
+            }
+
+            var status = await AuthManager.ForgotPassword(model.Email);
+
+            return Ok(status);
+        }
+
+        [HttpPost]
+        [Route("resetpassword")]
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordModel resetPassword)
+        {
+            var status = await AuthManager.ResetPassword(resetPassword);
+
+            return Ok(status);
         }
     }
 }

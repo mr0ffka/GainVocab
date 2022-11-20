@@ -19,11 +19,19 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultDatabas
 var allowedOrigins = builder.Configuration.GetSection("AllowOrigins");
 var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-
 builder.Services.AddDbContext<DefaultDbContext>(optionsBuilder => optionsBuilder.UseNpgsql(connectionString));
 
-builder.Services.AddIdentity<APIUser, IdentityRole>()
-    //.AddRoles<IdentityRole>()
+builder.Services.AddIdentity<APIUser, IdentityRole>(options =>
+    {
+        options.Password.RequiredLength = 8;
+        options.Password.RequireDigit = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireNonAlphanumeric = true;
+        options.SignIn.RequireConfirmedEmail = true;
+        options.Lockout.MaxFailedAccessAttempts = 5;
+        options.Lockout.AllowedForNewUsers = true;
+    })
     .AddTokenProvider<DataProtectorTokenProvider<APIUser>>(builder.Configuration["JwtSettings:Issuer"])
     .AddEntityFrameworkStores<DefaultDbContext>()
     .AddDefaultTokenProviders();

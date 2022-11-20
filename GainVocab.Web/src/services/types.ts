@@ -20,6 +20,7 @@ export interface IUserResponse {
 export interface ILoginModel {
     email: string;
     password: string;
+    rememberMe: boolean;
 }
 
 export interface IOAuthLoginModel {
@@ -43,4 +44,15 @@ export interface IRegisterModel {
 export interface IRegisterResponse {
     status: string;
     message: string;
+}
+
+export interface IForgotPasswordModel {
+    email: string;
+}
+
+export interface IResetPasswordModel {
+    userId: string;
+    resetToken: string;
+    newPassword: string;
+    newPasswordConfirm: string;
 }

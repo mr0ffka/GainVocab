@@ -16,7 +16,7 @@ const registerModel: IRegisterModel = reactive({
     email: "",
     password: "",
     passwordConfirm: "",
-})
+});
 
 const rules = reactive({
     firstName: [{ required: true, message: "First name is required" }],

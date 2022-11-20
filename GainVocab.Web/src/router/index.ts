@@ -58,13 +58,16 @@ const routes: Array<RouteRecordRaw> = [
                 name: 'verifyemail',
                 path: 'verifyemail',
                 component: () => import("../views/auth/VerifyEmailView.vue"),
-                children: [
-                    {
-                        name: 'verifyemail',
-                        path: ':verificationCode',
-                        component: () => import("../views/auth/VerifyEmailView.vue")
-                    },
-                ],
+            },
+            {
+                name: 'resetpassword',
+                path: 'resetpassword',
+                component: () => import("../views/auth/ResetPasswordView.vue"),
+            },
+            {
+                name: 'forgotpassword',
+                path: 'forgotpassword',
+                component: () => import("../views/auth/ForgotPasswordView.vue"),
             },
         ]
     },
@@ -97,7 +100,7 @@ router.beforeEach(
         from: RouteLocationNormalized,
         next: NavigationGuardNext
     ) => {
-        
+
         if (!to.meta.middleware) {
             return next();
         }

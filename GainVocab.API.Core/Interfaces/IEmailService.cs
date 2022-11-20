@@ -6,7 +6,7 @@ namespace GainVocab.API.Core.Interfaces
     public interface IEmailService
     {
         void SendEmail(EmailSendModel request);
-
-        Task SendEmailConfirmation(APIUser user);
+        Task SendEmailConfirmationEmail(APIUser user, string code);
+        Task SendForgotPasswordEmail(APIUser user, string code);
     }
 }

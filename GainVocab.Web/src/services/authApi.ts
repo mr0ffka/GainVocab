@@ -3,12 +3,14 @@ import merge from 'lodash/merge';
 
 import type {
     GenericResponse,
+    IResetPasswordModel,
     ILoginModel,
     ILoginResponse,
     IOAuthLoginModel,
     IRegisterModel,
     IUser,
     IUserResponse,
+    IForgotPasswordModel,
 } from './types';
 
 const authApi = axios.create({
@@ -59,6 +61,14 @@ export const verifyEmailFn = async (userId: string, verificationCode: string) =>
         }
     });
     return response.data;
+};
+
+export const resetPasswordFn = async (form: IResetPasswordModel) => {
+    return (await authApi.post<GenericResponse>('auth/resetpassword', form)).data;
+};
+
+export const forgotPasswordFn = async (model: IForgotPasswordModel) => {
+    return (await authApi.post<GenericResponse>('auth/forgotpassword', model)).data;
 };
 
 export const logoutUserFn = async () => {
