@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Google.Apis.Auth;
+using GainVocab.API.Data.Models;
 
 namespace GainVocab.API.Core.Interfaces
 {
@@ -14,7 +15,6 @@ namespace GainVocab.API.Core.Interfaces
         Task<IEnumerable<IdentityError>> Register(RegisterModel userModel);
         Task<AuthResponseModel> Login(LoginModel model);
         Task Logout();
-        Task<string> CreateRefreshToken();
         Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request);
         Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel);
         Task<IdentityResult> ConfirmEmailAddress(string userId, string code);

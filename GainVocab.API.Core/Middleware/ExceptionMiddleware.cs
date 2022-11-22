@@ -1,11 +1,14 @@
 ﻿using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+using System.Text.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
+using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,61 +16,36 @@ namespace GainVocab.API.Core.Middleware
 {
     public class ExceptionMiddleware
     {
-        private readonly RequestDelegate _next;
-        private readonly ILogger<ExceptionMiddleware> _logger;
+        private readonly RequestDelegate Next;
+        private readonly IExceptionHandler ExceptionHandler;
+        private readonly ILogger<ExceptionMiddleware> Logger;
 
-        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+        public ExceptionMiddleware(RequestDelegate next, IExceptionHandler exceptionHandler, ILogger<ExceptionMiddleware> logger)
         {
-            this._next = next;
-            this._logger = logger;
+            this.Next = next;
+            this.ExceptionHandler = exceptionHandler;
+            this.Logger = logger;
         }
 
-        public async Task InvokeAsync(HttpContext context)
+        public async Task InvokeAsync(HttpContext httpContext)
         {
             try
             {
-                await _next(context);
+                await Next(httpContext);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Something Went wrong while processing {context.Request.Path}");
-                await HandleExceptionAsync(context, ex);
+                Logger.LogError(ex, $"Something Went wrong while processing {httpContext.Request.Path}");
+                var error = await ExceptionHandler.HandleException(ex);
+                if (!httpContext.Response.HasStarted)
+                {
+                    httpContext.Response.Clear();
+                    httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+                    httpContext.Response.StatusCode = (int)error.StatusCode;
+                    await httpContext.Response.WriteAsync(JsonSerializer.Serialize(
+                        error));
+                }
             }
         }
-
-        private Task HandleExceptionAsync(HttpContext context, Exception ex)
-        {
-            context.Response.ContentType = "application/json";
-            HttpStatusCode statusCode = HttpStatusCode.InternalServerError;
-            var errorDetails = new ErrorDeatils
-            {
-                ErrorType = "Failure",
-                ErrorMessage = ex.Message,
-            };
-
-            switch (ex)
-            {
-                case NotFoundException notFoundException:
-                    statusCode = HttpStatusCode.NotFound;
-                    errorDetails.ErrorType = "Not Found";
-                    break;
-                case BadRequestException badRequestException:
-                    statusCode = HttpStatusCode.BadRequest;
-                    errorDetails.ErrorType = "Bad Request";
-                    break;
-                default:
-                    break;
-            }
-
-            string response = JsonConvert.SerializeObject(errorDetails);
-            context.Response.StatusCode = (int)statusCode;
-            return context.Response.WriteAsync(response);
-        }
-    }
-
-    public class ErrorDeatils
-    {
-        public string ErrorType { get; set; }
-        public string ErrorMessage { get; set; }
     }
 }

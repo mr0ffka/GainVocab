@@ -1,4 +1,5 @@
 using GainVocab.API.Core.Configurations;
+using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Middleware;
 using GainVocab.API.Core.Services;
@@ -77,6 +78,7 @@ builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 
 builder.Services.AddAuthentication(options => 
 {

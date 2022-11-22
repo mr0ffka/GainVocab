@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Users;
 using GainVocab.API.Data.Models;
@@ -24,7 +25,6 @@ namespace GainVocab.API.Core.Services
         private readonly IConfiguration Configuration;
         private readonly IEmailService EmailService;
         private readonly ILogger<AuthManager> Logger;
-        private APIUser User;
 
         private string loginProvider = "GainVocabApi";
         private const string refreshToken = "RefreshToken";
@@ -45,73 +45,35 @@ namespace GainVocab.API.Core.Services
             Logger = logger;
         }
 
-        public async Task<string> CreateRefreshToken()
-        {
-            await UserManager.RemoveAuthenticationTokenAsync(User, loginProvider, refreshToken);
-            var newRefreshToken = await UserManager.GenerateUserTokenAsync(User, loginProvider, refreshToken);
-            var result = await UserManager.SetAuthenticationTokenAsync(User, loginProvider, refreshToken, newRefreshToken);
-            return newRefreshToken;
-        }
-
-        private async Task<string> GenerateToken()
-        {
-            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:Key"]));
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            var expires = DateTime.UtcNow.AddMinutes(double.Parse(Configuration["JwtSettings:DurationInMinutes"]));
-
-            var roles = await UserManager.GetRolesAsync(User);
-            var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
-            var userClaims = await UserManager.GetClaimsAsync(User);
-
-            var claims = new List<Claim>
-            {
-                new Claim(JwtRegisteredClaimNames.Sub, User.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Email, User.Email),
-                new Claim("uid", User.Id),
-            }
-            .Union(userClaims).Union(roleClaims);
-
-            var token = new JwtSecurityToken(
-                issuer: Configuration["JwtSettings:Issuer"],
-                audience: Configuration["JwtSettings:Audience"],
-                claims: claims,
-                expires: expires,
-                signingCredentials: credentials
-                );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
         public async Task<AuthResponseModel> Login(LoginModel model)
         {
-            User = await UserManager.FindByEmailAsync(model.Email);
-            if (User == null) return null;
+            var user = await UserManager.FindByEmailAsync(model.Email);
+            if (user == null) return null;
 
-            bool isValidUser = await UserManager.CheckPasswordAsync(User, model.Password);
-            var result = await SignInManager.PasswordSignInAsync(User, model.Password, model.RememberMe, true);
+            bool isValidUser = await UserManager.CheckPasswordAsync(user, model.Password);
+            var result = await SignInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
 
             if (!result.Succeeded)
             {
-                if (isValidUser && !User.EmailConfirmed)
+                if (!user.EmailConfirmed)
                 {
-                    throw new UnauthorizedAccessException(AuthException.EmailNotConfirmed);
+                    throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_EmailNotConfirmed);
                 }
-                return null;
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
             }
-            if (await UserManager.IsLockedOutAsync(User) && isValidUser)
+            if (await UserManager.IsLockedOutAsync(user) && isValidUser)
             {
-                throw new UnauthorizedAccessException("Locked Account");
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_AccountLocked);
             }
 
-            var token = await GenerateToken();
-            var refreshToken = await CreateRefreshToken();
-            var rolesUserList = (await UserManager.GetRolesAsync(User)).ToList();
+            var token = await GenerateToken(user);
+            var refreshToken = await CreateRefreshToken(user);
+            var rolesUserList = (await UserManager.GetRolesAsync(user)).ToList();
 
             return new AuthResponseModel
             {
                 Token = token,
-                UserId = User.Id,
+                UserId = user.Id,
                 Roles = rolesUserList,
                 RefreshToken = refreshToken,
             };
@@ -124,21 +86,21 @@ namespace GainVocab.API.Core.Services
 
         public async Task<IEnumerable<IdentityError>> Register(RegisterModel registrationModel)
         {
-            User = Mapper.Map<APIUser>(registrationModel);
-            User.UserName = registrationModel.Email;
-            User.EmailConfirmed = false;
+            var user = Mapper.Map<APIUser>(registrationModel);
+            user.UserName = registrationModel.Email;
+            user.EmailConfirmed = false;
 
-            var result = await UserManager.CreateAsync(User, registrationModel.Password);
+            var result = await UserManager.CreateAsync(user, registrationModel.Password);
 
             if (result.Succeeded)
             {
-                await UserManager.AddToRoleAsync(User, "User");
+                await UserManager.AddToRoleAsync(user, "User");
             }
 
             if (!result.Errors.Any())
             {
-                var emailVerificationCode = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(User));
-                await EmailService.SendEmailConfirmationEmail(User, emailVerificationCode);
+                var emailVerificationCode = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(user));
+                await EmailService.SendEmailConfirmationEmail(user, emailVerificationCode);
             }
 
             return result.Errors;
@@ -149,27 +111,27 @@ namespace GainVocab.API.Core.Services
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
             var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
-            User = await UserManager.FindByNameAsync(username);
+            var user = await UserManager.FindByNameAsync(username);
 
-            if (User == null || User.Id != request.UserId)
+            if (user == null || user.Id != request.UserId)
             {
-                return null;
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
             }
 
-            var isValidRefreshToken = await UserManager.VerifyUserTokenAsync(User, loginProvider, refreshToken, request.RefreshToken);
+            var isValidRefreshToken = await UserManager.VerifyUserTokenAsync(user, loginProvider, refreshToken, request.RefreshToken);
 
             if (isValidRefreshToken)
             {
-                var token = await GenerateToken();
+                var token = await GenerateToken(user);
                 return new AuthResponseModel
                 {
                     Token = token,
-                    UserId = User.Id,
-                    RefreshToken = await CreateRefreshToken()
+                    UserId = user.Id,
+                    RefreshToken = await CreateRefreshToken(user)
                 };
             }
 
-            await UserManager.UpdateSecurityStampAsync(User);
+            await UserManager.UpdateSecurityStampAsync(user);
             return null;
         }
 
@@ -178,7 +140,7 @@ namespace GainVocab.API.Core.Services
             var payload = await VerifyGoogleToken(oauthModel);
             if (payload is null)
             {
-                throw new AuthException("Invalid Login Attempt");
+                throw new UnauthorizedException("Invalid Login Attempt");
             }
             var info = new UserLoginInfo(oauthModel.Provider, payload.Subject, oauthModel.Provider);
 
@@ -200,10 +162,10 @@ namespace GainVocab.API.Core.Services
                 }
             }
             if (user == null)
-                throw new AuthException("Invalid login attempt");
+                throw new UnauthorizedException("Invalid login attempt");
 
-            var token = await GenerateToken();
-            var refreshToken = await CreateRefreshToken();
+            var token = await GenerateToken(user);
+            var refreshToken = await CreateRefreshToken(user);
             var rolesUserList = (await UserManager.GetRolesAsync(user)).ToList();
 
             return new AuthResponseModel
@@ -217,19 +179,12 @@ namespace GainVocab.API.Core.Services
 
         public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(OAuthLoginModel oauthModel)
         {
-            try
+            var settings = new GoogleJsonWebSignature.ValidationSettings()
             {
-                var settings = new GoogleJsonWebSignature.ValidationSettings()
-                {
-                    Audience = new List<string>() { Configuration["OAuth2Settings:Google:ClientId"] }
-                };
-                var payload = await GoogleJsonWebSignature.ValidateAsync(oauthModel.Token, settings);
-                return payload;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+                Audience = new List<string>() { Configuration["OAuth2Settings:Google:ClientId"] }
+            };
+            var payload = await GoogleJsonWebSignature.ValidateAsync(oauthModel.Token, settings);
+            return payload;
         }
 
         public AuthenticationProperties ConfigureExternalAuthProp(string provider, string redirectUrl)
@@ -270,6 +225,44 @@ namespace GainVocab.API.Core.Services
                 return IdentityResult.Failed();
 
             return await UserManager.ResetPasswordAsync(user, resetPassword.ResetToken, resetPassword.NewPassword);
+        }
+
+        private async Task<string> CreateRefreshToken(APIUser user)
+        {
+            await UserManager.RemoveAuthenticationTokenAsync(user, loginProvider, refreshToken);
+            var newRefreshToken = await UserManager.GenerateUserTokenAsync(user, loginProvider, refreshToken);
+            var result = await UserManager.SetAuthenticationTokenAsync(user, loginProvider, refreshToken, newRefreshToken);
+            return newRefreshToken;
+        }
+
+        private async Task<string> GenerateToken(APIUser user)
+        {
+            var securitykey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JwtSettings:Key"]));
+            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
+            var expires = DateTime.UtcNow.AddMinutes(double.Parse(Configuration["JwtSettings:DurationInMinutes"]));
+
+            var roles = await UserManager.GetRolesAsync(user);
+            var roleClaims = roles.Select(x => new Claim(ClaimTypes.Role, x)).ToList();
+            var userClaims = await UserManager.GetClaimsAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim("uid", user.Id),
+            }
+            .Union(userClaims).Union(roleClaims);
+
+            var token = new JwtSecurityToken(
+                issuer: Configuration["JwtSettings:Issuer"],
+                audience: Configuration["JwtSettings:Audience"],
+                claims: claims,
+                expires: expires,
+                signingCredentials: credentials
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

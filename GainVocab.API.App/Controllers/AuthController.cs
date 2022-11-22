@@ -1,4 +1,5 @@
-﻿using GainVocab.API.Core.Interfaces;
+﻿using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Mvc;
 
@@ -63,11 +64,6 @@ namespace GainVocab.API.App.Controllers
             Logger.LogInformation($"Login Attempt for {loginModel.Email} ");
             var authResponse = await AuthManager.Login(loginModel);
 
-            if (authResponse == null)
-            {
-                return Unauthorized();
-            }
-
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
@@ -107,11 +103,6 @@ namespace GainVocab.API.App.Controllers
         {
             var authResponse = await AuthManager.VerifyRefreshToken(request);
 
-            if (authResponse == null)
-            {
-                return Unauthorized();
-            }
-
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
@@ -122,12 +113,6 @@ namespace GainVocab.API.App.Controllers
         public async Task<IActionResult> GoogleLogin([FromBody] OAuthLoginModel model)
         {
             var authResponse = await AuthManager.OAuthLogin(model);
-
-            if (authResponse == null)
-            {
-                return Unauthorized();
-            }
-
             //Response.Cookies.Append("X-Logged-In", true, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
@@ -150,11 +135,6 @@ namespace GainVocab.API.App.Controllers
         [Route("forgotpassword")]
         public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
         {
-            if (model == null)
-            {
-                return BadRequest();
-            }
-
             var status = await AuthManager.ForgotPassword(model.Email);
 
             return Ok(status);
