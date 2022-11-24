@@ -3,7 +3,6 @@
 <template>
   <div class="common-layout">
     <el-container>
-      <!-- <Header /> -->
       <el-main>
         <section class="bg-ct-blue-600 min-h-screen pt-20">
           <div
@@ -15,6 +14,7 @@
       </el-main>
     </el-container>
   </div>
+  <p class="text-5xl font-semibold">Home Page</p>
 </template>
 
 <style scoped></style>

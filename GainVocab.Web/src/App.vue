@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import Menu from "@/components/Header.vue";
+import Header from "@/components/common/Header.vue";
 import { useQuery } from "@tanstack/vue-query";
 import { getCurrUser } from "./services/authApi";
-const isLogged = useQuery(["authUser"], getCurrUser);
+
+useQuery(["authUser"], getCurrUser);
 </script>
 
 <template>
-  <Menu></Menu>
+  <Header></Header>
   <router-view></router-view>
 </template>
 

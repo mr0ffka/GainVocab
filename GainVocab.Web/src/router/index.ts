@@ -5,15 +5,17 @@ import {
   type NavigationGuardNext,
   type RouteLocationNormalized,
 } from "vue-router";
-import middlewarePipeline, { type Middleware } from "@/router/middlewarePipeline";
+import middlewarePipeline, {
+  type Middleware,
+} from "@/router/middlewarePipeline";
 import AdminRoutes from "@/views/modules/admin/routes";
 import UserRoutes from "@/views/modules/user/routes";
 import alreadyAuthMiddleware from "./middleware/alreadyAuthMiddleware";
 import { queryClient } from "@/helpers/queryClient";
 
-declare module 'vue-router' {
+declare module "vue-router" {
   interface RouteMeta {
-    middleware?: Middleware[]
+    middleware?: Middleware[];
   }
 }
 
@@ -117,7 +119,6 @@ router.beforeEach(
     from: RouteLocationNormalized,
     next: NavigationGuardNext
   ) => {
-    
     if (!queryClient.getQueryData(["authUser"])) {
       queryClient.invalidateQueries(["authUser"]);
     }

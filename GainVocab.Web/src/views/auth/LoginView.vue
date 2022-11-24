@@ -99,9 +99,18 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
             size="large"
           />
         </el-form-item>
+        <el-form-item>
+          <el-checkbox
+            v-model="loginModel.rememberMe"
+            label="Nie wylogowuj mnie"
+            size="large"
+          />
+        </el-form-item>
         <el-button @click="submitForm(formRef)" class="">Login</el-button>
         <!-- <google-login :callback="googleLoginCallback" /> -->
       </el-form>
     </div>
   </main>
 </template>
+
+<style scoped></style>
