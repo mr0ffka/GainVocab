@@ -35,33 +35,6 @@ const mutation = useMutation(() => logoutUserFn(), {
 const logout = () => {
   mutation.mutate();
 };
-
-const dupa = () => {
-  authMenuStore.changeMenuCollapsed();
-  console.log(authMenuStore.isMenuCollapsed);
-};
-
-// const expendAdminMenu = () => {
-//   isCollapsed.value = !isCollapsed.value;
-//   //   const adminMenuExpendedState =
-//   //     window.localStorage.getItem("adminMenuExpended");
-//   //   if (adminMenuExpendedState !== null) {
-//   //     let value = !Boolean(JSON.parse(adminMenuExpendedState));
-//   //     window.localStorage.setItem("adminMenuExpended", String(value));
-//   //     collapsed.value = value;
-//   //   } else {
-//   //     window.localStorage.setItem("adminMenuExpended", "false");
-//   //     collapsed.value = false;
-//   //   }
-
-//   //   window.dispatchEvent(
-//   //     new CustomEvent("adminMenuExpended-localstorage-changed", {
-//   //       detail: {
-//   //         storage: localStorage.getItem("adminMenuExpended"),
-//   //       },
-//   //     })
-//   //   );
-// };
 </script>
 
 <template>
@@ -107,8 +80,8 @@ const dupa = () => {
       @click="authMenuStore.changeMenuCollapsed()"
     >
       <el-icon class="no-inherit">
-        <fold v-show="isMenuCollapsed" />
-        <expand v-show="!isMenuCollapsed" />
+        <fold v-if="!isMenuCollapsed" />
+        <expand v-else />
       </el-icon>
     </el-menu-item>
     <el-menu-item
