@@ -1,58 +1,58 @@
 export interface GenericResponse {
-    succeeded: any;
-    status: string;
-    message: string;
+  succeeded: any;
+  status: string;
+  message: string;
 }
 
 export interface IUser {
-    isAuthenticated: boolean;
-    isAdmin: boolean;
-    email: string;
-    roles: [];
-    id: string;
+  isAuthenticated: boolean;
+  isAdmin: boolean;
+  email: string;
+  roles: [];
+  id: string;
 }
 
 export interface IUserResponse {
-    status: string;
-    user: IUser;
+  status: string;
+  user: IUser;
 }
 
 export interface ILoginModel {
-    email: string;
-    password: string;
-    rememberMe: boolean;
+  email: string;
+  password: string;
+  rememberMe: boolean;
 }
 
 export interface IOAuthLoginModel {
-    token: string;
-    provider: string;
+  token: string;
+  provider: string;
 }
 
 export interface ILoginResponse {
-    status: string;
-    accessToken: string;
+  status: string;
+  accessToken: string;
 }
 
 export interface IRegisterModel {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-    passwordConfirm: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  passwordConfirm: string;
 }
 
 export interface IRegisterResponse {
-    status: string;
-    message: string;
+  status: string;
+  message: string;
 }
 
 export interface IForgotPasswordModel {
-    email: string;
+  email: string;
 }
 
 export interface IResetPasswordModel {
-    userId: string;
-    resetToken: string;
-    newPassword: string;
-    newPasswordConfirm: string;
+  userId: string;
+  resetToken: string;
+  newPassword: string;
+  newPasswordConfirm: string;
 }

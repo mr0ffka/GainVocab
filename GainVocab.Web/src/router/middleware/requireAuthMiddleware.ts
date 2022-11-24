@@ -11,15 +11,9 @@ export default async function requireAuthMiddleware({
   try {
     const authResult = queryClient.getQueryData(['authUser']) as IUser;
     if (!authResult) {
-      const response = await getCurrUser();
-      if (response.isAuthenticated) {
-        queryClient.setQueryData(['authUser'], response);
-      }
-      else {
         return next({
           name: 'login',
         })
-      }
     }
   } catch (error) {
     return next({

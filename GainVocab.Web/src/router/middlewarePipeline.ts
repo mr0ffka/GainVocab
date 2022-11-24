@@ -1,5 +1,14 @@
-function middlewarePipeline(context: any, middleware: any, index: any) {
-  console.log("middlewarePipeline");
+import type { RouteLocationNormalized, NavigationGuardNext } from "vue-router";
+
+export type Middleware = (context: MiddlewareContext) => void
+
+export type MiddlewareContext = {
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: NavigationGuardNext,
+}
+
+function middlewarePipeline(context: MiddlewareContext, middleware: Middleware[], index: number) {
   const nextMiddleware = middleware[index];
 
   if (!nextMiddleware) {

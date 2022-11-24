@@ -10,6 +10,7 @@ namespace GainVocab.API.Core.Extensions.Errors
     {
         public static string UnauthorizedMessage_EmailNotConfirmed = "User cannot sign in without a confirmed email";
         public static string UnauthorizedMessage_IncorrectCredentials = "Incorrect credentials";
+        public static string UnauthorizedMessage_InvalidLoginAttempt = "Invalid login attempt";
         public static string UnauthorizedMessage_AccountLocked = "Account locked";
     }
 }

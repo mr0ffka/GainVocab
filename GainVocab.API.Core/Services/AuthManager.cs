@@ -140,7 +140,7 @@ namespace GainVocab.API.Core.Services
             var payload = await VerifyGoogleToken(oauthModel);
             if (payload is null)
             {
-                throw new UnauthorizedException("Invalid Login Attempt");
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_InvalidLoginAttempt);
             }
             var info = new UserLoginInfo(oauthModel.Provider, payload.Subject, oauthModel.Provider);
 
@@ -162,7 +162,7 @@ namespace GainVocab.API.Core.Services
                 }
             }
             if (user == null)
-                throw new UnauthorizedException("Invalid login attempt");
+                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_InvalidLoginAttempt);
 
             var token = await GenerateToken(user);
             var refreshToken = await CreateRefreshToken(user);
