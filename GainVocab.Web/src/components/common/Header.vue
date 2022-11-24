@@ -28,7 +28,7 @@ const mutation = useMutation(() => logoutUserFn(), {
       type: "success",
     });
     queryClient.setQueriesData(["authUser"], {});
-    await router.push({ name: "login" });
+    await router.push({ name: "home" });
   },
 });
 
