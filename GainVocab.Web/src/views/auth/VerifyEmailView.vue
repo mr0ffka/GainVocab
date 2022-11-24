@@ -5,7 +5,7 @@ import { onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 const userId = ref("");
-const verificationCode = ref("");
+const token = ref("");
 const router = useRouter();
 const route = useRoute();
 
@@ -14,18 +14,13 @@ onMounted(async () => {
     typeof route.query.userid === "string"
       ? route.query.userid
       : route.query.userid?.[0] ?? "";
-  verificationCode.value =
-    typeof route.query.code === "string"
-      ? route.query.code
-      : route.query.code?.[0] ?? "";
+  token.value =
+    typeof route.query.token === "string"
+      ? route.query.token
+      : route.query.token?.[0] ?? "";
 
-  if (
-    userId.value != "" &&
-    userId.value &&
-    verificationCode.value != "" &&
-    verificationCode.value
-  ) {
-    let result = await verifyEmailFn(userId.value, verificationCode.value);
+  if (userId.value != "" && userId.value && token.value != "" && token.value) {
+    let result = await verifyEmailFn(userId.value, token.value);
     if (result.succeeded) {
       ElMessage({
         showClose: true,

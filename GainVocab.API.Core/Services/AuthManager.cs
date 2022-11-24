@@ -99,8 +99,8 @@ namespace GainVocab.API.Core.Services
 
             if (!result.Errors.Any())
             {
-                var emailVerificationCode = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(user));
-                await EmailService.SendEmailConfirmationEmail(user, emailVerificationCode);
+                var token = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(user));
+                await EmailService.SendEmailConfirmationEmail(user, token);
             }
 
             return result.Errors;
@@ -212,8 +212,8 @@ namespace GainVocab.API.Core.Services
             if (user == null)
                 return IdentityResult.Failed();
 
-            var forgorPasswordCode = HttpUtility.UrlEncode(await UserManager.GeneratePasswordResetTokenAsync(user));
-            await EmailService.SendForgotPasswordEmail(user, forgorPasswordCode);
+            var token = HttpUtility.UrlEncode(await UserManager.GeneratePasswordResetTokenAsync(user));
+            await EmailService.SendForgotPasswordEmail(user, token);
 
             return IdentityResult.Success;
         }

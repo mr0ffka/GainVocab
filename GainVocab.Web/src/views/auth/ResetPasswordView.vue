@@ -40,9 +40,9 @@ onMounted(async () => {
       ? route.query.userid
       : route.query.userid?.[0] ?? "";
   forgotPasswordModel.resetToken =
-    typeof route.query.code === "string"
-      ? route.query.code
-      : route.query.code?.[0] ?? "";
+    typeof route.query.token === "string"
+      ? route.query.token
+      : route.query.token?.[0] ?? "";
 
   if (
     forgotPasswordModel.userId == "" ||
@@ -98,8 +98,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 <template>
   <main class="flex flex-1 justify-center items-center">
-    <div>Reset password</div>
     <div class="w-96 border-gray-600 border-2 p-10 rounded-md bg-gray-200">
+      <div class="font-bold text-center mb-5 text-lg">Reset password</div>
       <el-form
         label-position="top"
         ref="formRef"
@@ -108,7 +108,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         :rules="rules"
       >
         <el-form-item class="text-lg" prop="password">
-          <label>Password</label>
+          <label>New password</label>
           <el-input
             v-model="forgotPasswordModel.newPassword"
             type="password"
@@ -118,7 +118,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           />
         </el-form-item>
         <el-form-item class="text-lg" prop="passwordConfirm">
-          <label>Password confirmation</label>
+          <label>New password confirmation</label>
           <el-input
             v-model="forgotPasswordModel.newPasswordConfirm"
             type="password"
@@ -127,7 +127,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             size="large"
           />
         </el-form-item>
-        <el-button @click="submitForm(formRef)" class=""
+        <el-button size="large" @click="submitForm(formRef)" class=""
           >Reset password</el-button
         >
       </el-form>

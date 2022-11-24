@@ -14,7 +14,6 @@
       </el-main>
     </el-container>
   </div>
-  <p class="text-5xl font-semibold">Home Page</p>
 </template>
 
 <style scoped></style>

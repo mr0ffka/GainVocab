@@ -121,7 +121,7 @@ const dupa = () => {
     </el-menu-item>
     <el-menu-item class="!border-b-0 focus:!bg-transparent !ml-auto" index="">
       <el-dropdown size="large">
-        <el-icon style="" class="pt-5 pb-5">
+        <el-icon class="pt-5 pb-5">
           <more-filled />
         </el-icon>
         <template #dropdown>

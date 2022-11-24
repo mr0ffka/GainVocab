@@ -22,28 +22,36 @@ namespace GainVocab.API.Core.Services
             UserManager = userManager;
         }
 
-        public void SendEmail(EmailSendModel request)
+        private void SendEmail(EmailSendModel request)
         {
-            var email = new MimeMessage();
-            email.From.Add(MailboxAddress.Parse(Configuration["EmailHandlers:SMTP:Email"]));
-            email.To.Add(MailboxAddress.Parse(request.To));
-            email.Subject = request.Subject;
-            email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
+            try
+            {
+                var email = new MimeMessage();
+                email.From.Add(MailboxAddress.Parse(Configuration["EmailHandlers:SMTP:Email"]));
+                email.To.Add(MailboxAddress.Parse(request.To));
+                email.Subject = request.Subject;
+                email.Body = new TextPart(TextFormat.Html) { Text = request.Body };
 
-            using var smtp = new SmtpClient();
-            smtp.Connect(Configuration["EmailHandlers:SMTP:Host"], int.Parse(Configuration["EmailHandlers:SMTP:Port"]), SecureSocketOptions.StartTls);
-            smtp.Authenticate(Configuration["EmailHandlers:SMTP:Email"], Configuration["EmailHandlers:SMTP:Password"]);
-            smtp.Send(email);
-            smtp.Disconnect(true);
+                using var smtp = new SmtpClient();
+                smtp.Connect(Configuration["EmailHandlers:SMTP:Host"], int.Parse(Configuration["EmailHandlers:SMTP:Port"]), SecureSocketOptions.StartTls);
+                smtp.Authenticate(Configuration["EmailHandlers:SMTP:Email"], Configuration["EmailHandlers:SMTP:Password"]);
+                smtp.Send(email);
+                smtp.Disconnect(true);
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
         }
 
-        public Task SendEmailConfirmationEmail(APIUser user, string code)
+        public Task SendEmailConfirmationEmail(APIUser user, string token)
         {
             var model = new EmailSendModel();
 
-            var emailBody = "Please confirm your email address <a target=\"_blank\" href=\"#URL#\">Click here!</a>";
-            var link = Configuration["OriginUrl"] + "/auth/verifyemail?userid=" + user.Id + "&code=" + code;
-            var body = emailBody.Replace("#URL#", link);
+            var emailBody = "Please confirm your email address <a target=\"_blank\" href=\"{0}\">Click here!</a>";
+            var link = Configuration["OriginUrl"] + "/auth/verifyemail?userid=" + user.Id + "&token=" + token;
+            var body = String.Format(emailBody, link);
 
             model.To = user.Email;
             model.Subject = "GainVocab: Email confirmation";
@@ -53,13 +61,13 @@ namespace GainVocab.API.Core.Services
             return Task.CompletedTask;
         }
 
-        public Task SendForgotPasswordEmail(APIUser user, string code)
+        public Task SendForgotPasswordEmail(APIUser user, string token)
         {
             var model = new EmailSendModel();
 
-            var emailBody = "Reset your password <a target=\"_blank\" href=\"#URL#\">Click here!</a>";
-            var link = Configuration["OriginUrl"] + "/auth/resetpassword?userid=" + user.Id + "&code=" + code;
-            var body = emailBody.Replace("#URL#", link);
+            var emailBody = "Reset your password <a target=\"_blank\" href=\"{0}\">Click here!</a>";
+            var link = Configuration["OriginUrl"] + "/auth/resetpassword?userid=" + user.Id + "&token=" + token;
+            var body = String.Format(emailBody, link);
 
             model.To = user.Email;
             model.Subject = "GainVocab: Reset password";

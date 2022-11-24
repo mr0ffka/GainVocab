@@ -74,8 +74,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 <template>
   <main class="flex flex-1 justify-center items-center">
-    <div>Register new account</div>
     <div class="w-96 border-gray-600 border-2 p-10 rounded-md bg-gray-200">
+      <div class="font-bold text-center mb-5 text-lg">Register new account</div>
       <el-form
         label-position="top"
         ref="formRef"
@@ -130,10 +130,19 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             size="large"
           />
         </el-form-item>
-        <el-button @click="submitForm(formRef)" class=""
-          >Register new account</el-button
+        <el-button
+          size="large"
+          @click="submitForm(formRef)"
+          class="mt-2 text-center w-1/2 -translate-x-1/2"
         >
+          Register new account
+        </el-button>
       </el-form>
+      <router-link :to="{ name: 'login' }">
+        <div class="mt-5 text-center text-sm no-underline hover:underline">
+          Has an account already? Log in here!
+        </div>
+      </router-link>
     </div>
   </main>
 </template>

@@ -71,8 +71,10 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
 
 <template>
   <main class="flex flex-1 justify-center items-center">
-    <div>Login into an account</div>
     <div class="w-96 border-gray-600 border-2 p-10 rounded-md bg-gray-200">
+      <div class="font-bold text-center mb-5 text-lg">
+        Login into an account
+      </div>
       <el-form
         label-position="top"
         ref="formRef"
@@ -102,13 +104,27 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
         <el-form-item>
           <el-checkbox
             v-model="loginModel.rememberMe"
-            label="Nie wylogowuj mnie"
+            label="Remember me"
             size="large"
           />
+          <el-button size="large" @click="submitForm(formRef)" class="!ml-auto"
+            >Login</el-button
+          >
         </el-form-item>
-        <el-button @click="submitForm(formRef)" class="">Login</el-button>
         <!-- <google-login :callback="googleLoginCallback" /> -->
       </el-form>
+      <div class="flex">
+        <router-link :to="{ name: 'register' }">
+          <span class="text-sm no-underline hover:underline !ml-auto">
+            Create new account
+          </span>
+        </router-link>
+        <router-link :to="{ name: 'forgotpassword' }" class="!ml-auto">
+          <span class="text-sm no-underline hover:underline"
+            >Forgot your credentials?
+          </span>
+        </router-link>
+      </div>
     </div>
   </main>
 </template>
