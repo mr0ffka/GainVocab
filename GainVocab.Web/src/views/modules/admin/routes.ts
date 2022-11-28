@@ -17,6 +17,40 @@ export default [
         },
         component: () => import("@/views/modules/admin/Dashboard.vue"),
       },
+      {
+        path: "users",
+        name: "users",
+        meta: {
+          middleware: [isAdminMiddleware],
+        },
+        component: () => import("@/views/modules/admin/user/UserList.vue"),
+      },
+      {
+        path: "support",
+        name: "support",
+        meta: {
+          middleware: [isAdminMiddleware],
+        },
+        component: () => import("@/views/modules/admin/support/Support.vue"),
+      },
+      {
+        path: "languages",
+        name: "languages",
+        meta: {
+          middleware: [isAdminMiddleware],
+        },
+        component: () =>
+          import("@/views/modules/admin/language/LanguageList.vue"),
+      },
+      {
+        path: "language/import",
+        name: "language-import",
+        meta: {
+          middleware: [isAdminMiddleware],
+        },
+        component: () =>
+          import("@/views/modules/admin/language/LanguageImport.vue"),
+      },
     ],
   },
 ];

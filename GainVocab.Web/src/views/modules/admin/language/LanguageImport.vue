@@ -5,7 +5,7 @@ import AdminMenu from "@/views/modules/admin/AdminMenu.vue";
 <template>
   <div class="flex grow">
     <AdminMenu />
-    <div>Dashboard</div>
+    <div>Language Import</div>
   </div>
 </template>
 
