@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AdminMenu from "@/views/modules/admin/AdminMenu.vue";
+import AdminMenu from "@/components/admin/AdminMenu.vue";
 </script>
 
 <template>

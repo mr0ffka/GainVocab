@@ -43,7 +43,7 @@ export default [
           import("@/views/modules/admin/language/LanguageList.vue"),
       },
       {
-        path: "language/import",
+        path: "languages/import",
         name: "language-import",
         meta: {
           middleware: [isAdminMiddleware],
