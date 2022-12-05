@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onBeforeUpdate, reactive, ref } from "vue";
-import { loginUserFn, registerUserFn } from "@/services/authApi";
-import type { IRegisterModel } from "@/services/types";
+import { loginUserFn, registerUserFn } from "@/services/auth/authApi";
+import type { IRegisterModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";
-import { IUserResponse } from "@/services/types";
+import { IUserAuthResponse } from "@/services/auth/types";
 
 const formRef = ref<FormInstance>();
 const queryClient = useQueryClient();
@@ -38,7 +38,7 @@ const loginMutation = useMutation(
         type: "error",
       });
     },
-    onSuccess: (data: IUserResponse) => {
+    onSuccess: (data: IUserAuthResponse) => {
       ElMessage({
         showClose: true,
         message: "Registration successful",

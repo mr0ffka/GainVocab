@@ -1,7 +1,10 @@
 ﻿using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Users;
+using GainVocab.API.Core.Services;
+using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
 {
@@ -10,11 +13,13 @@ namespace GainVocab.API.App.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthManager AuthManager;
+        private readonly UsersService Users;
         private readonly ILogger<AuthController> Logger;
 
-        public AuthController(IAuthManager authManager, ILogger<AuthController> logger)
+        public AuthController(IAuthManager authManager, UsersService users, ILogger<AuthController> logger)
         {
             AuthManager = authManager;
+            Users = users;
             Logger = logger;
         }
 
@@ -63,7 +68,7 @@ namespace GainVocab.API.App.Controllers
         {
             Logger.LogInformation($"Login Attempt for {loginModel.Email} ");
             var authResponse = await AuthManager.Login(loginModel);
-
+            var user = await Users.GetAsync(authResponse.UserId);
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
@@ -77,6 +82,8 @@ namespace GainVocab.API.App.Controllers
                     IsAuthenticated = true,
                     IsAdmin = authResponse.Roles.Any(r => r == Enum.GetName(typeof(UserRoles), UserRoles.Administrator)),
                     Roles = authResponse.Roles,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
                 }
             });
 
@@ -147,6 +154,46 @@ namespace GainVocab.API.App.Controllers
             var status = await AuthManager.ResetPassword(resetPassword);
 
             return Ok(status);
+        }
+
+        [HttpGet]
+        [Route("me")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<FrontUserModel>> GetMe()
+        {
+            if (User.Identities.Any())
+            {
+                Logger.LogInformation($"[api/auth/me] {User.Identity?.Name}");
+
+                var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
+                var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();
+                var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+                var roles = new List<string>();
+                roleClaims.ForEach(r => roles.Add(r.Value));
+                APIUser user = null;
+
+                if (!string.IsNullOrEmpty(uid))
+                {
+                    user = await Users.GetAsync(uid!);
+                }
+
+                var frontUser = new FrontUserModel
+                {
+                    IsAuthenticated = User.Identity.IsAuthenticated,
+                    Email = emailClaim != null ? emailClaim.Value : null,
+                    Roles = roles,
+                    Id = uid != null ? uid : null,
+                    FirstName = user?.FirstName ?? "",
+                    LastName = user?.LastName ?? "",
+                    IsAdmin = roles.Any(r => r == Enum.GetName(typeof(UserRoles), UserRoles.Administrator))
+                };
+
+                return Ok(frontUser);
+            }
+
+            return Unauthorized();
         }
     }
 }

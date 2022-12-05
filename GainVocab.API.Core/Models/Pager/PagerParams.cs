@@ -9,8 +9,11 @@ namespace GainVocab.API.Core.Models.Pager
     public class PagerParams
     {
         private int _pageSize = 10;
-        public int StartIndex { get; set; }
+
         public int PageNumber { get; set; }
+        public string? SortDirection { get; set; }
+        public string? SortBy { get; set; }
+
         public int PageSize
         {
             get

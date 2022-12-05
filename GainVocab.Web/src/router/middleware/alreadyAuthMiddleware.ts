@@ -1,5 +1,5 @@
-import { IUser } from "@/services/types";
-import { getCurrUser } from "@/services/authApi";
+import { IUserAuth } from "@/services/auth/types";
+import { getCurrUser } from "@/services/auth/authApi";
 import { queryClient } from "@/helpers/queryClient";
 import type { NavigationGuardNext, RouteLocationNormalized } from "vue-router";
 import type { MiddlewareContext } from "../middlewarePipeline";
@@ -10,10 +10,10 @@ export default async function alreadyAuthMiddleware({
   to,
 }: MiddlewareContext) {
   try {
-    console.log("form: ", from, " to: ", to);
-    let authResult = queryClient.getQueryData(["authUser"]) as IUser;
+    //console.log("form: ", from, " to: ", to);
+    let authResult = queryClient.getQueryData(["authUser"]) as IUserAuth;
     if (!authResult) {
-      console.log("dupa alreadyAuthMiddleware");
+      //console.log("dupa alreadyAuthMiddleware");
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);
     }

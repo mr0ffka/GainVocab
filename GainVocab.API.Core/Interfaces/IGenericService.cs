@@ -12,7 +12,9 @@ namespace GainVocab.API.Core.Interfaces
     public interface IGenericService<T> where T : class
     {
         Task<T> GetAsync(int? id);
+        Task<T> GetAsync(string? id);
         Task<TResult> GetAsync<TResult>(int? id);
+        Task<TResult> GetAsync<TResult>(string? id);
         Task<List<T>> GetAllAsync();
         Task<List<TResult>> GetAllAsync<TResult>();
         Task<PagedResult<TResult>> GetAllAsync<TResult>(PagerParams pagerParams);

@@ -4,12 +4,12 @@ import {
   forgotPasswordFn,
   loginUserFn,
   registerUserFn,
-} from "@/services/authApi";
+} from "@/services/auth/authApi";
 import type {
   GenericResponse,
   IForgotPasswordModel,
   IRegisterModel,
-} from "@/services/types";
+} from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";

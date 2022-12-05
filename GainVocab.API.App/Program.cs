@@ -78,6 +78,8 @@ builder.Services.AddAutoMapper(typeof(MapperConfig));
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<UsersService>();
 builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 
 builder.Services.AddAuthentication(options => 
@@ -154,8 +156,6 @@ app.UseCors(builder =>
     .AllowAnyHeader()
     .AllowCredentials();
 });
-
-app.UseResponseCaching();
 
 app.Use(async (context, next) =>
 {

@@ -8,13 +8,14 @@ using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Core.Models.Core;
 using GainVocab.API.Data;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GainVocab.API.Core.Services
 {
     public class GenericService<T> : IGenericService<T> where T : class
     {
-        private readonly DefaultDbContext Context;
-        private readonly IMapper Mapper;
+        protected readonly DefaultDbContext Context;
+        protected readonly IMapper Mapper;
 
         public GenericService(DefaultDbContext context, IMapper mapper)
         {
@@ -67,7 +68,7 @@ namespace GainVocab.API.Core.Services
         {
             var totalSize = await Context.Set<T>().CountAsync();
             var items = await Context.Set<T>()
-                .Skip(pagerParams.StartIndex)
+                .Skip(pagerParams.PageSize * (pagerParams.PageNumber - 1))
                 .Take(pagerParams.PageSize)
                 .ProjectTo<TResult>(Mapper.ConfigurationProvider)
                 .ToListAsync();
@@ -104,6 +105,27 @@ namespace GainVocab.API.Core.Services
             if (result is null)
             {
                 throw new NotFoundException(typeof(T).Name, id.HasValue ? id : "No Key Provided");
+            }
+
+            return Mapper.Map<TResult>(result);
+        }
+
+        public async Task<T> GetAsync(string? id)
+        {
+            if (id is null)
+            {
+                return null;
+            }
+
+            return await Context.Set<T>().FindAsync(id);
+        }
+
+        public async Task<TResult> GetAsync<TResult>(string? id)
+        {
+            var result = await Context.Set<T>().FindAsync(id);
+            if (result is null)
+            {
+                throw new NotFoundException(typeof(T).Name, string.IsNullOrEmpty(id) ? id : "No Key Provided");
             }
 
             return Mapper.Map<TResult>(result);

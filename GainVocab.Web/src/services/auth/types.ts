@@ -4,17 +4,19 @@ export interface GenericResponse {
   message: string;
 }
 
-export interface IUser {
+export interface IUserAuth {
   isAuthenticated: boolean;
   isAdmin: boolean;
   email: string;
   roles: [];
   id: string;
+  firstName: string;
+  lastName: string;
 }
 
-export interface IUserResponse {
+export interface IUserAuthResponse {
   status: string;
-  user: IUser;
+  user: IUserAuth;
 }
 
 export interface ILoginModel {

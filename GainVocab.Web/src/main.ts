@@ -19,7 +19,7 @@ createApp(App)
   .use(vue3GoogleLogin, {
     clientId: import.meta.env.OAUTH_GOOGLE_CLIENT_ID,
   })
-  .use(ElementPlus, { size: "small", zIndex: 3000 })
+  .use(ElementPlus, { zIndex: 3000 })
   .use(VueQueryPlugin, { queryClient })
   .use(VueAxios, axios)
   .mount("#app");

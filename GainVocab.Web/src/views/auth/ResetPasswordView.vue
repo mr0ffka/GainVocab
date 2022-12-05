@@ -4,16 +4,16 @@ import {
   loginUserFn,
   registerUserFn,
   resetPasswordFn,
-} from "@/services/authApi";
+} from "@/services/auth/authApi";
 import type {
   GenericResponse,
   IResetPasswordModel,
   IRegisterModel,
-} from "@/services/types";
+} from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";
-import { IUserResponse } from "@/services/types";
+import { IUserAuthResponse } from "@/services/auth/types";
 import { useRoute, useRouter } from "vue-router";
 
 const formRef = ref<FormInstance>();

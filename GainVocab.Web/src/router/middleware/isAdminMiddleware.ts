@@ -1,5 +1,5 @@
-import { getCurrUser } from "@/services/authApi";
-import { IUser } from "@/services/types";
+import { getCurrUser } from "@/services/auth/authApi";
+import { IUserAuth } from "@/services/auth/types";
 import { queryClient } from "@/helpers/queryClient";
 import type { NavigationGuardNext } from "vue-router";
 
@@ -9,7 +9,7 @@ export default async function isAdminMiddleware({
   next: NavigationGuardNext;
 }) {
   try {
-    let authResult = queryClient.getQueryData(["authUser"]) as IUser;
+    let authResult = queryClient.getQueryData(["authUser"]) as IUserAuth;
     if (!authResult) {
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);

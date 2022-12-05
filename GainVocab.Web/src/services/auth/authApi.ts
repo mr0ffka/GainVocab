@@ -1,5 +1,4 @@
 import axios from "axios";
-import merge from "lodash/merge";
 
 import type {
   GenericResponse,
@@ -8,8 +7,8 @@ import type {
   ILoginResponse,
   IOAuthLoginModel,
   IRegisterModel,
-  IUser,
-  IUserResponse,
+  IUserAuth,
+  IUserAuthResponse,
   IForgotPasswordModel,
 } from "./types";
 
@@ -25,32 +24,17 @@ export const refreshAccessTokenFn = async () => {
   return response.data;
 };
 
-// authApi.interceptors.response.use(
-//     (response) => {
-//         return response;
-//     },
-//     async (error) => {
-//         const originalRequest = error.config;
-//         const errMessage = error.response.data.message as string;
-//         if (errMessage.includes('not logged in') && !originalRequest._retry) {
-//             originalRequest._retry = true;
-//             await refreshAccessTokenFn();
-//             return authApi(originalRequest);
-//         }
-//         return Promise.reject(error);
-//     }
-// );
-
 export const registerUserFn = async (user: IRegisterModel) => {
-  return (await authApi.post<IUserResponse>("auth/register", user)).data;
+  return (await authApi.post<IUserAuthResponse>("auth/register", user)).data;
 };
 
 export const loginUserFn = async (user: ILoginModel) => {
-  return (await authApi.post<IUserResponse>("auth/login", user)).data;
+  return (await authApi.post<IUserAuthResponse>("auth/login", user)).data;
 };
 
 export const oAuthGoogleLoginFn = async (oauth: IOAuthLoginModel) => {
-  return (await authApi.post<IUserResponse>("auth/googleLogin", oauth)).data;
+  return (await authApi.post<IUserAuthResponse>("auth/googleLogin", oauth))
+    .data;
 };
 
 export const verifyEmailFn = async (
@@ -81,5 +65,5 @@ export const logoutUserFn = async () => {
 };
 
 export const getCurrUser = async () => {
-  return (await authApi.get<IUser>("users/me")).data;
+  return (await authApi.get<IUserAuth>("auth/me")).data;
 };

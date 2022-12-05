@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { onBeforeUpdate, reactive, ref } from "vue";
-import { loginUserFn } from "@/services/authApi";
-import type { ILoginModel } from "@/services/types";
+import { loginUserFn } from "@/services/auth/authApi";
+import type { ILoginModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";
-import { IUserResponse } from "@/services/types";
-import { useAuthUser } from "@/services/authQueries";
-import { CallbackTypes, GoogleLogin } from "vue3-google-login";
+import { IUserAuthResponse } from "@/services/auth/types";
+import { CallbackTypes } from "vue3-google-login";
 
 const formRef = ref<FormInstance>();
 const queryClient = useQueryClient();
@@ -33,7 +32,7 @@ const loginMutation = useMutation(
         type: "error",
       });
     },
-    onSuccess: (data: IUserResponse) => {
+    onSuccess: (data: IUserAuthResponse) => {
       ElMessage({
         showClose: true,
         message: "Successfully logged in",
