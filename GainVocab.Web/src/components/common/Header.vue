@@ -42,7 +42,7 @@ const logout = () => {
   <el-menu
     v-if="!isLogged.data.value?.isAuthenticated && !isLogged.isLoading.value"
     :default-active="$route.path"
-    class="flex"
+    class="flex shadow-md z-50"
     mode="horizontal"
     :router="true"
     :ellipsis="true"
@@ -77,7 +77,7 @@ const logout = () => {
       !isLogged.isLoading.value
     "
     index=""
-    class="flex"
+    class="flex shadow-md z-50"
     mode="horizontal"
     :router="true"
     :ellipsis="true"

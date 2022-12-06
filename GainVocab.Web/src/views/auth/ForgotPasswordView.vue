@@ -61,8 +61,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
-  <main class="flex flex-1 justify-center items-center">
-    <div class="w-96 border-gray-600 border-2 p-10 rounded-md bg-gray-200">
+  <main class="flex justify-center mt-2 drop-shadow">
+    <div class="border-grey border p-10 w-2/5 shadow-md">
       <div class="font-bold text-center mb-5 text-lg">
         Send reset password email
       </div>
@@ -82,6 +82,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             size="large"
           />
         </el-form-item>
+        <el-button size="large" @click="router.go(-1)" class="">
+          Go back
+        </el-button>
         <el-button size="large" @click="submitForm(formRef)" class="">
           Send
         </el-button>

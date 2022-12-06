@@ -97,8 +97,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
-  <main class="flex flex-1 justify-center items-center">
-    <div class="w-96 border-gray-600 border-2 p-10 rounded-md bg-gray-200">
+  <main class="flex justify-center mt-2 drop-shadow">
+    <div class="border-grey border p-10 w-2/5 shadow-md">
       <div class="font-bold text-center mb-5 text-lg">Reset password</div>
       <el-form
         label-position="top"

@@ -72,36 +72,36 @@ const resetFilters = () => {
 <template>
   <div class="flex grow">
     <AdminMenu />
-    <div class="grow flex flex-col">
-      <div class="flex w-100">
+    <div class="grow flex flex-col p-2">
+      <div class="flex">
         <div class="flex flex-row">
           <el-input
             v-model="filter.firstName"
-            class="w-50 m-2"
+            class="mb-2 w-50"
             placeholder="First Name"
           />
           <el-input
             v-model="filter.lastName"
-            class="w-50 m-2"
+            class="mb-2 ml-2 w-50"
             placeholder="Last Name"
           />
         </div>
         <div class="!ml-auto">
           <el-button
-            class="my-2 mr-2 p-3 font-bold right !ml-auto"
+            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
             @click="getUsers.mutate()"
             ><el-icon><Search /></el-icon>&nbsp;Search</el-button
           >
           <el-button
-            class="my-2 mr-2 p-3 font-bold right !ml-auto"
+            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
             type="info"
             @click="resetFilters"
             ><el-icon><RefreshRight /></el-icon>&nbsp;Reset filters</el-button
           >
           <el-button
-            class="my-2 mr-2 p-3 font-bold right !ml-auto"
+            class="mb-2 p-3 font-bold right !ml-auto"
             type="success"
             plain
             @click="router.push({ name: 'user-add' })"
@@ -110,12 +110,11 @@ const resetFilters = () => {
         </div>
       </div>
       <el-table
-        class="px-2 overflow-x-hidden"
-        :stripe="true"
         :data="users ?? []"
         :default-sort="{ prop: 'firstName', order: 'descending' }"
         :flexible="true"
         :border="true"
+        :stripe="true"
         @row-click="rowClickDetails"
       >
         <el-table-column
@@ -144,6 +143,7 @@ const resetFilters = () => {
           fixed="right"
           label="Operations"
           index="col-operations"
+          width=""
         >
           <template #default="scope">
             <el-button
