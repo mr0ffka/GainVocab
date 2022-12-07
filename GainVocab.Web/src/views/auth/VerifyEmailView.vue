@@ -20,20 +20,22 @@ onMounted(async () => {
       : route.query.token?.[0] ?? "";
 
   if (userId.value != "" && userId.value && token.value != "" && token.value) {
-    let result = await verifyEmailFn(userId.value, token.value);
-    if (result.succeeded) {
-      ElMessage({
-        showClose: true,
-        message: "Email confirmation successful!",
-        type: "success",
+    const result = await verifyEmailFn(userId.value, token.value)
+      .then(() => {
+        ElMessage({
+          showClose: true,
+          message: "Email confirmation successful!",
+          type: "success",
+        });
+      })
+      .catch(() => {
+        ElMessage({
+          showClose: true,
+          message:
+            "An error occured during email confirmation! Try again later.",
+          type: "error",
+        });
       });
-    } else {
-      ElMessage({
-        showClose: true,
-        message: "An error occured during email confirmation! Try again later.",
-        type: "error",
-      });
-    }
     router.push("login");
   }
 });

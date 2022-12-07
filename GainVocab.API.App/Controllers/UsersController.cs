@@ -1,4 +1,7 @@
-﻿using GainVocab.API.Core.Interfaces;
+﻿using AutoMapper;
+using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Extensions.Errors;
+using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Core.Models.Users;
 using GainVocab.API.Core.Services;
@@ -9,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using System.Collections.Generic;
 using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
@@ -22,13 +26,15 @@ namespace GainVocab.API.App.Controllers
         private readonly UserManager<APIUser> UserManager;
         private readonly UsersService Users;
         private readonly ILogger<UsersController> Logger;
+        private readonly IMapper Mapper;
 
-        public UsersController(IAuthManager authManager, UserManager<APIUser> userManager, ILogger<UsersController> logger, UsersService users)
+        public UsersController(IAuthManager authManager, UserManager<APIUser> userManager, ILogger<UsersController> logger, UsersService users, IMapper mapper)
         {
             AuthManager = authManager;
             Logger = logger;
             UserManager = userManager;
             Users = users;
+            Mapper = mapper;
         }
 
         [HttpGet]
@@ -38,6 +44,29 @@ namespace GainVocab.API.App.Controllers
             var data = await Users.GetList(filter, pager);
 
             return Ok(data);
+        }
+
+        [HttpPost("add")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Add([FromBody] UserAddModel newUser)
+        {
+            var response = await Users.Add(newUser);
+
+            if (response.Errors.Any())
+            {
+                throw new BadRequestException("Error while adding user", Mapper.Map<List<IdentityError>, List<ErrorEntry>>(response.Errors.ToList()));
+            }
+
+            return Ok(response.Succeeded);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Remove(string id)
+        {
+            await Users.Remove(id);
+
+            return Ok();
         }
     }
 }

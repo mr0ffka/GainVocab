@@ -1,7 +1,7 @@
 import axios from "axios";
+import { GenericResponse } from "../common/types";
 
 import type {
-  GenericResponse,
   IResetPasswordModel,
   ILoginModel,
   ILoginResponse,

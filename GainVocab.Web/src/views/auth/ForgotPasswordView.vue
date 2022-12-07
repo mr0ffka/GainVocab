@@ -1,21 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import {
-  forgotPasswordFn,
-  loginUserFn,
-  registerUserFn,
-} from "@/services/auth/authApi";
-import type {
-  GenericResponse,
-  IForgotPasswordModel,
-  IRegisterModel,
-} from "@/services/auth/types";
+import { forgotPasswordFn } from "@/services/auth/authApi";
+import type { IForgotPasswordModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";
 
 const formRef = ref<FormInstance>();
-const queryClient = useQueryClient();
 
 const formModel: IForgotPasswordModel = reactive({
   email: "",
@@ -25,32 +15,29 @@ const rules = reactive({
   email: [{ required: true, message: "Email is required" }],
 });
 
-const forgotPasswordMutation = useMutation(
-  (email: IForgotPasswordModel) => forgotPasswordFn(formModel),
-  {
-    onError: (error: any) => {
-      ElMessage({
-        showClose: true,
-        message: "Something went wrong",
-        type: "error",
-      });
-    },
-    onSuccess: (data: GenericResponse) => {
+const forgotPassword = (email: IForgotPasswordModel) =>
+  forgotPasswordFn(formModel)
+    .then((data) => {
       ElMessage({
         showClose: true,
         message: "Reset passowrd link has been send",
         type: "success",
       });
       router.push({ name: "login" });
-    },
-  }
-);
+    })
+    .catch((error) => {
+      ElMessage({
+        showClose: true,
+        message: "Something went wrong",
+        type: "error",
+      });
+    });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      forgotPasswordMutation.mutate({
+      forgotPassword({
         email: formModel.email,
       });
     } else {

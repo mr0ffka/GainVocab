@@ -1,9 +1,3 @@
-export interface GenericResponse {
-  succeeded: any;
-  status: string;
-  message: string;
-}
-
 export interface IUserAuth {
   isAuthenticated: boolean;
   isAdmin: boolean;

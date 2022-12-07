@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GainVocab.API.Core.Extensions.Errors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -9,9 +10,16 @@ namespace GainVocab.API.Core.Exceptions
 {
     public class BadRequestException : Exception
     {
+        public List<ErrorEntry> Errors { get; set; }
+
         public BadRequestException(string message) : base(message)
         {
 
+        }
+
+        public BadRequestException(string message, List<ErrorEntry> errors) : base(message)
+        {
+            Errors = errors;
         }
 
         public BadRequestException(string message, Exception innerException) : base(message, innerException)

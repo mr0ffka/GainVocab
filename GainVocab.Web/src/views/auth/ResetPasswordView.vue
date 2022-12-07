@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { onBeforeUpdate, onMounted, reactive, ref } from "vue";
-import {
-  loginUserFn,
-  registerUserFn,
-  resetPasswordFn,
-} from "@/services/auth/authApi";
-import type {
-  GenericResponse,
-  IResetPasswordModel,
-  IRegisterModel,
-} from "@/services/auth/types";
+import { onMounted, reactive, ref } from "vue";
+import { resetPasswordFn } from "@/services/auth/authApi";
+import type { IResetPasswordModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
+import { useQueryClient } from "@tanstack/vue-query";
 import router from "@/router";
-import { IUserAuthResponse } from "@/services/auth/types";
 import { useRoute, useRouter } from "vue-router";
 
 const formRef = ref<FormInstance>();
-const queryClient = useQueryClient();
 const route = useRoute();
 
 const forgotPasswordModel: IResetPasswordModel = reactive({
@@ -58,32 +48,29 @@ onMounted(async () => {
   }
 });
 
-const resetPasswordMutation = useMutation(
-  (form: IResetPasswordModel) => resetPasswordFn(form),
-  {
-    onError: (error: any) => {
+const resetPassword = (form: IResetPasswordModel) =>
+  resetPasswordFn(form)
+    .then(() => {
       ElMessage({
         showClose: true,
         message: "Something went wrong",
         type: "error",
       });
-    },
-    onSuccess: (data: GenericResponse) => {
+    })
+    .catch(() => {
       ElMessage({
         showClose: true,
         message: "Password changed successfully!",
         type: "success",
       });
       router.push({ name: "login" });
-    },
-  }
-);
+    });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      resetPasswordMutation.mutate({
+      resetPassword({
         userId: forgotPasswordModel.userId,
         resetToken: forgotPasswordModel.resetToken,
         newPassword: forgotPasswordModel.newPassword,

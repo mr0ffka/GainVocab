@@ -4,7 +4,7 @@ import { loginUserFn, registerUserFn } from "@/services/auth/authApi";
 import type { IRegisterModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/vue-query";
-import router from "@/router";
+import { router } from "@/router";
 import { IUserAuthResponse } from "@/services/auth/types";
 
 const formRef = ref<FormInstance>();
@@ -28,37 +28,34 @@ const rules = reactive({
   ],
 });
 
-const loginMutation = useMutation(
-  (credentials: IRegisterModel) => registerUserFn(credentials),
-  {
-    onError: (error: any) => {
-      ElMessage({
-        showClose: true,
-        message: error.response.data.Title,
-        type: "error",
-      });
-    },
-    onSuccess: (data: IUserAuthResponse) => {
+const register = (credentials: IRegisterModel) =>
+  registerUserFn(credentials)
+    .then((data: IUserAuthResponse) => {
       ElMessage({
         showClose: true,
         message: "Registration successful",
         type: "success",
       });
-      queryClient.setQueryData(["authUser"], data.user);
       if (data.user.isAdmin) {
         router.push({ name: "admin-dashboard" });
       } else {
         router.push({ name: "user-dashboard" });
       }
-    },
-  }
-);
+      queryClient.setQueryData(["authUser"], data.user);
+    })
+    .catch((error: any) => {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.Title,
+        type: "error",
+      });
+    });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      loginMutation.mutate({
+      register({
         firstName: registerModel.firstName,
         lastName: registerModel.lastName,
         email: registerModel.email,

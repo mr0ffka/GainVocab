@@ -14,5 +14,7 @@ namespace GainVocab.API.Core.Interfaces
     public interface IUsersService
     {
         Task<PagedResult<APIUserModel>> GetList(FilterModel filter, PagerParams pager);
+        Task<IdentityResult> Add(UserAddModel newUser);
+        Task Remove(string id);
     }
 }

@@ -4,7 +4,7 @@ import { loginUserFn } from "@/services/auth/authApi";
 import type { ILoginModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { useMutation, useQueryClient } from "@tanstack/vue-query";
-import router from "@/router";
+import { router } from "@/router";
 import { IUserAuthResponse } from "@/services/auth/types";
 import { CallbackTypes } from "vue3-google-login";
 
@@ -22,37 +22,34 @@ const rules = reactive({
   password: [{ required: true, message: "Password is required" }],
 });
 
-const loginMutation = useMutation(
-  (credentials: ILoginModel) => loginUserFn(credentials),
-  {
-    onError: (error: any) => {
-      ElMessage({
-        showClose: true,
-        message: error.response.data.Title,
-        type: "error",
-      });
-    },
-    onSuccess: (data: IUserAuthResponse) => {
+const login = (credentials: ILoginModel) =>
+  loginUserFn(credentials)
+    .then((data: IUserAuthResponse) => {
       ElMessage({
         showClose: true,
         message: "Successfully logged in",
         type: "success",
       });
-      queryClient.setQueryData(["authUser"], data.user);
       if (data.user.isAdmin) {
         router.push({ name: "admin-dashboard" });
       } else {
         router.push({ name: "user-dashboard" });
       }
-    },
-  }
-);
+      queryClient.setQueryData(["authUser"], data.user);
+    })
+    .catch((error: any) => {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.Title,
+        type: "error",
+      });
+    });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      loginMutation.mutate({
+      login({
         email: loginModel.email,
         password: loginModel.password,
         rememberMe: loginModel.rememberMe,

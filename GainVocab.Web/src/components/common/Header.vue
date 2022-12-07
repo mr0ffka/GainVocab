@@ -9,31 +9,42 @@ import { Expand, Fold, Lock, MoreFilled } from "@element-plus/icons-vue";
 import { useAuthMenuStore } from "@/store/authMenuStore";
 import { storeToRefs } from "pinia";
 
-const isLogged = useQuery(["authUser"], getCurrUser);
+const useAuthUserQuery = () => {
+  console.log("useAuthUserQuery");
+  const query = useQuery(["authUser"], getCurrUser);
+  if (query.data.value?.isAuthenticated === false) {
+    router.push({ name: "login" });
+  }
+
+  return query;
+};
+
+const isLogged = useAuthUserQuery();
+
 const authMenuStore = useAuthMenuStore();
 const { isMenuCollapsed } = storeToRefs(authMenuStore);
 
-const mutation = useMutation(() => logoutUserFn(), {
-  onError: (error: any) => {
-    ElMessage({
-      showClose: true,
-      message: (error as any).response.data.message,
-      type: "error",
+const logoutFn = () =>
+  logoutUserFn()
+    .then(async () => {
+      ElMessage({
+        showClose: true,
+        message: "Successfully logged out",
+        type: "success",
+      });
+      queryClient.setQueriesData(["authUser"], {});
+      router.push({ name: "home" });
+    })
+    .catch((error) => {
+      ElMessage({
+        showClose: true,
+        message: (error as any).response.data.message,
+        type: "error",
+      });
     });
-  },
-  onSuccess: async (data: any) => {
-    ElMessage({
-      showClose: true,
-      message: "Successfully logged out",
-      type: "success",
-    });
-    await queryClient.setQueriesData(["authUser"], {});
-    await router.push({ name: "home" });
-  },
-});
 
 const logout = () => {
-  mutation.mutate();
+  logoutFn();
 };
 </script>
 

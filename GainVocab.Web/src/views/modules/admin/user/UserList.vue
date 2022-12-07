@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
-import { getListUser } from "@/services/user/userApi";
+import { getListUser, removeUser } from "@/services/user/userApi";
 import { useUserStore } from "@/store/userStore";
-import { useMutation, useQuery } from "@tanstack/vue-query";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import { IUserModel } from "@/services/user/types";
@@ -17,33 +16,51 @@ const confirmDeleteDialog = ref(false);
 const focusedItem = ref<IUserModel | null>();
 let users = ref<IUserModel[]>();
 let pagerValues = ref<IPager>();
+const userRoleKeyValuePair = userStore.getUserRoleKeyValuePair();
 
-const getUsers = useMutation(
-  async () => await getListUser(filter.value, pager.value),
-  {
-    onError: (error: any) => {
-      ElMessage({
-        showClose: true,
-        message: error.response.data.Title,
-        type: "error",
-      });
-    },
-    onSuccess: (data: IPagedResult) => {
+const getUsers = () =>
+  getListUser(filter.value, pager.value)
+    .then((data: IPagedResult) => {
+      console.log(filter);
       users.value = data.items;
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,
         recordNumber: data.recordNumber,
       };
-    },
-  }
-);
+    })
+    .catch((error) => {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.Title,
+        type: "error",
+      });
+    });
+
+const deleteUser = async (id: string) =>
+  await removeUser(id)
+    .then((data: any) => {
+      ElMessage({
+        showClose: true,
+        message: "User has been deleted",
+        type: "success",
+      });
+      getUsers();
+    })
+    .catch((error: any) => {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.Title,
+        type: "error",
+      });
+    });
 
 onMounted(() => {
-  getUsers.mutate();
+  getUsers();
 });
 
 const rowClickDetails = (row: IUserModel, column: any) => {
+  console.log(column);
   if (column.index != "col-operations") {
     router.push({ name: "user-details", params: { id: row.id } });
   }
@@ -59,13 +76,13 @@ const handleDeleteDialog = (row: IUserModel) => {
   confirmDeleteDialog.value = true;
 };
 const handleDelete = () => {
-  // delete logic
+  deleteUser(focusedItem.value?.id ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
 const resetFilters = () => {
   userStore.resetFilters();
-  getUsers.mutate();
+  getUsers();
 };
 </script>
 
@@ -77,20 +94,36 @@ const resetFilters = () => {
         <div class="flex flex-row">
           <el-input
             v-model="filter.firstName"
-            class="mb-2 w-50"
+            class="mb-2"
             placeholder="First Name"
           />
           <el-input
             v-model="filter.lastName"
-            class="mb-2 ml-2 w-50"
+            class="mb-2 ml-2"
             placeholder="Last Name"
           />
+          <el-select
+            v-model="filter.roles"
+            multiple
+            collapse-tags
+            collapse-tags-tooltip
+            placeholder="Roles"
+            clearable
+            class="ml-2"
+          >
+            <el-option
+              v-for="item in userRoleKeyValuePair"
+              :key="item.key"
+              :label="item.value"
+              :value="item.key"
+            />
+          </el-select>
         </div>
-        <div class="!ml-auto">
+        <div class="flex flex-row !ml-auto">
           <el-button
             class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
-            @click="getUsers.mutate()"
+            @click="getUsers"
             ><el-icon><Search /></el-icon>&nbsp;Search</el-button
           >
           <el-button
@@ -140,9 +173,9 @@ const resetFilters = () => {
         />
         <el-table-column
           label-class-name="font-black"
+          index="col-operations"
           fixed="right"
           label="Operations"
-          index="col-operations"
           width=""
         >
           <template #default="scope">
@@ -176,8 +209,8 @@ const resetFilters = () => {
           :background="true"
           layout="->,total,sizes"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers.mutate()"
-          @size-change="getUsers.mutate()"
+          @current-change="getUsers()"
+          @size-change="getUsers()"
         />
         <el-pagination
           class="absolute top-0"
@@ -189,8 +222,8 @@ const resetFilters = () => {
           :background="true"
           layout=",prev, pager, next"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers.mutate()"
-          @size-change="getUsers.mutate()"
+          @current-change="getUsers()"
+          @size-change="getUsers()"
         />
       </div>
     </div>

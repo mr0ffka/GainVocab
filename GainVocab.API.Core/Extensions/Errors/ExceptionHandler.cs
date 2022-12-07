@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
@@ -9,6 +10,7 @@ using GainVocab.API.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace GainVocab.API.Core.Extensions.Errors
 {
@@ -48,11 +50,21 @@ namespace GainVocab.API.Core.Extensions.Errors
         {
             Logger.LogInformation(notFoundException, notFoundException.Message);
 
-            return new ErrorResponse
+            var error = new ErrorResponse
             {
                 Title = notFoundException.Message,
                 StatusCode = HttpStatusCode.NotFound,
             };
+
+            error.Errors = new List<ErrorEntry>();
+            error.Errors.Add(new ErrorEntry
+            {
+                Code = HttpStatusCode.NotFound.ToString(),
+                Title = notFoundException.Message,
+                Source = ""
+            });
+
+            return error;
         }
 
         private ErrorResponse HandleValidationException(ValidationException validationException)
@@ -85,33 +97,61 @@ namespace GainVocab.API.Core.Extensions.Errors
         {
             Logger.LogInformation(badRequestException, badRequestException.Message);
 
-            return new ErrorResponse
+            var error = new ErrorResponse
             {
                 Title = badRequestException.Message,
                 StatusCode = HttpStatusCode.BadRequest
             };
+
+            if (badRequestException.Errors != null && badRequestException.Errors.Any())
+            {
+                error.Errors = new List<ErrorEntry>();
+                error.Errors.AddRange(badRequestException.Errors.Select(e => e).ToList());
+            }
+
+            return error;
         }
 
         private ErrorResponse HandleUnauthorizedException(UnauthorizedAccessException unauthorizedException)
         {
             Logger.LogInformation(unauthorizedException, unauthorizedException.Message);
 
-            return new ErrorResponse
+            var error = new ErrorResponse
             {
                 Title = unauthorizedException.Message,
-                StatusCode = HttpStatusCode.Unauthorized
+                StatusCode = HttpStatusCode.Unauthorized,
             };
+
+            error.Errors = new List<ErrorEntry>();
+            error.Errors.Add(new ErrorEntry
+            {
+                Code = HttpStatusCode.Unauthorized.ToString(),
+                Title = unauthorizedException.Message,
+                Source = ""
+            });
+
+            return error;
         }
 
         private ErrorResponse HandleUnhandledExceptions(Exception exception)
         {
             Logger.LogError(exception, exception.Message);
 
-            return new ErrorResponse
+            var error = new ErrorResponse
             {
                 Title = "An unhandled error occurred while processing this request",
-                StatusCode = HttpStatusCode.InternalServerError
+                StatusCode = HttpStatusCode.InternalServerError,
             };
+
+            error.Errors = new List<ErrorEntry>();
+            error.Errors.Add(new ErrorEntry
+            {
+                Code = HttpStatusCode.InternalServerError.ToString(),
+                Title = "An unhandled error occurred while processing this request",
+                Source = ""
+            });
+
+            return error;
         }
     }
 }

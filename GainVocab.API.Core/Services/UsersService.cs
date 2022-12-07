@@ -1,21 +1,47 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GainVocab.API.Core.Extensions;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Core.Models.Users;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
 using System.Linq.Expressions;
+using System.Web;
 
 namespace GainVocab.API.Core.Services
 {
     public class UsersService : GenericService<APIUser>, IUsersService
     {
-        public UsersService(DefaultDbContext context, IMapper mapper) : base(context, mapper)
+        private readonly UserManager<APIUser> UserManager;
+
+        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, IMapper mapper) : base(context, mapper)
         {
+            UserManager = userManager;
+        }
+
+        public async Task<IdentityResult> Add(UserAddModel newUser)
+        {
+            var user = Mapper.Map<APIUser>(newUser);
+            user.UserName = newUser.Email;
+            user.EmailConfirmed = true;
+
+            var result = await UserManager.CreateAsync(user, newUser.Password);
+
+            if (result.Succeeded)
+            {
+                foreach(var role in newUser.Roles)
+                { 
+                    await UserManager.AddToRoleAsync(user, role.Description());
+                }
+            }
+
+            return result;
         }
 
         public async Task<PagedResult<APIUserModel>> GetList(FilterModel filter, PagerParams pager)
@@ -69,6 +95,12 @@ namespace GainVocab.API.Core.Services
                 RecordNumber = pager.PageSize,
                 TotalCount = totalCount
             };
+        }
+
+        public async Task Remove(string id)
+        {
+            var user = await GetAsync(id);
+            var result = await UserManager.DeleteAsync(user);
         }
     }
 }

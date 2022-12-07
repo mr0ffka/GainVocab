@@ -10,5 +10,6 @@ namespace GainVocab.API.Core.Models.Users
     {
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public List<UserRoles>? Roles { get; set; }
     }
 }

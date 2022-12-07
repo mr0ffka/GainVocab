@@ -1,3 +1,5 @@
+import { GenericResponse } from "./../common/types";
+import { IUserAddModel } from "./types";
 import merge from "lodash/merge";
 import axios from "axios";
 
@@ -20,4 +22,12 @@ export const getListUser = async (
       params: merge({}, filter, pager),
     })
   ).data;
+};
+
+export const addUser = async (user: IUserAddModel) => {
+  return (await userApi.post<GenericResponse>("users/add", user)).data;
+};
+
+export const removeUser = async (id: string) => {
+  return (await userApi.delete(`users/${id}`)).data;
 };
