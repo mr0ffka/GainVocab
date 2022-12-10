@@ -48,7 +48,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
-  <main class="flex justify-center mt-2 drop-shadow">
+  <main class="flex justify-center items-center h-screen drop-shadow">
     <div class="border-grey border p-10 w-2/5 shadow-md">
       <div class="font-bold text-center mb-5 text-lg">
         Send reset password email

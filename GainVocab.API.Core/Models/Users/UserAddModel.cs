@@ -16,7 +16,7 @@ namespace GainVocab.API.Core.Models.Users
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? PasswordConfirm { get; set; }
-        public List<UserRoles> Roles { get; set; }
+        public List<string> Roles { get; set; }
 
         public IEnumerable<ValidationResult> Validate(System.ComponentModel.DataAnnotations.ValidationContext validationContext)
         {
@@ -29,6 +29,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required");
                 v.RuleFor(x => x.Email).EmailAddress().WithMessage("Incorrect email address");
                 v.RuleFor(x => x.Roles).NotEmpty().WithMessage("User role is required");
+                v.RuleFor(x => x.Roles).ForEach(r => r.IsEnumName(typeof(UserRoles), caseSensitive: false)).WithMessage("Wrong role name provided");
             })
             .Validate(this)
             .Result();

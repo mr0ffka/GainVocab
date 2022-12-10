@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 
@@ -35,11 +36,28 @@ namespace GainVocab.API.Core.Services
 
             if (result.Succeeded)
             {
-                foreach(var role in newUser.Roles)
-                { 
-                    await UserManager.AddToRoleAsync(user, role.Description());
-                }
+                await UserManager.AddToRolesAsync(user, newUser.Roles);
+                //foreach(var role in newUser.Roles)
+                //{ 
+                //    await UserManager.AddToRoleAsync(user, role);
+                //}
             }
+
+            return result;
+        }
+
+        public async Task<APIUserModel> Get(string id)
+        {
+            var user = Context.Users
+                .Where(u => u.Id == id)
+                .FirstOrDefault();
+
+            if (user == null)
+                return null;
+
+            var userRoles = await UserManager.GetRolesAsync(user);
+            var result = Mapper.Map<APIUser, APIUserModel>(user);
+            result.Roles = userRoles.ToList() ?? new List<string>();
 
             return result;
         }
@@ -80,21 +98,45 @@ namespace GainVocab.API.Core.Services
                     : query.OrderByDescending(selectedColumn);
             }
 
-            var totalCount = query.Count();
-
-            var items = query
+            var users = query
                 .Skip(pager.PageSize * (pager.PageNumber - 1))
                 .Take(pager.PageSize)
-                .ProjectTo<APIUserModel>(Mapper.ConfigurationProvider)
                 .ToList();
+
+            var items = new List<APIUserModel>();
+
+            foreach (var user in users)
+            {
+                var userRoles = await UserManager.GetRolesAsync(user);
+                var mappedUser = Mapper.Map<APIUser, APIUserModel>(user);
+                mappedUser.Roles = userRoles.ToList() ?? new List<string>();
+                items.Add(mappedUser);
+            }
+
+            if (filter.Roles != null && filter.Roles.Any())
+            {
+                items = items.Where(u => filter.Roles.Select(x => x.ToString()).ToList().Intersect(u.Roles).Any()).ToList();
+            }
 
             return new PagedResult<APIUserModel>
             {
                 Items = items,
                 PageNumber = pager.PageNumber,
                 RecordNumber = pager.PageSize,
-                TotalCount = totalCount
+                TotalCount = items.Count
             };
+        }
+
+        public async Task Update(string id, UserEditModel model)
+        {
+            var user = await GetAsync(id);
+
+            Mapper.Map(model, user);
+            await UserManager.UpdateAsync(user);
+
+            var userRoles = await UserManager.GetRolesAsync(user);
+            await UserManager.RemoveFromRolesAsync(user, userRoles);
+            await UserManager.AddToRolesAsync(user, model.Roles);
         }
 
         public async Task Remove(string id)

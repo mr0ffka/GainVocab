@@ -10,10 +10,10 @@ export default async function alreadyAuthMiddleware({
   to,
 }: MiddlewareContext) {
   try {
-    //console.log("form: ", from, " to: ", to);
-    let authResult = queryClient.getQueryData(["authUser"]) as IUserAuth;
+    let authResult = (await queryClient.getQueryData([
+      "authUser",
+    ])) as IUserAuth;
     if (!authResult) {
-      //console.log("dupa alreadyAuthMiddleware");
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);
     }

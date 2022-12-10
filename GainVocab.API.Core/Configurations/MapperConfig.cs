@@ -16,6 +16,7 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<APIUserModel, APIUser>().ReverseMap();
             CreateMap<RegisterModel, APIUser>().ReverseMap();
             CreateMap<UserAddModel, APIUser>().ReverseMap();
+            CreateMap<UserEditModel, APIUser>().ReverseMap();
             CreateMap<IdentityError, ErrorEntry>()
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Description))
                 .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))

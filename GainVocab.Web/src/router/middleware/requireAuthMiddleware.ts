@@ -9,8 +9,10 @@ export default async function requireAuthMiddleware({
   next: NavigationGuardNext;
 }) {
   try {
-    const authResult = queryClient.getQueryData(["authUser"]) as IUserAuth;
-    if (!authResult) {
+    const authResult = (await queryClient.getQueryData([
+      "authUser",
+    ])) as IUserAuth;
+    if (!authResult || !authResult.isAuthenticated) {
       return next({
         name: "login",
       });

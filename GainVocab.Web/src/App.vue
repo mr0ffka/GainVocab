@@ -7,8 +7,7 @@ useQuery(["authUser"], getCurrUser);
 </script>
 
 <template>
-  <Header></Header>
-  <router-view></router-view>
+  <router-view :key="$route.fullPath"></router-view>
 </template>
 
 <style scoped></style>

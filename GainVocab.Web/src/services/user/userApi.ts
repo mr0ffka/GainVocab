@@ -1,3 +1,5 @@
+import { toURLSearchParams } from "./../../helpers/axios";
+import qs from "qs";
 import { GenericResponse } from "./../common/types";
 import { IUserAddModel } from "./types";
 import merge from "lodash/merge";
@@ -19,7 +21,7 @@ export const getListUser = async (
 ) => {
   return (
     await userApi.get<IPagedResult>("users", {
-      params: merge({}, filter, pager),
+      params: toURLSearchParams({ ...filter, ...pager }),
     })
   ).data;
 };
@@ -28,6 +30,14 @@ export const addUser = async (user: IUserAddModel) => {
   return (await userApi.post<GenericResponse>("users/add", user)).data;
 };
 
+export const getUser = async (id: string) => {
+  return (await userApi.get<IUserAddModel>(`users/${id}`)).data;
+};
+
 export const removeUser = async (id: string) => {
   return (await userApi.delete(`users/${id}`)).data;
+};
+
+export const updateUser = async (id: string, model: IUserAddModel) => {
+  return (await userApi.patch<IUserAddModel>(`users/${id}`, model)).data;
 };

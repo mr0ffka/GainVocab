@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import { IUserAddModel, USER_ROLES } from "@/services/user/types";
-import { useMutation } from "@tanstack/vue-query";
 import { ElMessage, FormInstance } from "element-plus";
-import { reactive, ref } from "vue";
+import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
-import { addUser } from "@/services/user/userApi";
-import { ErrorResponse } from "@/services/common/types";
+import { addUser, getUser, updateUser } from "@/services/user/userApi";
 import { useUserStore } from "@/store/userStore";
+import Header from "@/components/common/Header.vue";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
+const userId = ref<string>("");
 const formRef = ref<FormInstance>();
 const userStore = useUserStore();
-const userRoleKeyValuePair = userStore.getUserRoleKeyValuePair();
+const userRoleOptions = userStore.getUserRoleOptions();
 
 const userAddModel: IUserAddModel = reactive({
   firstName: "",
@@ -33,6 +35,13 @@ const rules = reactive({
   roles: [{ required: true, message: "Select a user role" }],
 });
 
+onMounted(async () => {
+  if (route.params.id !== undefined) {
+    userId.value = route.params.id.toString();
+    userGet();
+  }
+});
+
 const userAdd = (user: IUserAddModel) =>
   addUser(user)
     .then(() => {
@@ -48,10 +57,46 @@ const userAdd = (user: IUserAddModel) =>
       error.errors.forEach(async (e: any) => {
         message += e.title + "<br/>";
       });
-      console.log(message);
       ElMessage({
         showClose: true,
         message: message,
+        type: "error",
+      });
+    });
+
+const userGet = () =>
+  getUser(userId.value.toString())
+    .then((data: IUserAddModel) => {
+      userAddModel.email = data.email;
+      userAddModel.firstName = data.firstName;
+      userAddModel.lastName = data.lastName;
+      userAddModel.roles = data.roles;
+    })
+    .catch((error: any) => {
+      let message: string = "";
+      error.errors.forEach(async (e: any) => {
+        message += e.title + "<br/>";
+      });
+      ElMessage({
+        showClose: true,
+        message: message,
+        type: "error",
+      });
+    });
+
+const userUpdate = (model: IUserAddModel) =>
+  updateUser(userId.value.toString(), model)
+    .then(() => {
+      ElMessage({
+        showClose: true,
+        message: "User updated",
+        type: "success",
+      });
+    })
+    .catch((error: any) => {
+      ElMessage({
+        showClose: true,
+        message: "error",
         type: "error",
       });
     });
@@ -60,14 +105,25 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
-      userAdd({
-        firstName: userAddModel.firstName,
-        lastName: userAddModel.lastName,
-        email: userAddModel.email,
-        password: userAddModel.password,
-        passwordConfirm: userAddModel.passwordConfirm,
-        roles: userAddModel.roles,
-      });
+      if (userId.value === "" || userId.value === null) {
+        userAdd({
+          firstName: userAddModel.firstName,
+          lastName: userAddModel.lastName,
+          email: userAddModel.email,
+          password: userAddModel.password,
+          passwordConfirm: userAddModel.passwordConfirm,
+          roles: userAddModel.roles,
+        });
+      } else {
+        userUpdate({
+          firstName: userAddModel.firstName,
+          lastName: userAddModel.lastName,
+          email: userAddModel.email,
+          password: userAddModel.password,
+          passwordConfirm: userAddModel.passwordConfirm,
+          roles: userAddModel.roles,
+        });
+      }
     } else {
       console.log("error submit!", fields);
     }
@@ -76,11 +132,15 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 </script>
 
 <template>
+  <Header></Header>
   <div class="flex grow">
     <AdminMenu />
     <div class="grow flex flex-col p-2">
       <div class="flex">
-        <span class="font-bold text-xl">Add new user</span>
+        <span v-if="userId === '' || userId === null" class="font-bold text-xl"
+          >Add new user</span
+        >
+        <span v-else class="font-bold text-xl">Edit user</span>
       </div>
       <el-form
         class="my-2"
@@ -88,7 +148,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         label-width="auto"
         ref="formRef"
         :model="userAddModel"
-        :rules="rules"
+        :rules="userId === '' || userId === null ? rules : null"
       >
         <el-form-item prop="firstName" label="First name">
           <el-input
@@ -110,6 +170,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           <el-input
             v-model="userAddModel.email"
             placeholder="Email"
+            :disabled="userId !== ''"
             clearable
             size="large"
           />
@@ -147,10 +208,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             class="grow"
           >
             <el-option
-              v-for="item in userRoleKeyValuePair"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
+              v-for="item in userRoleOptions"
+              :key="item"
+              :label="item"
+              :value="item"
             />
           </el-select>
         </el-form-item>
@@ -172,7 +233,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           @click="submitForm(formRef)"
           class="text-center !ml-auto"
         >
-          Add new account
+          <span v-if="userId === '' || userId === null">Add new user</span>
+          <span v-else>Edit user</span>
         </el-button>
       </div>
     </div>

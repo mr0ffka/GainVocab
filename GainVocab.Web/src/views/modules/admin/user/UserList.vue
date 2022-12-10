@@ -9,19 +9,21 @@ import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
+import Header from "@/components/common/Header.vue";
 
 const userStore = useUserStore();
-const { filter, pager } = storeToRefs(userStore);
+const { filter, pager, isSearching } = storeToRefs(userStore);
 const confirmDeleteDialog = ref(false);
 const focusedItem = ref<IUserModel | null>();
 let users = ref<IUserModel[]>();
 let pagerValues = ref<IPager>();
-const userRoleKeyValuePair = userStore.getUserRoleKeyValuePair();
+const userRoleOptions = userStore.getUserRoleOptions();
 
-const getUsers = () =>
+const getUsers = () => {
+  isSearching.value = true;
   getListUser(filter.value, pager.value)
     .then((data: IPagedResult) => {
-      console.log(filter);
+      isSearching.value = false;
       users.value = data.items;
       pagerValues.value = {
         pageNumber: data.pageNumber,
@@ -30,12 +32,14 @@ const getUsers = () =>
       };
     })
     .catch((error) => {
+      isSearching.value = false;
       ElMessage({
         showClose: true,
         message: error.response.data.Title,
         type: "error",
       });
     });
+};
 
 const deleteUser = async (id: string) =>
   await removeUser(id)
@@ -60,8 +64,7 @@ onMounted(() => {
 });
 
 const rowClickDetails = (row: IUserModel, column: any) => {
-  console.log(column);
-  if (column.index != "col-operations") {
+  if (column.type != "not-clickable") {
     router.push({ name: "user-details", params: { id: row.id } });
   }
 };
@@ -87,6 +90,7 @@ const resetFilters = () => {
 </script>
 
 <template>
+  <Header></Header>
   <div class="flex grow">
     <AdminMenu />
     <div class="grow flex flex-col p-2">
@@ -109,13 +113,14 @@ const resetFilters = () => {
             collapse-tags-tooltip
             placeholder="Roles"
             clearable
-            class="ml-2"
+            @clear="getUsers"
+            class="ml-2 min-w-fit"
           >
             <el-option
-              v-for="item in userRoleKeyValuePair"
-              :key="item.key"
-              :label="item.value"
-              :value="item.key"
+              v-for="item in userRoleOptions"
+              :key="item"
+              :label="item"
+              :value="item"
             />
           </el-select>
         </div>
@@ -123,6 +128,7 @@ const resetFilters = () => {
           <el-button
             class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
+            :loading="isSearching"
             @click="getUsers"
             ><el-icon><Search /></el-icon>&nbsp;Search</el-button
           >
@@ -173,29 +179,47 @@ const resetFilters = () => {
         />
         <el-table-column
           label-class-name="font-black"
-          index="col-operations"
-          fixed="right"
-          label="Operations"
+          prop="roles"
+          label="Roles"
+          sortable
           width=""
         >
           <template #default="scope">
-            <el-button
-              size="small"
-              plain
-              type="info"
-              @click="handleDetails(scope.row)"
-              >Details</el-button
-            >
-            <el-button size="small" plain @click="handleEdit(scope.row)"
-              >Edit</el-button
-            >
-            <el-button
-              size="small"
-              type="danger"
-              plain
-              @click="handleDeleteDialog(scope.row)"
-              >Delete</el-button
-            >
+            <el-tag
+              v-for="role in scope.row.roles"
+              class="mr-2"
+              disable-transitions
+              >{{ role }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label-class-name="font-black"
+          fixed="right"
+          label="Operations"
+          width=""
+          type="not-clickable"
+        >
+          <template #default="scope">
+            <div class="flex flex-row">
+              <el-button
+                size="small"
+                plain
+                type="info"
+                @click="handleDetails(scope.row)"
+                >Details</el-button
+              >
+              <el-button size="small" plain @click="handleEdit(scope.row)"
+                >Edit</el-button
+              >
+              <el-button
+                size="small"
+                type="danger"
+                plain
+                @click="handleDeleteDialog(scope.row)"
+                >Delete</el-button
+              >
+            </div>
           </template>
         </el-table-column>
       </el-table>

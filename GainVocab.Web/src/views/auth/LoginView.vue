@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { onBeforeUpdate, reactive, ref } from "vue";
+import { reactive, ref } from "vue";
 import { loginUserFn } from "@/services/auth/authApi";
 import type { ILoginModel } from "@/services/auth/types";
 import { ElMessage, FormInstance } from "element-plus";
-import { useMutation, useQueryClient } from "@tanstack/vue-query";
+import { useQueryClient } from "@tanstack/vue-query";
 import { router } from "@/router";
 import { IUserAuthResponse } from "@/services/auth/types";
 import { CallbackTypes } from "vue3-google-login";
 
 const formRef = ref<FormInstance>();
 const queryClient = useQueryClient();
+const isLogging = ref(false);
 
 const loginModel: ILoginModel = reactive({
   email: "",
@@ -46,6 +47,7 @@ const login = (credentials: ILoginModel) =>
     });
 
 const submitForm = async (formEl: FormInstance | undefined) => {
+  isLogging.value = true;
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
@@ -56,6 +58,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       });
     } else {
       console.log("error submit!", fields);
+      isLogging.value = false;
     }
   });
 };
@@ -66,7 +69,7 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
 </script>
 
 <template>
-  <main class="flex justify-center mt-2 drop-shadow">
+  <main class="flex justify-center items-center h-screen drop-shadow">
     <div class="border-grey border p-10 w-2/5 shadow-md">
       <div class="font-bold text-center mb-5 text-lg">
         Login into an account
@@ -103,7 +106,11 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
             label="Remember me"
             size="large"
           />
-          <el-button size="large" @click="submitForm(formRef)" class="!ml-auto"
+          <el-button
+            size="large"
+            :loading="isLogging"
+            @click="submitForm(formRef)"
+            class="!ml-auto"
             >Login</el-button
           >
         </el-form-item>

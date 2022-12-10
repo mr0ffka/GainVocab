@@ -10,7 +10,6 @@ import { useAuthMenuStore } from "@/store/authMenuStore";
 import { storeToRefs } from "pinia";
 
 const useAuthUserQuery = () => {
-  console.log("useAuthUserQuery");
   const query = useQuery(["authUser"], getCurrUser);
   if (query.data.value?.isAuthenticated === false) {
     router.push({ name: "login" });

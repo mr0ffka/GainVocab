@@ -9,7 +9,9 @@ export default async function isAdminMiddleware({
   next: NavigationGuardNext;
 }) {
   try {
-    let authResult = queryClient.getQueryData(["authUser"]) as IUserAuth;
+    let authResult = (await queryClient.getQueryData([
+      "authUser",
+    ])) as IUserAuth;
     if (!authResult) {
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);

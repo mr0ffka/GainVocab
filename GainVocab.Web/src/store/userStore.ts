@@ -4,6 +4,7 @@ import { defineStore, mapActions, mapState, mapStores } from "pinia";
 import { IFilterModel, USER_ROLES } from "@/services/user/types";
 
 export const useUserStore = defineStore("userStore", () => {
+  const isSearching = ref(false);
   const pager = ref<IPagerParams>({
     pageSize: 10,
     pageNumber: 1,
@@ -22,14 +23,18 @@ export const useUserStore = defineStore("userStore", () => {
     filter.value.roles = [];
   }
 
-  function getUserRoleKeyValuePair() {
-    const options = USER_ROLES.map((userRole, index) => ({
-      key: index,
-      value: userRole,
-    }));
-
+  function getUserRoleOptions() {
+    const options = ["Administrator", "User"];
     return options;
   }
+  // function getUserRoleKeyValuePair() {
+  //   const options = USER_ROLES.map((userRole, index) => ({
+  //     key: index,
+  //     value: userRole,
+  //   }));
 
-  return { pager, filter, resetFilters, getUserRoleKeyValuePair };
+  //   return options;
+  // }
+
+  return { pager, filter, isSearching, resetFilters, getUserRoleOptions };
 });

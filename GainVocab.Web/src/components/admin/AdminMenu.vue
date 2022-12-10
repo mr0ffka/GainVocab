@@ -17,7 +17,7 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
 
 <template>
   <el-menu
-    class="el-menu-vertical shadow-md "
+    class="el-menu-vertical shadow-md"
     :collapse="isMenuCollapsed"
     :collapse-transition="false"
     :router="true"
