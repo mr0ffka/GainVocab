@@ -57,11 +57,13 @@ const resetPassword = (form: IResetPasswordModel) =>
         type: "error",
       });
     })
-    .catch(() => {
-      ElMessage({
-        showClose: true,
-        message: "Password changed successfully!",
-        type: "success",
+    .catch((error: any) => {
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
       router.push({ name: "login" });
     });

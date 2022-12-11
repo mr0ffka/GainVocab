@@ -20,7 +20,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required");
                 v.RuleFor(x => x.Email).EmailAddress().WithMessage("Incorrect email address");
             })
-            .Validate(this)
+            .Validate(this, options => options.ThrowOnFailures())
             .Result();
         }
     }

@@ -22,7 +22,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.Email).EmailAddress().WithMessage("[[[Email is required]]]");
                 v.RuleFor(x => x.Password).NotEmpty().WithMessage("[[[Password is required]]]");
             })
-            .Validate(this)
+            .Validate(this, options => options.ThrowOnFailures())
             .Result();
         }
     }

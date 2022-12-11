@@ -106,14 +106,14 @@ namespace GainVocab.API.Core.Services
             return result.Errors;
         }
 
-        public async Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request)
+        public async Task<AuthResponseModel> VerifyRefreshToken(UserRefreshModel request)
         {
             var jwtSecurityTokenHandler = new JwtSecurityTokenHandler();
             var tokenContent = jwtSecurityTokenHandler.ReadJwtToken(request.Token);
             var username = tokenContent.Claims.ToList().FirstOrDefault(q => q.Type == JwtRegisteredClaimNames.Email)?.Value;
             var user = await UserManager.FindByNameAsync(username);
 
-            if (user == null || user.Id != request.UserId)
+            if (user == null)
             {
                 throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
             }

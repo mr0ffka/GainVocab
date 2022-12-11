@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
-import { IUserAddModel, USER_ROLES } from "@/services/user/types";
+import { IUserAddModel} from "@/services/user/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
@@ -53,14 +53,12 @@ const userAdd = (user: IUserAddModel) =>
       router.push({ name: "user-list" });
     })
     .catch((error: any) => {
-      let message: string = "";
-      error.errors.forEach(async (e: any) => {
-        message += e.title + "<br/>";
-      });
-      ElMessage({
-        showClose: true,
-        message: message,
-        type: "error",
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 
@@ -73,14 +71,12 @@ const userGet = () =>
       userAddModel.roles = data.roles;
     })
     .catch((error: any) => {
-      let message: string = "";
-      error.errors.forEach(async (e: any) => {
-        message += e.title + "<br/>";
-      });
-      ElMessage({
-        showClose: true,
-        message: message,
-        type: "error",
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 
@@ -94,10 +90,12 @@ const userUpdate = (model: IUserAddModel) =>
       });
     })
     .catch((error: any) => {
-      ElMessage({
-        showClose: true,
-        message: "error",
-        type: "error",
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 
@@ -148,7 +146,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         label-width="auto"
         ref="formRef"
         :model="userAddModel"
-        :rules="userId === '' || userId === null ? rules : null"
+        :rules="userId === '' || userId === null ? rules : {}"
       >
         <el-form-item prop="firstName" label="First name">
           <el-input

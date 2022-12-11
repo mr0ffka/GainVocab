@@ -33,10 +33,12 @@ const getUsers = () => {
     })
     .catch((error) => {
       isSearching.value = false;
-      ElMessage({
-        showClose: true,
-        message: error.response.data.Title,
-        type: "error",
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 };

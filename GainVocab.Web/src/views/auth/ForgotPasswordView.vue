@@ -25,11 +25,13 @@ const forgotPassword = (email: IForgotPasswordModel) =>
       });
       router.push({ name: "login" });
     })
-    .catch((error) => {
-      ElMessage({
-        showClose: true,
-        message: "Something went wrong",
-        type: "error",
+    .catch((error: any) => {
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 

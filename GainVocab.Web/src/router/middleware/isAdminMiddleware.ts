@@ -1,4 +1,4 @@
-import { getCurrUser } from "@/services/auth/authApi";
+import { getCurrUser, refreshAccessTokenFn } from "@/services/auth/authApi";
 import { IUserAuth } from "@/services/auth/types";
 import { queryClient } from "@/helpers/queryClient";
 import type { NavigationGuardNext } from "vue-router";
@@ -19,9 +19,17 @@ export default async function isAdminMiddleware({
     if (authResult.isAdmin) {
       return next();
     } else if (!authResult.isAuthenticated) {
-      return next({
-        name: "login",
-      });
+      console.log("use refresh token");
+      await refreshAccessTokenFn();
+      authResult = await getCurrUser();
+      queryClient.setQueryData(["authUser"], authResult);
+      if (authResult.isAdmin) {
+        return next();
+      } else {
+        return next({
+          name: "login",
+        });
+      }
     } else {
       return next({
         name: "error-403",

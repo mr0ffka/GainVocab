@@ -15,7 +15,7 @@ namespace GainVocab.API.Core.Interfaces
         Task<IEnumerable<IdentityError>> Register(RegisterModel userModel);
         Task<AuthResponseModel> Login(LoginModel model);
         Task Logout();
-        Task<AuthResponseModel> VerifyRefreshToken(AuthResponseModel request);
+        Task<AuthResponseModel> VerifyRefreshToken(UserRefreshModel request);
         Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel);
         Task<IdentityResult> ConfirmEmailAddress(string userId, string code);
         Task<IdentityResult> ForgotPassword(string email);

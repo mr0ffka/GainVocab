@@ -1,7 +1,7 @@
 import { IUserAuth } from "@/services/auth/types";
-import { getCurrUser } from "@/services/auth/authApi";
 import { queryClient } from "@/helpers/queryClient";
 import type { NavigationGuardNext } from "vue-router";
+import { getCurrUser, refreshAccessTokenFn } from "@/services/auth/authApi";
 
 export default async function requireAuthMiddleware({
   next,
@@ -9,13 +9,19 @@ export default async function requireAuthMiddleware({
   next: NavigationGuardNext;
 }) {
   try {
-    const authResult = (await queryClient.getQueryData([
+    let authResult = (await queryClient.getQueryData([
       "authUser",
     ])) as IUserAuth;
     if (!authResult || !authResult.isAuthenticated) {
-      return next({
-        name: "login",
-      });
+      console.log("dupa 2");
+      await refreshAccessTokenFn();
+      authResult = await getCurrUser();
+      queryClient.setQueryData(["authUser"], authResult);
+      if (!authResult || !authResult.isAuthenticated) {
+        return next({
+          name: "login",
+        });
+      }
     }
   } catch (error) {
     return next({

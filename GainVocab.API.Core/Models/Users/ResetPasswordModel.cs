@@ -26,7 +26,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.NewPassword).Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$").WithMessage("[[[Incorrect password]]]");
 
             })
-            .Validate(this)
+            .Validate(this, options => options.ThrowOnFailures())
             .Result();
         }
     }

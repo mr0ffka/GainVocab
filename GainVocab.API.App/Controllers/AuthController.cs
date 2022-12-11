@@ -3,6 +3,8 @@ using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Users;
 using GainVocab.API.Core.Services;
 using GainVocab.API.Data.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -12,6 +14,9 @@ namespace GainVocab.API.App.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private const string JWT_TOKEN_COOKIE_NAME = "X-Access-Token";
+        private const string REFRESH_TOKEN_COOKIE_NAME = "X-Refresh-Token";
+
         private readonly IAuthManager AuthManager;
         private readonly UsersService Users;
         private readonly ILogger<AuthController> Logger;
@@ -106,8 +111,14 @@ namespace GainVocab.API.App.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult> RefreshToken([FromBody] AuthResponseModel request)
+        public async Task<ActionResult> RefreshToken()
         {
+            Logger.LogInformation($"Refresh Attempt");
+
+            var request = new UserRefreshModel();
+            request.RefreshToken = Request.Cookies[REFRESH_TOKEN_COOKIE_NAME];
+            request.Token = Request.Cookies[JWT_TOKEN_COOKIE_NAME];
+
             var authResponse = await AuthManager.VerifyRefreshToken(request);
 
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
@@ -115,14 +126,36 @@ namespace GainVocab.API.App.Controllers
 
             return Ok();
         }
+        //[HttpPost("refresh")]
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //public async Task<ActionResult> Refresh()
+        //{
+        //    var refreshToken = Request.Cookies[REFRESH_TOKEN_COOKIE_NAME];
+        //    if (string.IsNullOrEmpty(refreshToken))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    var tokens = await AuthService.Refresh(refreshToken);
+
+        //    if (tokens is null || String.IsNullOrEmpty(tokens.JwtToken) || String.IsNullOrEmpty(tokens.RefreshToken))
+        //    {
+        //        return BadRequest();
+        //    }
+        //    Response.Cookies.Append(JWT_TOKEN_COOKIE_NAME, tokens.JwtToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddHours(AuthSettings.JwtExpireHours) });
+        //    //Response.Cookies.Append("X-Username", user.UserName, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+        //    Response.Cookies.Append(REFRESH_TOKEN_COOKIE_NAME, tokens.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.UtcNow.AddHours(AuthSettings.RefreshTokenExpireHours) });
+
+        //    return Ok();
+        //}
 
         [HttpPost("googlelogin")]
         public async Task<IActionResult> GoogleLogin([FromBody] OAuthLoginModel model)
         {
             var authResponse = await AuthManager.OAuthLogin(model);
             //Response.Cookies.Append("X-Logged-In", true, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append(JWT_TOKEN_COOKIE_NAME, authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            Response.Cookies.Append(REFRESH_TOKEN_COOKIE_NAME, authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
             return Ok(new
             {
@@ -165,7 +198,7 @@ namespace GainVocab.API.App.Controllers
         {
             if (User.Identities.Any())
             {
-                Logger.LogInformation($"[api/auth/me] {User.Identity?.Name}");
+                //Logger.LogInformation($"[api/auth/me] {User.Identity?.Name}");
 
                 var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email);
                 var roleClaims = User.Claims.Where(c => c.Type == ClaimTypes.Role).ToList();

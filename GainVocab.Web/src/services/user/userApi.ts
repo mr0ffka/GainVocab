@@ -1,19 +1,10 @@
 import { toURLSearchParams } from "./../../helpers/axios";
-import qs from "qs";
 import { GenericResponse } from "./../common/types";
-import { IUserAddModel } from "./types";
-import merge from "lodash/merge";
-import axios from "axios";
+import { IUserAddModel, IUserDetailsModel } from "./types";
 
 import type { IPagerParams, IPagedResult } from "../common/types";
 import type { IFilterModel } from "../user/types";
-
-const userApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-});
-
-userApi.defaults.headers.common["Content-Type"] = "application/json";
+import { api as userApi } from "@/helpers/axios";
 
 export const getListUser = async (
   filter: IFilterModel,
@@ -32,6 +23,10 @@ export const addUser = async (user: IUserAddModel) => {
 
 export const getUser = async (id: string) => {
   return (await userApi.get<IUserAddModel>(`users/${id}`)).data;
+};
+
+export const getUserDetails = async (id: string) => {
+  return (await userApi.get<IUserDetailsModel>(`users/details/${id}`)).data;
 };
 
 export const removeUser = async (id: string) => {

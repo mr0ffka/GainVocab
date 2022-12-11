@@ -25,7 +25,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.Password).Equal(p => p.PasswordConfirm).WithMessage("Passwords must be the same");
                 v.RuleFor(x => x.Roles).ForEach(r => r.IsEnumName(typeof(UserRoles), caseSensitive: false)).WithMessage("Wrong role name provided");
             })
-            .Validate(this)
+            .Validate(this, options => options.ThrowOnFailures())
             .Result();
         }
     }

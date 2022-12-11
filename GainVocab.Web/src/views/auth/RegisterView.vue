@@ -44,10 +44,12 @@ const register = (credentials: IRegisterModel) =>
       queryClient.setQueryData(["authUser"], data.user);
     })
     .catch((error: any) => {
-      ElMessage({
-        showClose: true,
-        message: error.response.data.Title,
-        type: "error",
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
       });
     });
 

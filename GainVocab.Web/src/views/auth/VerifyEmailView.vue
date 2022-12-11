@@ -28,12 +28,13 @@ onMounted(async () => {
           type: "success",
         });
       })
-      .catch(() => {
-        ElMessage({
-          showClose: true,
-          message:
-            "An error occured during email confirmation! Try again later.",
-          type: "error",
+      .catch((error: any) => {
+        error.response.data.Errors.forEach(async (e: any) => {
+          ElMessage({
+            showClose: true,
+            message: e.Title,
+            type: "error",
+          });
         });
       });
     router.push("login");

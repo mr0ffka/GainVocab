@@ -1,9 +1,6 @@
 import { IUserAuth } from "../auth/types";
 
-export type UserRole = typeof USER_ROLES[number];
-export const USER_ROLES = ["Administrator", "User"] as const;
-
-export type UserRole2 = "Administrator" | "User";
+export type UserRole = "Administrator" | "User";
 
 export interface IFilterModel {
   firstName: string;
@@ -16,7 +13,7 @@ export interface IUserModel {
   firstName: string;
   lastName: string;
   email: string;
-  roles: UserRole2[];
+  roles: UserRole[];
 }
 
 export interface IUserAddModel {
@@ -25,5 +22,13 @@ export interface IUserAddModel {
   email: string;
   password: string;
   passwordConfirm: string;
-  roles: UserRole2[];
+  roles: UserRole[];
+}
+
+export interface IUserDetailsModel {
+  firstName: string;
+  lastName: string;
+  email: string;
+  roles: UserRole[];
+  courses: [];
 }

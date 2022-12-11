@@ -1,7 +1,21 @@
 <script setup lang="ts"></script>
 
 <template>
-  <p>500</p>
+  <div class="max-w-4xl mx-auto flex justify-center items-center h-screen">
+    <div class="text-center">
+      <div class="text-5xl font-bold">500</div>
+      <div class="block text-xl font-semibold">Internal Server Error</div>
+      <el-button
+        size="large"
+        @click="$router.go(-1)"
+        type="info"
+        plain
+        class="mt-10 text-center"
+      >
+        Go back
+      </el-button>
+    </div>
+  </div>
 </template>
 
 <style scoped></style>

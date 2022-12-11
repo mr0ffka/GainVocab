@@ -37,10 +37,6 @@ namespace GainVocab.API.Core.Services
             if (result.Succeeded)
             {
                 await UserManager.AddToRolesAsync(user, newUser.Roles);
-                //foreach(var role in newUser.Roles)
-                //{ 
-                //    await UserManager.AddToRoleAsync(user, role);
-                //}
             }
 
             return result;

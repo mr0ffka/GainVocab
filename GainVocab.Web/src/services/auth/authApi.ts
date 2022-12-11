@@ -12,15 +12,10 @@ import type {
   IForgotPasswordModel,
 } from "./types";
 
-const authApi = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-  withCredentials: true,
-});
-
-authApi.defaults.headers.common["Content-Type"] = "application/json";
+import { api as authApi } from "@/helpers/axios";
 
 export const refreshAccessTokenFn = async () => {
-  const response = await authApi.get<ILoginResponse>("auth/refresh");
+  const response = await authApi.post("auth/refresh");
   return response.data;
 };
 
