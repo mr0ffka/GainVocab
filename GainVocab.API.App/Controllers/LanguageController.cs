@@ -56,9 +56,9 @@ namespace GainVocab.API.App.Controllers
             return Ok();
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{publicId}")]
         [Authorize(Roles = "Administrator")]
-        public async Task<ActionResult> Get(string publicId)
+        public async Task<ActionResult> Get(string? publicId)
         {
             var user = Languages.Get(publicId);
 
@@ -70,9 +70,9 @@ namespace GainVocab.API.App.Controllers
             return Ok(user);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{publicId}")]
         [Authorize(Roles = "Administrator")]
-        public async Task<ActionResult> Remove(string publicId)
+        public async Task<ActionResult> Remove(string? publicId)
         {
             await Languages.Remove(publicId);
 

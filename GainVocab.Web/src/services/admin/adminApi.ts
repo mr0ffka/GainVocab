@@ -58,6 +58,6 @@ export const getListLanguage = async (
   ).data;
 };
 
-export const removeLanguage = async (id: string) => {
-  return (await api.delete(`course/language/${id}`)).data;
+export const removeLanguage = async (publicId: string) => {
+  return (await api.delete(`course/language/${publicId}`)).data;
 };
