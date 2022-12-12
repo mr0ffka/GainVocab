@@ -6,6 +6,7 @@ using GainVocab.API.Data.Models;
 using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using GainVocab.API.Core.Extensions.Errors;
+using GainVocab.API.Core.Models.Language;
 
 namespace GainVocab.API.Core.Configurations
 {
@@ -21,6 +22,12 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Description))
                 .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
                 .ForMember(d => d.Source, o => o.Ignore());
+
+            CreateMap<LanguageAddModel, Language>().ReverseMap();
+            CreateMap<LanguageListModel, Language>()
+                .ReverseMap()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
+                .ForMember(d => d.Courses, o => o.Ignore());
         }
     }
 }

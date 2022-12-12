@@ -64,7 +64,7 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Get(string id)
         {
-            var user = await Users.Get(id);
+            var user = await Users.GetUserModel(id);
 
             if (user == null)
             {

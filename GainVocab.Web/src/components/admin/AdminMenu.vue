@@ -45,7 +45,7 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
     <el-sub-menu index="sm-1">
       <template #title>
         <el-icon><reading /></el-icon>
-        <span>Languages</span>
+        <span>Courses</span>
       </template>
       <el-menu-item-group>
         <el-menu-item
@@ -53,14 +53,20 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
             router.getRoutes().filter((x) => x.name == 'language-list')[0].path
           "
           :route="{ name: 'language-list' }"
-          >Language list</el-menu-item
+          >Languages</el-menu-item
         >
         <el-menu-item
           :index="
-            router.getRoutes().filter((x) => x.name == 'language-import')[0]
-              .path
+            router.getRoutes().filter((x) => x.name == 'course-list')[0].path
           "
-          :route="{ name: 'language-import' }"
+          :route="{ name: 'course-list' }"
+          >Courses</el-menu-item
+        >
+        <el-menu-item
+          :index="
+            router.getRoutes().filter((x) => x.name == 'data-import')[0].path
+          "
+          :route="{ name: 'data-import' }"
           >Import data</el-menu-item
         >
       </el-menu-item-group>

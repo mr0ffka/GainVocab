@@ -1,9 +1,9 @@
-import { IPagerParams } from "./../services/common/types";
+import { IPagerParams } from "../services/common/types";
 import { ref } from "vue";
-import { defineStore, mapActions, mapState, mapStores } from "pinia";
-import { IFilterModel, USER_ROLES } from "@/services/user/types";
+import { defineStore } from "pinia";
+import { IUserFilterModel } from "@/services/admin/types";
 
-export const useUserStore = defineStore("userStore", () => {
+export const useAdminUserStore = defineStore("adminUserStore", () => {
   const isSearching = ref(false);
   const pager = ref<IPagerParams>({
     pageSize: 10,
@@ -11,7 +11,7 @@ export const useUserStore = defineStore("userStore", () => {
     sortBy: "",
     sortDirection: "ASC",
   });
-  const filter = ref<IFilterModel>({
+  const filter = ref<IUserFilterModel>({
     firstName: "",
     lastName: "",
     roles: [],
@@ -27,14 +27,6 @@ export const useUserStore = defineStore("userStore", () => {
     const options = ["Administrator", "User"];
     return options;
   }
-  // function getUserRoleKeyValuePair() {
-  //   const options = USER_ROLES.map((userRole, index) => ({
-  //     key: index,
-  //     value: userRole,
-  //   }));
-
-  //   return options;
-  // }
 
   return { pager, filter, isSearching, resetFilters, getUserRoleOptions };
 });

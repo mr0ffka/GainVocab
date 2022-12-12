@@ -2,7 +2,7 @@ import { IUserAuth } from "../auth/types";
 
 export type UserRole = "Administrator" | "User";
 
-export interface IFilterModel {
+export interface IUserFilterModel {
   firstName: string;
   lastName: string;
   roles: [];
@@ -30,5 +30,25 @@ export interface IUserDetailsModel {
   lastName: string;
   email: string;
   roles: UserRole[];
+  courses: [];
+}
+
+export interface ILanguageAddModel {
+  name: string;
+}
+
+export interface ILanguageModel {
+  id: string;
+  name: string;
+}
+
+export interface ILanguageListModel {
+  id: string;
+  name: string;
+  courses: [];
+}
+
+export interface ILanguageFilterModel {
+  name: string;
   courses: [];
 }

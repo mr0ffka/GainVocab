@@ -60,22 +60,39 @@ export default [
         ],
       },
       {
-        path: "languages",
+        path: "course",
         meta: {
           middleware: [isAdminMiddleware],
         },
         children: [
           {
-            path: "",
-            name: "language-list",
-            component: () =>
-              import("@/views/modules/admin/language/LanguageList.vue"),
+            path: "language",
+            children: [
+              {
+                path: "",
+                name: "language-list",
+                component: () =>
+                  import("@/views/modules/admin/course/LanguageList.vue"),
+              },
+              {
+                path: "add",
+                name: "language-add",
+                component: () =>
+                  import("@/views/modules/admin/course/LanguageForm.vue"),
+              },
+            ],
           },
           {
-            path: "import",
-            name: "language-import",
+            path: "",
+            name: "course-list",
             component: () =>
-              import("@/views/modules/admin/language/LanguageImport.vue"),
+              import("@/views/modules/admin/course/CourseList.vue"),
+          },
+          {
+            path: "data-import",
+            name: "data-import",
+            component: () =>
+              import("@/views/modules/admin/course/DataImport.vue"),
           },
         ],
       },

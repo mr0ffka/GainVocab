@@ -7,7 +7,7 @@ import Header from "@/components/common/Header.vue";
   <Header></Header>
   <div class="flex grow">
     <AdminMenu />
-    <div>Language Import</div>
+    <div>Course List</div>
   </div>
 </template>
 

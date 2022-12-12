@@ -1,30 +1,34 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
-import { getListUser, removeUser } from "@/services/admin/adminApi";
-import { useAdminUserStore } from "@/store/adminUserStore";
+import {
+  getListLanguage,
+  removeLanguage,
+  removeUser,
+} from "@/services/admin/adminApi";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import { IUserModel } from "@/services/admin/types";
+import { ILanguageListModel, ILanguageModel } from "@/services/admin/types";
 import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
+import { useAdminLanguageStore } from "@/store/adminLanguageStore";
 
-const userStore = useAdminUserStore();
-const { filter, pager, isSearching } = storeToRefs(userStore);
+const store = useAdminLanguageStore();
+const { filter, pager, isSearching } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
-const focusedItem = ref<IUserModel | null>();
-let users = ref<IUserModel[]>();
+const focusedItem = ref<ILanguageListModel | null>();
+let entities = ref<ILanguageListModel[]>();
 let pagerValues = ref<IPager>();
-const userRoleOptions = userStore.getUserRoleOptions();
 
-const getUsers = () => {
+const getEntities = () => {
   isSearching.value = true;
-  getListUser(filter.value, pager.value)
+  getListLanguage(filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;
-      users.value = data.items;
+      console.log(data.items);
+      entities.value = data.items;
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,
@@ -43,15 +47,15 @@ const getUsers = () => {
     });
 };
 
-const deleteUser = async (id: string) =>
-  await removeUser(id)
+const deleteEntity = async (id: string) =>
+  await removeLanguage(id)
     .then((data: any) => {
       ElMessage({
         showClose: true,
-        message: "User has been deleted",
+        message: "Language has been deleted",
         type: "success",
       });
-      getUsers();
+      getEntities();
     })
     .catch((error: any) => {
       ElMessage({
@@ -62,32 +66,23 @@ const deleteUser = async (id: string) =>
     });
 
 onMounted(() => {
-  getUsers();
+  getEntities();
 });
 
-const rowClickDetails = (row: IUserModel, column: any) => {
-  if (column.type != "not-clickable") {
-    router.push({ name: "user-details", params: { id: row.id } });
-  }
-};
-const handleDetails = (row: IUserModel) => {
-  router.push({ name: "user-details", params: { id: row.id } });
-};
-const handleEdit = (row: IUserModel) => {
-  router.push({ name: "user-edit", params: { id: row.id } });
-};
-const handleDeleteDialog = (row: IUserModel) => {
+const handleDeleteDialog = (row: ILanguageListModel) => {
+  console.log(row);
   focusedItem.value = row;
   confirmDeleteDialog.value = true;
 };
 const handleDelete = () => {
-  deleteUser(focusedItem.value?.id ?? "");
+  console.log(focusedItem);
+  deleteEntity(focusedItem.value?.id ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
 const resetFilters = () => {
-  userStore.resetFilters();
-  getUsers();
+  store.resetFilters();
+  getEntities();
 };
 </script>
 
@@ -99,27 +94,22 @@ const resetFilters = () => {
       <div class="flex">
         <div class="flex flex-row">
           <el-input
-            v-model="filter.firstName"
+            v-model="filter.name"
             class="mb-2"
-            placeholder="First Name"
-          />
-          <el-input
-            v-model="filter.lastName"
-            class="mb-2 ml-2"
-            placeholder="Last Name"
+            placeholder="Language name"
           />
           <el-select
-            v-model="filter.roles"
+            v-model="filter.courses"
             multiple
             collapse-tags
             collapse-tags-tooltip
-            placeholder="Roles"
+            placeholder="Course"
             clearable
-            @clear="getUsers"
+            @clear="getEntities"
             class="ml-2 min-w-fit"
           >
             <el-option
-              v-for="item in userRoleOptions"
+              v-for="item in []"
               :key="item"
               :label="item"
               :value="item"
@@ -131,7 +121,7 @@ const resetFilters = () => {
             class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
             :loading="isSearching"
-            @click="getUsers"
+            @click="getEntities"
             ><el-icon><Search /></el-icon>&nbsp;Search</el-button
           >
           <el-button
@@ -145,44 +135,29 @@ const resetFilters = () => {
             class="mb-2 p-3 font-bold right !ml-auto"
             type="success"
             plain
-            @click="router.push({ name: 'user-add' })"
-            ><el-icon><Plus /></el-icon>&nbsp;Add user</el-button
+            @click="router.push({ name: 'language-add' })"
+            ><el-icon><Plus /></el-icon>&nbsp;Add language</el-button
           >
         </div>
       </div>
       <el-table
-        :data="users ?? []"
+        :data="entities ?? []"
         :default-sort="{ prop: 'firstName', order: 'descending' }"
         :flexible="true"
         :border="true"
         :stripe="true"
-        @row-click="rowClickDetails"
       >
         <el-table-column
           label-class-name="font-black"
-          prop="firstName"
-          label="First Name"
+          prop="name"
+          label="Language"
           sortable
           width=""
         />
         <el-table-column
           label-class-name="font-black"
-          prop="lastName"
-          label="Last Name"
-          sortable
-          width=""
-        />
-        <el-table-column
-          label-class-name="font-black"
-          prop="email"
-          label="Email"
-          sortable
-          width=""
-        />
-        <el-table-column
-          label-class-name="font-black"
-          prop="roles"
-          label="Roles"
+          prop="courses"
+          label="Courses"
           sortable
           width=""
         >
@@ -206,16 +181,6 @@ const resetFilters = () => {
             <div class="flex flex-row">
               <el-button
                 size="small"
-                plain
-                type="info"
-                @click="handleDetails(scope.row)"
-                >Details</el-button
-              >
-              <el-button size="small" plain @click="handleEdit(scope.row)"
-                >Edit</el-button
-              >
-              <el-button
-                size="small"
                 type="danger"
                 plain
                 @click="handleDeleteDialog(scope.row)"
@@ -235,8 +200,8 @@ const resetFilters = () => {
           :background="true"
           layout="->,total,sizes"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers()"
-          @size-change="getUsers()"
+          @current-change="getEntities()"
+          @size-change="getEntities()"
         />
         <el-pagination
           class="absolute top-0"
@@ -248,8 +213,8 @@ const resetFilters = () => {
           :background="true"
           layout=",prev, pager, next"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers()"
-          @size-change="getUsers()"
+          @current-change="getEntities()"
+          @size-change="getEntities()"
         />
       </div>
     </div>
@@ -257,13 +222,12 @@ const resetFilters = () => {
 
   <el-dialog
     v-model="confirmDeleteDialog"
-    title="Delete user"
+    title="Delete language"
     width="30%"
     center
   >
-    Do you really want to delete user:
-    <span class="font-bold">
-      {{ focusedItem?.firstName }} {{ focusedItem?.lastName }}</span
+    Do you really want to delete language:
+    <span class="font-bold"> {{ focusedItem?.name }}</span
     >?
     <template #footer>
       <span class="dialog-footer">

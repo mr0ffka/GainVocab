@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
-import { IUserDetailsModel } from "@/services/user/types";
+import { IUserDetailsModel } from "@/services/admin/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
-import { getUserDetails } from "@/services/user/userApi";
-import { useUserStore } from "@/store/userStore";
+import { getUserDetails } from "@/services/admin/adminApi";
+import { useAdminUserStore } from "@/store/adminUserStore";
 import Header from "@/components/common/Header.vue";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
 const userId = ref<string>("");
-const userStore = useUserStore();
+const userStore = useAdminUserStore();
 const userRoleOptions = userStore.getUserRoleOptions();
 
 const userDetailsModel: IUserDetailsModel = reactive({

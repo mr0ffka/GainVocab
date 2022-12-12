@@ -22,6 +22,9 @@ namespace GainVocab.API.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new LanguageConfiguration());
         }
+
+        public DbSet<Language> Languages { get; set; }
     }
 }

@@ -7,7 +7,7 @@
       <div class="block text-xl font-semibold">Internal Server Error</div>
       <el-button
         size="large"
-        @click="$router.go(-1)"
+        @click="$router.push({ name: 'home' })"
         type="info"
         plain
         class="mt-10 text-center"

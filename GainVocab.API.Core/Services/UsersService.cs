@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Extensions;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Pager;
@@ -42,14 +43,21 @@ namespace GainVocab.API.Core.Services
             return result;
         }
 
-        public async Task<APIUserModel> Get(string id)
+        public async Task<APIUser> GetAsync(string id)
         {
-            var user = Context.Users
+            var user = await Context.Users
                 .Where(u => u.Id == id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
 
             if (user == null)
-                return null;
+                throw new NotFoundException("User", "Entity not found");
+
+            return user;
+        }
+
+        public async Task<APIUserModel> GetUserModel(string id)
+        {
+            var user = await GetAsync(id);
 
             var userRoles = await UserManager.GetRolesAsync(user);
             var result = Mapper.Map<APIUser, APIUserModel>(user);
