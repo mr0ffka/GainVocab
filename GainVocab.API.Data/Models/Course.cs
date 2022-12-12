@@ -8,20 +8,16 @@ using System.Threading.Tasks;
 
 namespace GainVocab.API.Data.Models
 {
-    public class Language
+    public class Course
     {
-        public Language()
-        {
-            CoursesFrom = new HashSet<Course>();
-            CoursesTo = new HashSet<Course>();
-        }
-
         [Key]
         public long Id { get; set; }
         public string PublicId { get; set; }
         public string Name { get; set; }
+        public long LanguageFromId { get; set; }
+        public long LanguageToId { get; set; }
 
-        public virtual ICollection<Course> CoursesFrom { get; set; }
-        public virtual ICollection<Course> CoursesTo { get; set; }
+        public virtual Language? LanguageFrom { get; set; }
+        public virtual Language? LanguageTo { get; set; }
     }
 }

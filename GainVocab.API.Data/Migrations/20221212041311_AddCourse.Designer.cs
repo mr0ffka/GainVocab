@@ -3,6 +3,7 @@ using System;
 using GainVocab.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,16 +12,16 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GainVocab.API.Data.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    partial class DefaultDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221212041311_AddCourse")]
+    partial class AddCourse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "uuid-ossp");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("GainVocab.API.Data.Models.APIUser", b =>
@@ -187,15 +188,15 @@ namespace GainVocab.API.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7aa39602-256c-4720-b5fc-41f027f8a802",
-                            ConcurrencyStamp = "8f1bb521-42d7-485e-beca-2d53d0b6ea91",
+                            Id = "bec27dda-43d8-4425-945b-4293e654a519",
+                            ConcurrencyStamp = "a6468619-5480-4e48-957c-2947d6ce1109",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "c9f7dd0f-647c-46b0-9194-c6437cb1bfcd",
-                            ConcurrencyStamp = "b977cf87-1a72-48ac-8219-b58012c75caf",
+                            Id = "555738e7-4109-495d-bd4a-eb9a186a44c8",
+                            ConcurrencyStamp = "9e59575f-71ca-4dd7-bf70-684f3fff7db6",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -313,15 +314,13 @@ namespace GainVocab.API.Data.Migrations
                         .WithMany("CoursesFrom")
                         .HasForeignKey("LanguageFromId")
                         .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired()
-                        .HasConstraintName("FK_Course_LanguageFromId");
+                        .IsRequired();
 
                     b.HasOne("GainVocab.API.Data.Models.Language", "LanguageTo")
                         .WithMany("CoursesTo")
                         .HasForeignKey("LanguageToId")
                         .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired()
-                        .HasConstraintName("FK_Course_LanguageToId");
+                        .IsRequired();
 
                     b.Navigation("LanguageFrom");
 

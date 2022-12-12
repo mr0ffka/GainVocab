@@ -1,3 +1,4 @@
+import { refreshAccessTokenFn } from "@/services/auth/authApi";
 import axios from "axios";
 
 export const api = axios.create({
@@ -6,6 +7,21 @@ export const api = axios.create({
 });
 
 api.defaults.headers.common["Content-Type"] = "application/json";
+
+api.interceptors.response.use(
+  async (response) => {
+    if (response.status === 401) {
+      await refreshAccessTokenFn();
+    }
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.data) {
+      return Promise.reject(error.response.data);
+    }
+    return Promise.reject(error.message);
+  }
+);
 
 export const toURLSearchParams = (record: Record<string, unknown>) =>
   new URLSearchParams(

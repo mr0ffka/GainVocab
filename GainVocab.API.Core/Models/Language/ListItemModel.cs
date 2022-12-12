@@ -9,9 +9,9 @@ using GainVocab.API.Core.Extensions;
 
 namespace GainVocab.API.Core.Models.Language
 {
-    public class LanguageListModel
+    public class ListItemModel
     {
-        public string Id { get; set; }
+        public string? Id { get; set; }
         public string? Name { get; set; }
         public List<string>? Courses { get; set; }
     }

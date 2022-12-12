@@ -13,7 +13,6 @@ export default async function requireAuthMiddleware({
       "authUser",
     ])) as IUserAuth;
     if (!authResult || !authResult.isAuthenticated) {
-      console.log("dupa 2");
       await refreshAccessTokenFn();
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);

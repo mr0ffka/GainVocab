@@ -19,7 +19,6 @@ export default async function isAdminMiddleware({
     if (authResult.isAdmin) {
       return next();
     } else if (!authResult.isAuthenticated) {
-      console.log("use refresh token");
       await refreshAccessTokenFn();
       authResult = await getCurrUser();
       queryClient.setQueryData(["authUser"], authResult);

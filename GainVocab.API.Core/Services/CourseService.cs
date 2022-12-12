@@ -1,29 +1,25 @@
 ﻿using AutoMapper;
 using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Interfaces;
-using GainVocab.API.Core.Models.Language;
+using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace GainVocab.API.Core.Services
 {
-    public class LanguageService : GenericService<Language>, ILanguageService
+    public class CourseService : GenericService<Course>, ICourseService
     {
-        private ICourseService CourseService;
-
-        public LanguageService(DefaultDbContext context, ICourseService courseService, IMapper mapper) : base(context, mapper)
+        public CourseService(DefaultDbContext context, IMapper mapper) : base(context, mapper)
         {
-            CourseService = courseService;
         }
 
         public async Task Add(AddModel entity)
         {
-            var mappedEntity = Mapper.Map<Language>(entity);
+            var mappedEntity = Mapper.Map<Course>(entity);
 
             try
             {
@@ -36,9 +32,9 @@ namespace GainVocab.API.Core.Services
             }
         }
 
-        public Language Get(string publicId)
+        public Course Get(string publicId)
         {
-            var entity = Context.Languages
+            var entity = Context.Course
                 .Where(e => e.PublicId == publicId)
                 .FirstOrDefault();
 
@@ -50,10 +46,10 @@ namespace GainVocab.API.Core.Services
 
         public ListItemModel GetListModel(string publicId)
         {
-            var entity = Get(publicId);
+            var user = Get(publicId);
 
             //var userRoles = await UserManager.GetRolesAsync(user);
-            var result = Mapper.Map<Language, ListItemModel>(entity);
+            var result = Mapper.Map<Course, ListItemModel>(user);
             //result.Roles = userRoles.ToList() ?? new List<string>();
 
             return result;
@@ -61,34 +57,51 @@ namespace GainVocab.API.Core.Services
 
         public List<ItemModel> GetOptionsList()
         {
-            var query = Context.Languages.ToList();
+            var query = Context.Course.ToList();
 
             var items = Mapper.Map<List<ItemModel>>(query);
 
             return items;
         }
 
+        List<Course> ICourseService.GetListByPublicId(List<string> courses)
+        {
+            var query = Context.Course.Where(c => courses.Contains(c.PublicId));
+            return query.ToList();
+        }
+
         public async Task<PagedResult<ListItemModel>> GetList(FilterModel filter, PagerParams pager)
         {
             // filtres 
-            var predicate = PredicateBuilder.New<Language>(true);
+            var predicate = PredicateBuilder.New<Course>(true);
 
             if (!string.IsNullOrEmpty(filter.Name))
             {
                 predicate.And(x => x.Name.ToLower().Contains(filter.Name.ToLower()));
             }
 
-            var query = Context.Languages
-                .Include(l => l.CoursesFrom)
-                .Include(l => l.CoursesFrom)
+            if (!string.IsNullOrEmpty(filter.LanguageFrom))
+            {
+                predicate.And(x => x.LanguageFrom.PublicId.Equals(filter.LanguageFrom));
+            }
+
+            if (!string.IsNullOrEmpty(filter.LanguageTo))
+            {
+                predicate.And(x => x.LanguageTo.PublicId.Equals(filter.LanguageTo));
+            }
+
+            var query = Context.Course
+                .AsExpandable()
+                .Include(c => c.LanguageFrom)
+                .Include(c => c.LanguageTo)
                 .Where(predicate);
 
             // sorting
             if (!string.IsNullOrEmpty(pager.SortBy))
             {
-                var columnsSelectors = new Dictionary<string, Expression<Func<Language, object>>>
+                var columnsSelectors = new Dictionary<string, Expression<Func<Course, object>>>
                 {
-                    { nameof(Language.Name).ToUpper(), x => x.Name! },
+                    { nameof(Course.Name).ToUpper(), x => x.Name! },
                 };
 
                 var selectedColumn = columnsSelectors[pager.SortBy.ToUpper()];
@@ -106,11 +119,6 @@ namespace GainVocab.API.Core.Services
             var items = new List<ListItemModel>();
             items = Mapper.Map<List<ListItemModel>>(entities);
 
-            if (filter.Courses != null && filter.Courses.Any())
-            {
-                var coursesNames = CourseService.GetListByPublicId(filter.Courses).Select(c => c.Name).ToList();
-                items = items.Where(u => u.Courses.Intersect(coursesNames).Any()).ToList();
-            }
 
             return new PagedResult<ListItemModel>
             {
@@ -127,7 +135,7 @@ namespace GainVocab.API.Core.Services
 
             if (entity is null)
             {
-                throw new NotFoundException("Languages", publicId);
+                throw new NotFoundException("Course", publicId);
             }
 
             Context.Remove(entity);

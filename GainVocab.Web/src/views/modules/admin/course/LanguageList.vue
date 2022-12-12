@@ -3,11 +3,11 @@ import AdminMenu from "@/components/admin/AdminMenu.vue";
 import {
   getListLanguage,
   removeLanguage,
-  removeUser,
+  getCoursesOptionsList,
 } from "@/services/admin/adminApi";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import { ILanguageListModel, ILanguageModel } from "@/services/admin/types";
+import { ICourseItemModel, ILanguageListModel } from "@/services/admin/types";
 import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
@@ -21,19 +21,40 @@ const confirmDeleteDialog = ref(false);
 const focusedItem = ref<ILanguageListModel | null>();
 let entities = ref<ILanguageListModel[]>();
 let pagerValues = ref<IPager>();
+const coursesOptions = ref<ICourseItemModel[] | null>();
 
-const getEntities = () => {
+const getEntities = async () => {
   isSearching.value = true;
-  getListLanguage(filter.value, pager.value)
+  await getListLanguage(filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;
-      console.log(data.items);
       entities.value = data.items;
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,
         recordNumber: data.recordNumber,
       };
+    })
+    .catch((error) => {
+      isSearching.value = false;
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
+      });
+    });
+};
+
+const getCoursesOptions = async () => {
+  await getCoursesOptionsList()
+    .then((data: ICourseItemModel[]) => {
+      let options: ICourseItemModel[] = [];
+      data.forEach((el) => {
+        options.push(el);
+      });
+      coursesOptions.value = options;
     })
     .catch((error) => {
       isSearching.value = false;
@@ -67,15 +88,14 @@ const deleteEntity = async (id: string) =>
 
 onMounted(() => {
   getEntities();
+  getCoursesOptions();
 });
 
 const handleDeleteDialog = (row: ILanguageListModel) => {
-  console.log(row);
   focusedItem.value = row;
   confirmDeleteDialog.value = true;
 };
 const handleDelete = () => {
-  console.log(focusedItem);
   deleteEntity(focusedItem.value?.id ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
@@ -109,10 +129,10 @@ const resetFilters = () => {
             class="ml-2 min-w-fit"
           >
             <el-option
-              v-for="item in []"
-              :key="item"
-              :label="item"
-              :value="item"
+              v-for="item in coursesOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
         </div>
@@ -142,7 +162,7 @@ const resetFilters = () => {
       </div>
       <el-table
         :data="entities ?? []"
-        :default-sort="{ prop: 'firstName', order: 'descending' }"
+        :default-sort="{ prop: 'name', order: 'descending' }"
         :flexible="true"
         :border="true"
         :stripe="true"
@@ -163,10 +183,10 @@ const resetFilters = () => {
         >
           <template #default="scope">
             <el-tag
-              v-for="role in scope.row.roles"
+              v-for="course in scope.row.courses"
               class="mr-2"
               disable-transitions
-              >{{ role }}
+              >{{ course }}
             </el-tag>
           </template>
         </el-table-column>

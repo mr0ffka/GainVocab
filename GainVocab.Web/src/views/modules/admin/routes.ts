@@ -89,6 +89,12 @@ export default [
               import("@/views/modules/admin/course/CourseList.vue"),
           },
           {
+            path: "add",
+            name: "course-add",
+            component: () =>
+              import("@/views/modules/admin/course/CourseForm.vue"),
+          },
+          {
             path: "data-import",
             name: "data-import",
             component: () =>

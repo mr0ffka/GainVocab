@@ -1,35 +1,26 @@
 ﻿using AutoMapper;
-using GainVocab.API.Core.Exceptions;
-using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
-using GainVocab.API.Core.Models.Language;
+using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Models.Pager;
-using GainVocab.API.Core.Services;
 using GainVocab.API.Data.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
 {
-    [Route("api/course/language")]
+    [Route("api/course")]
     [ApiController]
     [Authorize]
-    public class LanguageController : ControllerBase
+    public class CourseController : ControllerBase
     {
-        private readonly ILanguageService Languages;
-        private readonly ILogger<LanguageController> Logger;
+        private readonly ICourseService Courses;
+        private readonly ILogger<CourseController> Logger;
         private readonly IMapper Mapper;
 
-        public LanguageController(ILogger<LanguageController> logger, ILanguageService languages, IMapper mapper)
+        public CourseController(ILogger<CourseController> logger, ICourseService courses, IMapper mapper)
         {
             Logger = logger;
-            Languages = languages;
+            Courses = courses;
             Mapper = mapper;
         }
 
@@ -37,16 +28,17 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> GetList([FromQuery] FilterModel filter, [FromQuery] PagerParams pager)
         {
-            var data = await Languages.GetList(filter, pager);
+            var data = await Courses.GetList(filter, pager);
 
             return Ok(data);
         }
+
 
         [HttpGet("options")]
         [Authorize(Roles = "Administrator")]
         public ActionResult GetOptionsList()
         {
-            var data = Languages.GetOptionsList();
+            var data = Courses.GetOptionsList();
 
             return Ok(data);
         }
@@ -55,7 +47,7 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Add([FromBody] AddModel entity)
         {
-            await Languages.Add(entity);
+            await Courses.Add(entity);
 
             //if (response.Errors.Any())
             //{
@@ -69,7 +61,7 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Get(string? publicId)
         {
-            var user = Languages.Get(publicId);
+            var user = Courses.Get(publicId);
 
             if (user == null)
             {
@@ -83,7 +75,7 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Remove(string? publicId)
         {
-            await Languages.Remove(publicId);
+            await Courses.Remove(publicId);
 
             return Ok();
         }

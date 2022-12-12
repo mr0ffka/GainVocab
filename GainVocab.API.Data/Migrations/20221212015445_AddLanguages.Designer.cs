@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GainVocab.API.Data.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    [Migration("20221211230648_AddLanguages")]
+    [Migration("20221212015445_AddLanguages")]
     partial class AddLanguages
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -150,15 +150,15 @@ namespace GainVocab.API.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "729dc3d6-ee2b-4bc0-ab85-c63749df9176",
-                            ConcurrencyStamp = "672ec22c-e6ab-44c4-a8bb-89878b369e26",
+                            Id = "2add73a3-7a03-4805-980a-7098ac50716b",
+                            ConcurrencyStamp = "38309096-949c-498f-a9ad-6542eb3be708",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "b8d01044-6b57-4a0f-8259-d9e50da18f77",
-                            ConcurrencyStamp = "f30d2654-ca95-4cef-8d14-917679cf93a1",
+                            Id = "a17df6ee-dfc0-482a-a5f5-9d3898617442",
+                            ConcurrencyStamp = "6b6e7835-e2e1-41b2-aa9b-e6c7b145a8c3",
                             Name = "User",
                             NormalizedName = "USER"
                         });

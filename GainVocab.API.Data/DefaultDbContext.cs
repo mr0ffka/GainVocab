@@ -20,11 +20,17 @@ namespace GainVocab.API.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasPostgresExtension("uuid-ossp");
+
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
+            modelBuilder.ApplyConfiguration(new CourseConfiguration());
+
+
         }
 
         public DbSet<Language> Languages { get; set; }
+        public DbSet<Course> Course { get; set; }
     }
 }

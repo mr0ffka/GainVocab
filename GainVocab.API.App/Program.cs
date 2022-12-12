@@ -69,6 +69,7 @@ builder.Services.AddSwaggerGen(options =>
             new List<string>()
         }
     });
+    options.CustomSchemaIds(type => type.FullName);
 });
 
 builder.Services.AddCors();
@@ -81,6 +82,7 @@ builder.Services.AddScoped<IAuthManager, AuthManager>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
+builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<UsersService>();
 builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 

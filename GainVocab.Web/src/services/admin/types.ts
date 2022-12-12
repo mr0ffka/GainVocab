@@ -52,3 +52,35 @@ export interface ILanguageFilterModel {
   name: string;
   courses: [];
 }
+
+export interface ICourseAddModel {
+  name: string;
+  languageFrom: string;
+  languageTo: string;
+}
+
+export interface ICourseItemModel {
+  id: string;
+  name: string;
+}
+
+export interface ICourseModel {
+  id: string;
+  name: string;
+  languageFrom: ILanguageModel;
+  languageTo: ILanguageModel;
+}
+
+export interface ICourseListModel {
+  id: string;
+  name: string;
+  languageFrom: ILanguageModel;
+  languageTo: ILanguageModel;
+  studentAmnt: number;
+}
+
+export interface ICourseFilterModel {
+  name: string;
+  languageFrom: string;
+  languageTo: string;
+}
