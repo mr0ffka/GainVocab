@@ -25,6 +25,11 @@ namespace GainVocab.API.Core.Services
         {
             var mappedEntity = Mapper.Map<Language>(entity);
 
+            if (Context.Languages.Where(c => c.Name.Equals(mappedEntity.Name)).Any())
+            {
+                throw new BadRequestException($"Language '{mappedEntity.Name}' already exists!");
+            }
+
             try
             {
                 await Context.AddAsync(mappedEntity);

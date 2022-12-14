@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,14 @@ namespace GainVocab.API.Core.Exceptions
 
         public BadRequestException(string message) : base(message)
         {
-
+            Errors = new List<ErrorEntry>();
+            var error = new ErrorEntry
+            {
+                Code = HttpStatusCode.BadRequest.ToString(),
+                Title = message,
+                Source = ""
+            };
+            Errors.Add(error);
         }
 
         public BadRequestException(string message, List<ErrorEntry> errors) : base(message)

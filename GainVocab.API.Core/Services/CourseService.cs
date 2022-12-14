@@ -1,13 +1,17 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using System.Net;
 
 namespace GainVocab.API.Core.Services
 {
@@ -20,6 +24,16 @@ namespace GainVocab.API.Core.Services
         public async Task Add(AddModel entity)
         {
             var mappedEntity = Mapper.Map<Course>(entity);
+
+            if (Context.Course.Where(c => c.Name.Equals(mappedEntity.Name)).Any())
+            {
+                throw new BadRequestException($"Course '{mappedEntity.Name}' already exists!");
+            }
+
+            if (Context.Course.Where(c => c.LanguageFromId == mappedEntity.LanguageFrom.Id && c.LanguageToId == mappedEntity.LanguageTo.Id).Any())
+            {
+                throw new BadRequestException($"Course with identical languages already exists!");
+            }
 
             try
             {

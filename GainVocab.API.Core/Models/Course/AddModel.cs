@@ -17,6 +17,7 @@ namespace GainVocab.API.Core.Models.Course
                 v.RuleFor(x => x.Name).NotEmpty().WithMessage("Course name is required");
                 v.RuleFor(x => x.LanguageFrom).NotEmpty().WithMessage("Language from is required");
                 v.RuleFor(x => x.LanguageTo).NotEmpty().WithMessage("Language to is required");
+                v.RuleFor(x => x.LanguageFrom).NotEqual(l => l.LanguageTo).WithMessage("Language from and Language to cannot be the same!");
             })
             .Validate(this, options => options.ThrowOnFailures())
             .Result();

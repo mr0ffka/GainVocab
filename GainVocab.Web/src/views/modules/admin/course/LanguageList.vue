@@ -248,7 +248,8 @@ const resetFilters = () => {
   >
     Do you really want to delete language:
     <span class="font-bold"> {{ focusedItem?.name }}</span
-    >?
+    >? By deleting language you'll be deleting all courses using this language
+    as well.
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>

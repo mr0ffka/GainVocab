@@ -23,7 +23,7 @@ namespace GainVocab.API.Data
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
             base.OnModelCreating(modelBuilder);
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            //modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
 

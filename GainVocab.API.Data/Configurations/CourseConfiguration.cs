@@ -24,7 +24,7 @@ namespace GainVocab.API.Data.Configurations
             builder.HasOne(l => l.LanguageFrom)
                    .WithMany(c => c.CoursesFrom)
                    .HasForeignKey(c => c.LanguageFromId)
-                   .OnDelete(DeleteBehavior.SetNull)
+                   .OnDelete(DeleteBehavior.Cascade)
                    .HasConstraintName("FK_Course_LanguageFromId");
 
             builder.Navigation(b => b.LanguageFrom)
@@ -33,7 +33,7 @@ namespace GainVocab.API.Data.Configurations
             builder.HasOne(l => l.LanguageTo)
                    .WithMany(c => c.CoursesTo)
                    .HasForeignKey(c => c.LanguageToId)
-                   .OnDelete(DeleteBehavior.SetNull)
+                   .OnDelete(DeleteBehavior.Cascade)
                    .HasConstraintName("FK_Course_LanguageToId");
 
             builder.Navigation(b => b.LanguageTo)
