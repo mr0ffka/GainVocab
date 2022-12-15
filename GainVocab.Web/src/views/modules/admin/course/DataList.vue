@@ -1,37 +1,35 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import {
-  getCoursesOptionsList,
-  getListUser,
-  getRoleOptionsList,
-  removeUser,
+  getLanguageOptionsList,
+  getListCourse,
+  removeCourse,
 } from "@/services/admin/adminApi";
-import { useAdminUserStore } from "@/store/adminUserStore";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import { ICourseItemModel, IUserModel } from "@/services/admin/types";
+import { ICourseListModel, ILanguageModel } from "@/services/admin/types";
 import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
+import { useAdminCourseStore } from "@/store/adminCourseStore";
 
-const userStore = useAdminUserStore();
-const { filter, pager, isSearching } = storeToRefs(userStore);
+const store = useAdminCourseStore();
+const { filter, pager, isSearching } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
-const focusedItem = ref<IUserModel | null>();
-const userRoleOptions = ref<string[] | null>();
-const coursesOptions = ref<ICourseItemModel[] | null>();
-
-let users = ref<IUserModel[]>();
+const focusedItem = ref<ICourseListModel | null>();
+let entities = ref<ICourseListModel[]>();
 let pagerValues = ref<IPager>();
+const languageOptions = ref<ILanguageModel[] | null>();
 
-const getUsers = () => {
+const getEntities = () => {
   isSearching.value = true;
-  getListUser(filter.value, pager.value)
+  getListCourse(filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;
-      users.value = data.items;
+      entities.value = data.items;
+      console.log(data);
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,
@@ -50,14 +48,14 @@ const getUsers = () => {
     });
 };
 
-const getRolesOptions = async () => {
-  await getRoleOptionsList()
-    .then((data: string[]) => {
-      let options: string[] = [];
+const getLanguageOptions = async () => {
+  await getLanguageOptionsList()
+    .then((data: ILanguageModel[]) => {
+      let options: ILanguageModel[] = [];
       data.forEach((el) => {
         options.push(el);
       });
-      userRoleOptions.value = options;
+      languageOptions.value = options;
     })
     .catch((error) => {
       isSearching.value = false;
@@ -71,36 +69,15 @@ const getRolesOptions = async () => {
     });
 };
 
-const getCoursesOptions = async () => {
-  await getCoursesOptionsList()
-    .then((data: ICourseItemModel[]) => {
-      let options: ICourseItemModel[] = [];
-      data.forEach((el) => {
-        options.push(el);
-      });
-      coursesOptions.value = options;
-    })
-    .catch((error) => {
-      isSearching.value = false;
-      error.response.data.Errors.forEach(async (e: any) => {
-        ElMessage({
-          showClose: true,
-          message: e.Title,
-          type: "error",
-        });
-      });
-    });
-};
-
-const deleteUser = async (id: string) =>
-  await removeUser(id)
+const deleteEntity = async (id: string) =>
+  await removeCourse(id)
     .then((data: any) => {
       ElMessage({
         showClose: true,
-        message: "User has been deleted",
+        message: "Language has been deleted",
         type: "success",
       });
-      getUsers();
+      getEntities();
     })
     .catch((error: any) => {
       ElMessage({
@@ -111,34 +88,22 @@ const deleteUser = async (id: string) =>
     });
 
 onMounted(() => {
-  getUsers();
-  getRolesOptions();
-  getCoursesOptions();
+  getEntities();
+  getLanguageOptions();
 });
 
-const rowClickDetails = (row: IUserModel, column: any) => {
-  if (column.type != "not-clickable") {
-    router.push({ name: "user-details", params: { id: row.id } });
-  }
-};
-const handleDetails = (row: IUserModel) => {
-  router.push({ name: "user-details", params: { id: row.id } });
-};
-const handleEdit = (row: IUserModel) => {
-  router.push({ name: "user-edit", params: { id: row.id } });
-};
-const handleDeleteDialog = (row: IUserModel) => {
+const handleDeleteDialog = (row: ICourseListModel) => {
   focusedItem.value = row;
   confirmDeleteDialog.value = true;
 };
 const handleDelete = () => {
-  deleteUser(focusedItem.value?.id ?? "");
+  deleteEntity(focusedItem.value?.id ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
 const resetFilters = () => {
-  userStore.resetFilters();
-  getUsers();
+  store.resetFilters();
+  getEntities();
 };
 </script>
 
@@ -150,44 +115,39 @@ const resetFilters = () => {
       <div class="flex">
         <div class="flex flex-row">
           <el-input
-            v-model="filter.firstName"
+            v-model="filter.name"
             class="mb-2"
-            placeholder="First Name"
-          />
-          <el-input
-            v-model="filter.lastName"
-            class="mb-2 ml-2"
-            placeholder="Last Name"
+            placeholder="Course name"
           />
           <el-select
-            v-model="filter.roles"
+            v-model="filter.languageFrom"
             multiple
             collapse-tags
             collapse-tags-tooltip
-            placeholder="Roles"
+            placeholder="Language from"
             clearable
-            @clear="getUsers"
+            @clear="getEntities"
             class="ml-2 min-w-fit"
           >
             <el-option
-              v-for="item in userRoleOptions"
-              :key="item"
-              :label="item"
-              :value="item"
+              v-for="item in languageOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             />
           </el-select>
           <el-select
-            v-model="filter.courses"
+            v-model="filter.languageTo"
             multiple
             collapse-tags
             collapse-tags-tooltip
-            placeholder="Course"
+            placeholder="Language to"
             clearable
-            @clear="getUsers"
+            @clear="getEntities"
             class="ml-2 min-w-fit"
           >
             <el-option
-              v-for="item in coursesOptions"
+              v-for="item in languageOptions"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -199,7 +159,7 @@ const resetFilters = () => {
             class="mb-2 mr-2 p-3 font-bold right !ml-auto"
             plain
             :loading="isSearching"
-            @click="getUsers"
+            @click="getEntities"
             ><el-icon><Search /></el-icon>&nbsp;Search</el-button
           >
           <el-button
@@ -213,71 +173,40 @@ const resetFilters = () => {
             class="mb-2 p-3 font-bold right !ml-auto"
             type="success"
             plain
-            @click="router.push({ name: 'user-add' })"
-            ><el-icon><Plus /></el-icon>&nbsp;Add user</el-button
+            @click="router.push({ name: 'course-add' })"
+            ><el-icon><Plus /></el-icon>&nbsp;Add course</el-button
           >
         </div>
       </div>
       <el-table
-        :data="users ?? []"
-        :default-sort="{ prop: 'firstName', order: 'descending' }"
+        :data="entities ?? []"
+        :default-sort="{ prop: 'name', order: 'descending' }"
         :flexible="true"
         :border="true"
         :stripe="true"
-        @row-click="rowClickDetails"
       >
         <el-table-column
           label-class-name="font-black"
-          prop="firstName"
-          label="First Name"
+          prop="name"
+          label="Course"
           sortable
           width=""
         />
         <el-table-column
           label-class-name="font-black"
-          prop="lastName"
-          label="Last Name"
-          sortable
-          width=""
-        />
-        <el-table-column
-          label-class-name="font-black"
-          prop="email"
-          label="Email"
-          sortable
-          width=""
-        />
-        <el-table-column
-          label-class-name="font-black"
-          prop="roles"
-          label="Roles"
+          prop="languageFrom"
+          label="Language From"
           sortable
           width=""
         >
-          <template #default="scope">
-            <el-tag
-              v-for="role in scope.row.roles"
-              class="mr-2"
-              disable-transitions
-              >{{ role }}
-            </el-tag>
-          </template>
         </el-table-column>
         <el-table-column
           label-class-name="font-black"
-          prop="courses"
-          label="Courses"
+          prop="languageTo"
+          label="Language To"
           sortable
           width=""
         >
-          <template #default="scope">
-            <el-tag
-              v-for="course in scope.row.courses"
-              class="mr-2"
-              disable-transitions
-              >{{ course }}
-            </el-tag>
-          </template>
         </el-table-column>
         <el-table-column
           label-class-name="font-black"
@@ -288,16 +217,6 @@ const resetFilters = () => {
         >
           <template #default="scope">
             <div class="flex flex-row">
-              <el-button
-                size="small"
-                plain
-                type="info"
-                @click="handleDetails(scope.row)"
-                >Details</el-button
-              >
-              <el-button size="small" plain @click="handleEdit(scope.row)"
-                >Edit</el-button
-              >
               <el-button
                 size="small"
                 type="danger"
@@ -319,8 +238,8 @@ const resetFilters = () => {
           :background="true"
           layout="->,total,sizes"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers()"
-          @size-change="getUsers()"
+          @current-change="getEntities()"
+          @size-change="getEntities()"
         />
         <el-pagination
           class="absolute top-0"
@@ -332,8 +251,8 @@ const resetFilters = () => {
           :background="true"
           layout=",prev, pager, next"
           :total="pagerValues?.totalCount ?? 0"
-          @current-change="getUsers()"
-          @size-change="getUsers()"
+          @current-change="getEntities()"
+          @size-change="getEntities()"
         />
       </div>
     </div>
@@ -341,13 +260,12 @@ const resetFilters = () => {
 
   <el-dialog
     v-model="confirmDeleteDialog"
-    title="Delete user"
+    title="Delete language"
     width="30%"
     center
   >
-    Do you really want to delete user:
-    <span class="font-bold">
-      {{ focusedItem?.firstName }} {{ focusedItem?.lastName }}</span
+    Do you really want to delete course:
+    <span class="font-bold"> {{ focusedItem?.name }}</span
     >?
     <template #footer>
       <span class="dialog-footer">

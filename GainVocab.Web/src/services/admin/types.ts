@@ -1,11 +1,10 @@
 import { IUserAuth } from "../auth/types";
 
-export type UserRole = "Administrator" | "User";
-
 export interface IUserFilterModel {
   firstName: string;
   lastName: string;
   roles: [];
+  courses: [];
 }
 
 export interface IUserModel {
@@ -13,7 +12,8 @@ export interface IUserModel {
   firstName: string;
   lastName: string;
   email: string;
-  roles: UserRole[];
+  roles: string[];
+  courses: string[];
 }
 
 export interface IUserAddModel {
@@ -22,14 +22,15 @@ export interface IUserAddModel {
   email: string;
   password: string;
   passwordConfirm: string;
-  roles: UserRole[];
+  roles: string[];
+  courses: string[];
 }
 
 export interface IUserDetailsModel {
   firstName: string;
   lastName: string;
   email: string;
-  roles: UserRole[];
+  roles: string[];
   courses: [];
 }
 

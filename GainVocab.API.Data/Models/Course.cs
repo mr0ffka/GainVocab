@@ -19,5 +19,6 @@ namespace GainVocab.API.Data.Models
 
         public virtual Language? LanguageFrom { get; set; }
         public virtual Language? LanguageTo { get; set; }
+        public ICollection<APIUserCourse> Users { get; set; }
     }
 }

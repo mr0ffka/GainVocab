@@ -53,7 +53,19 @@ namespace GainVocab.API.Core.Services
                 .FirstOrDefault();
 
             if (entity == null)
-                throw new NotFoundException("Languages", "Entity not found");
+                throw new NotFoundException("Courses", "Entity not found");
+
+            return entity;
+        }
+
+        public Course Get(long id)
+        {
+            var entity = Context.Course
+                .Where(e => e.Id == id)
+                .FirstOrDefault();
+
+            if (entity == null)
+                throw new NotFoundException("Courses", "Entity not found");
 
             return entity;
         }
@@ -154,6 +166,20 @@ namespace GainVocab.API.Core.Services
 
             Context.Remove(entity);
             await Context.SaveChangesAsync();
+        }
+
+        public List<Course> GetListByUser(APIUser user)
+        {
+            var result = new List<Course>();
+
+            if (user.Courses != null && user.Courses.Any())
+            {
+                var courseIds = user.Courses.Select(c => c.CourseId).ToList();
+                var courses = Context.Course.Where(c => courseIds.Contains(c.Id)).ToList();
+                result.AddRange(courses);
+            }
+
+            return result;
         }
     }
 }

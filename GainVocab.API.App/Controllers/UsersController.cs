@@ -74,6 +74,29 @@ namespace GainVocab.API.App.Controllers
             return Ok(user);
         }
 
+        [HttpGet("details/{id}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> GetDetails(string id)
+        {
+            var user = await Users.GetDetails(id);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
+
+        [HttpGet("roles/options")]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult GetOptionsList()
+        {
+            var data = Users.GetRoleOptionsList();
+
+            return Ok(data);
+        }
+
         [HttpPatch("{id}")]
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Update(string id, [FromBody] UserEditModel model)

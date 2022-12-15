@@ -18,14 +18,25 @@ namespace GainVocab.API.Core.Configurations
     { 
         public MapperConfig()
         {
-            CreateMap<APIUserModel, APIUser>().ReverseMap();
-            CreateMap<RegisterModel, APIUser>().ReverseMap();
-            CreateMap<UserAddModel, APIUser>().ReverseMap();
-            CreateMap<UserEditModel, APIUser>().ReverseMap();
+            CreateMap<APIUserModel, APIUser>()
+                .ReverseMap()
+                .ForMember(d => d.Roles, o => o.MapFrom<UserRolesResolver, APIUser>(s => s))
+                .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses));
+            CreateMap<RegisterModel, APIUser>();
+            CreateMap<UserAddModel, APIUser>()
+                .ForMember(d => d.Courses, o => o.Ignore());
+            CreateMap<UserEditModel, APIUser>()
+                .ForMember(d => d.Courses, o => o.MapFrom<CoursesUserEditResolver, Tuple<string, List<string>>>(s => new Tuple<string, List<string>>(s.Email, s.Courses)));
+            CreateMap<UserDetailsModel, APIUser>()
+                .ReverseMap()
+                .ForMember(d => d.Roles, o => o.MapFrom<UserRolesResolver, APIUser>(s => s))
+                .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses));
             CreateMap<IdentityError, ErrorEntry>()
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Description))
                 .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
                 .ForMember(d => d.Source, o => o.Ignore());
+            CreateMap<IdentityRole, String>()
+                .ConvertUsing(r => r.Name);
 
             CreateMap<Models.Language.AddModel, Language>().ReverseMap();
             CreateMap<Models.Language.ListItemModel, Language>()
@@ -50,6 +61,84 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId));
         }
     }
+
+    #region UserRolesResolver
+    public class UserRolesResolver : IMemberValueResolver<object, object, APIUser, List<string>>
+    {
+        private readonly UserManager<APIUser> UserManager;
+
+        public UserRolesResolver(UserManager<APIUser> userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public List<string> Resolve(object source, object destination, APIUser sourceMember, List<string> destMember, ResolutionContext context)
+        {
+            var userRoles = UserManager.GetRolesAsync(sourceMember).GetAwaiter();
+
+            return userRoles.GetResult().ToList();
+        }
+    }
+    #endregion
+
+    #region UserCoursesResolver
+    public class UserCoursesResolver : IMemberValueResolver<object, object, ICollection<APIUserCourse>, List<string>>
+    {
+        private readonly ICourseService Courses;
+
+        public UserCoursesResolver(ICourseService courses)
+        {
+            Courses = courses;
+        }
+
+        public List<string> Resolve(object source, object destination, ICollection<APIUserCourse> sourceMember, List<string> destMember, ResolutionContext context)
+        {
+            var courses = new List<Course>();
+            foreach (var entity in sourceMember)
+            {
+                var course = Courses.Get(entity.CourseId);
+                courses.Add(course);
+            }
+            var coursesNames = new List<string>();
+            if (courses.Any())
+            {
+                coursesNames.AddRange(courses.Select(c => c.Name));
+            }
+            return coursesNames;
+        }
+    }
+    #endregion
+
+    #region CoursesUserAddEditResolver
+    public class CoursesUserEditResolver : IMemberValueResolver<object, object, Tuple<string, List<string>>, ICollection<APIUserCourse>>
+    {
+        private readonly UserManager<APIUser> UserManager;
+        private readonly ICourseService Courses;
+
+        public CoursesUserEditResolver(UserManager<APIUser> userManager, ICourseService courses)
+        {
+            UserManager = userManager;
+            Courses = courses;
+        }
+
+        public ICollection<APIUserCourse> Resolve(object source, object destination, Tuple<string, List<string>> sourceMember, ICollection<APIUserCourse> destMember, ResolutionContext context)
+        {
+            var userAwaiter = UserManager.FindByEmailAsync(sourceMember.Item1).GetAwaiter();
+            var user = userAwaiter.GetResult();
+            var courses = new List<Course>();
+            sourceMember.Item2.ForEach(cpid => courses.Add(Courses.Get(cpid)));
+            var result = new List<APIUserCourse>();
+            foreach (var course in courses)
+            {
+                var temp = new APIUserCourse();
+                temp.APIUserId = user.Id;
+                temp.CourseId = course.Id;
+                result.Add(temp);
+            }
+            return result;
+        }
+    }
+    #endregion
 
     #region LanguagesByPublicIdResolver
     public class LanguagesByPublicIdResolver : IMemberValueResolver<object, object, string, Language>

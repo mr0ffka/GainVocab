@@ -6,7 +6,6 @@ using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

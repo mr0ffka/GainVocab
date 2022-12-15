@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-public enum UserRoles
+public enum UserRoles2
 {
     [Description("Administrator")]
     Administrator,

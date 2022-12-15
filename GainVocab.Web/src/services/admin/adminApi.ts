@@ -34,6 +34,10 @@ export const getUser = async (id: string) => {
   return (await api.get<IUserAddModel>(`users/${id}`)).data;
 };
 
+export const getRoleOptionsList = async () => {
+  return (await api.get<string[]>("users/roles/options")).data;
+};
+
 export const getUserDetails = async (id: string) => {
   return (await api.get<IUserDetailsModel>(`users/details/${id}`)).data;
 };

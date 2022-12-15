@@ -26,6 +26,7 @@ namespace GainVocab.API.Data
             //modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
+            modelBuilder.ApplyConfiguration(new APIUserCourseConfiguration());
 
 
         }

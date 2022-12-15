@@ -15,18 +15,15 @@ export const useAdminUserStore = defineStore("adminUserStore", () => {
     firstName: "",
     lastName: "",
     roles: [],
+    courses: [],
   });
 
   function resetFilters() {
     filter.value.firstName = "";
     filter.value.lastName = "";
     filter.value.roles = [];
+    filter.value.courses = [];
   }
 
-  function getUserRoleOptions() {
-    const options = ["Administrator", "User"];
-    return options;
-  }
-
-  return { pager, filter, isSearching, resetFilters, getUserRoleOptions };
+  return { pager, filter, isSearching, resetFilters };
 });

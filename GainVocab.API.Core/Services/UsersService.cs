@@ -21,10 +21,12 @@ namespace GainVocab.API.Core.Services
     public class UsersService : GenericService<APIUser>, IUsersService
     {
         private readonly UserManager<APIUser> UserManager;
+        private readonly ICourseService CourseService;
 
-        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, IMapper mapper) : base(context, mapper)
+        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, ICourseService courseService, IMapper mapper) : base(context, mapper)
         {
             UserManager = userManager;
+            CourseService = courseService;
         }
 
         public async Task<IdentityResult> Add(UserAddModel newUser)
@@ -38,16 +40,32 @@ namespace GainVocab.API.Core.Services
             if (result.Succeeded)
             {
                 await UserManager.AddToRolesAsync(user, newUser.Roles);
+                var courses = new List<Course>();
+                if (newUser.Courses != null && newUser.Courses.Any())
+                {
+                    newUser.Courses.ForEach(cpid => courses.Add(CourseService.Get(cpid)));
+                    var coursesResult = new List<APIUserCourse>();
+                    foreach (var course in courses)
+                    {
+                        var temp = new APIUserCourse();
+                        temp.APIUserId = user.Id;
+                        temp.CourseId = course.Id;
+                        coursesResult.Add(temp);
+                    }
+                    user.Courses = coursesResult;
+                    await UserManager.UpdateAsync(user);
+                }
             }
 
             return result;
         }
 
-        public async Task<APIUser> GetAsync(string id)
+        public APIUser GetAsync(string id)
         {
-            var user = await Context.Users
+            var user = Context.Users
+                .Include(x => x.Courses)
                 .Where(u => u.Id == id)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
 
             if (user == null)
                 throw new NotFoundException("User", "Entity not found");
@@ -57,11 +75,8 @@ namespace GainVocab.API.Core.Services
 
         public async Task<APIUserModel> GetUserModel(string id)
         {
-            var user = await GetAsync(id);
-
-            var userRoles = await UserManager.GetRolesAsync(user);
+            var user = GetAsync(id);
             var result = Mapper.Map<APIUser, APIUserModel>(user);
-            result.Roles = userRoles.ToList() ?? new List<string>();
 
             return result;
         }
@@ -80,9 +95,15 @@ namespace GainVocab.API.Core.Services
                 predicate.And(x => x.LastName.ToLower().Contains(filter.LastName.ToLower()));
             }
 
+            if (filter.Courses != null && filter.Courses.Any())
+            {
+                var courses = CourseService.GetListByPublicId(filter.Courses).Select(c => c.Id).ToList();
+
+                predicate.And(x => x.Courses.Any(c => courses.Contains(c.CourseId)));
+            }
+
             var query = Context.Users
-                .AsNoTracking()
-                .AsExpandable()
+                .Include(u => u.Courses)
                 .Where(predicate);
 
             // sorting
@@ -107,15 +128,7 @@ namespace GainVocab.API.Core.Services
                 .Take(pager.PageSize)
                 .ToList();
 
-            var items = new List<APIUserModel>();
-
-            foreach (var user in users)
-            {
-                var userRoles = await UserManager.GetRolesAsync(user);
-                var mappedUser = Mapper.Map<APIUser, APIUserModel>(user);
-                mappedUser.Roles = userRoles.ToList() ?? new List<string>();
-                items.Add(mappedUser);
-            }
+            var items = Mapper.Map<List<APIUser>, List<APIUserModel>>(users);
 
             if (filter.Roles != null && filter.Roles.Any())
             {
@@ -133,7 +146,7 @@ namespace GainVocab.API.Core.Services
 
         public async Task Update(string id, UserEditModel model)
         {
-            var user = await GetAsync(id);
+            var user = GetAsync(id);
 
             Mapper.Map(model, user);
             await UserManager.UpdateAsync(user);
@@ -145,8 +158,26 @@ namespace GainVocab.API.Core.Services
 
         public async Task Remove(string id)
         {
-            var user = await GetAsync(id);
+            var user = GetAsync(id);
             var result = await UserManager.DeleteAsync(user);
+        }
+
+        public async Task<UserDetailsModel> GetDetails(string id)
+        {
+            var user = GetAsync(id);
+            var details = Mapper.Map<UserDetailsModel>(user);
+
+            return details;
+
+        }
+
+        public List<string> GetRoleOptionsList()
+        {
+            var query = Context.Roles.ToList();
+
+            var items = Mapper.Map<List<string>>(query);
+
+            return items;
         }
     }
 }
