@@ -85,3 +85,26 @@ export interface ICourseFilterModel {
   languageFrom: string;
   languageTo: string;
 }
+
+export interface ICourseDataAddModel {
+  source: string;
+  translation: string;
+  coursePublicId: string;
+}
+
+export interface ICourseDataUpdateModel {
+  source: string;
+  translation: string;
+}
+
+export interface ICourseDataFilterModel {
+  publicId: string;
+  source: string;
+  translation: string;
+}
+
+export interface ICourseDataListModel {
+  publicId: string;
+  source: string;
+  translation: string;
+}

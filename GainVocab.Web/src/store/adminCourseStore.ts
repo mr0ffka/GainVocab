@@ -32,10 +32,5 @@ export const useAdminCourseStore = defineStore("adminCourseStore", () => {
     filter.value.languageTo = "";
   }
 
-  //   function getUserRoleOptions() {
-  //     const options = ["Administrator", "User"];
-  //     return options;
-  //   }
-
   return { pager, empty, filter, isSearching, resetFilters };
 });

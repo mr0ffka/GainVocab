@@ -27,11 +27,11 @@ namespace GainVocab.API.Data
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
             modelBuilder.ApplyConfiguration(new APIUserCourseConfiguration());
-
-
+            modelBuilder.ApplyConfiguration(new CourseDataConfiguration());
         }
 
         public DbSet<Language> Languages { get; set; }
         public DbSet<Course> Course { get; set; }
+        public DbSet<CourseData> CourseData { get; set; }
     }
 }

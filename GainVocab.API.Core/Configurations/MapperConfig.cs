@@ -59,6 +59,19 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<Models.Course.ItemModel, Course>()
                 .ReverseMap()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId));
+
+            CreateMap<Models.CourseData.AddModel, CourseData>()
+                .ForMember(d => d.Course, o => o.MapFrom<CourseFromPublicIdResolver, string>(s => s.CoursePublicId))
+                .ForMember(d => d.CourseId, o => o.MapFrom<CourseIdFromPublicIdResolver, string>(s => s.CoursePublicId));
+            CreateMap<Models.CourseData.ItemModel, CourseData>()
+                .ForMember(d => d.Course, o => o.MapFrom<CourseFromPublicIdResolver, string>(s => s.CoursePublicId))
+                .ForMember(d => d.CourseId, o => o.MapFrom<CourseIdFromPublicIdResolver, string>(s => s.CoursePublicId))
+                .ReverseMap()
+                .ForMember(d => d.CoursePublicId, o => o.MapFrom<CoursePublicIdFromIdResolver, long>(s => s.CourseId));
+            CreateMap<Models.CourseData.UpdateModel, CourseData>().ReverseMap();
+            CreateMap<Models.CourseData.AddModel, Models.CourseData.ItemModel>().ReverseMap();
+            CreateMap<Models.CourseData.ListItemModel, CourseData>()
+                .ReverseMap();
         }
     }
 
@@ -156,6 +169,66 @@ namespace GainVocab.API.Core.Configurations
             var entity = Languages.Get(publicId);
 
             return entity;
+        }
+    }
+    #endregion
+
+    #region CourseFromPublicIdResolver
+    public class CourseFromPublicIdResolver : IMemberValueResolver<object, object, string, Course>
+    {
+        public ICourseService Courses { get; }
+
+        public CourseFromPublicIdResolver(ICourseService courses)
+        {
+            Courses = courses;
+        }
+
+        public Course Resolve(object source, object destination, string publicId,
+            Course course, ResolutionContext context)
+        {
+            var entity = Courses.Get(publicId);
+
+            return entity;
+        }
+    }
+    #endregion
+
+    #region CourseIdFromPublicIdResolver
+    public class CourseIdFromPublicIdResolver : IMemberValueResolver<object, object, string, long>
+    {
+        public ICourseService Courses { get; }
+
+        public CourseIdFromPublicIdResolver(ICourseService courses)
+        {
+            Courses = courses;
+        }
+
+        public long Resolve(object source, object destination, string publicId,
+            long courseId, ResolutionContext context)
+        {
+            var entity = Courses.Get(publicId);
+
+            return entity != null ? entity.Id : -1;
+        }
+    }
+    #endregion
+
+    #region CoursePublicIdFromIdResolver
+    public class CoursePublicIdFromIdResolver : IMemberValueResolver<object, object, long, string>
+    {
+        public ICourseService Courses { get; }
+
+        public CoursePublicIdFromIdResolver(ICourseService courses)
+        {
+            Courses = courses;
+        }
+
+        public string Resolve(object source, object destination, long id,
+            string publicId, ResolutionContext context)
+        {
+            var entity = Courses.Get(id);
+
+            return entity != null ? entity.PublicId : "";
         }
     }
     #endregion

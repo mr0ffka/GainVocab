@@ -77,13 +77,16 @@ builder.Services.AddCors();
 builder.Host.UseSerilog((ctx, lc) => lc.WriteTo.Console().ReadFrom.Configuration(ctx.Configuration));
 
 builder.Services.AddAutoMapper(typeof(MapperConfig));
+
 builder.Services.AddScoped(typeof(IGenericService<>), typeof(GenericService<>));
 builder.Services.AddScoped<IAuthManager, AuthManager>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IUsersService, UsersService>();
+builder.Services.AddScoped<UsersService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
-builder.Services.AddScoped<UsersService>();
+builder.Services.AddScoped<ICourseDataService, CourseDataService>();
+
 builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 
 builder.Services.AddAuthentication(options => 

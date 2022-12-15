@@ -10,6 +10,12 @@ namespace GainVocab.API.Data.Models
 {
     public class Course
     {
+        public Course()
+        {
+            Users = new HashSet<APIUserCourse>();
+            Data = new HashSet<CourseData>();
+        }
+
         [Key]
         public long Id { get; set; }
         public string PublicId { get; set; }
@@ -20,5 +26,6 @@ namespace GainVocab.API.Data.Models
         public virtual Language? LanguageFrom { get; set; }
         public virtual Language? LanguageTo { get; set; }
         public ICollection<APIUserCourse> Users { get; set; }
+        public ICollection<CourseData> Data { get; set; }
     }
 }

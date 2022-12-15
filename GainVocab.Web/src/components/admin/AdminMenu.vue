@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
 import {
   Help,
-  Menu as IconMenu,
   User,
   Operation,
   Reading,
+  Upload,
+  Notebook,
+  Connection,
+  House,
 } from "@element-plus/icons-vue";
 import { useAuthMenuStore } from "@/store/authMenuStore";
 import { storeToRefs } from "pinia";
@@ -21,9 +23,9 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
     :collapse="isMenuCollapsed"
     :collapse-transition="false"
     :router="true"
+    active-text-color="black"
     :default-active="$route.path"
-    active-text-color="000"
-    :default-openeds="['sm-1']"
+    :default-openeds="['sm-1', 'sm-2']"
   >
     <el-menu-item
       :index="
@@ -31,7 +33,8 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
       "
       :route="{ name: 'admin-dashboard' }"
     >
-      <el-icon><operation /></el-icon>
+      <!-- <el-icon><operation /></el-icon> -->
+      <el-icon><House /></el-icon>
       <span>Dashboard</span>
     </el-menu-item>
     <el-menu-item
@@ -53,22 +56,43 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
             router.getRoutes().filter((x) => x.name == 'language-list')[0].path
           "
           :route="{ name: 'language-list' }"
-          >Languages</el-menu-item
         >
+          <el-icon><Connection /></el-icon>
+          <span>Languages</span>
+        </el-menu-item>
         <el-menu-item
           :index="
             router.getRoutes().filter((x) => x.name == 'course-list')[0].path
           "
           :route="{ name: 'course-list' }"
-          >Courses</el-menu-item
         >
-        <el-menu-item
-          :index="
-            router.getRoutes().filter((x) => x.name == 'data-import')[0].path
-          "
-          :route="{ name: 'data-import' }"
-          >Import data</el-menu-item
-        >
+          <el-icon><reading /></el-icon>
+          <span>Courses</span>
+        </el-menu-item>
+        <el-sub-menu index="sm-2">
+          <template #title>
+            <el-icon><Notebook /></el-icon>
+            <span>Course data</span>
+          </template>
+          <el-menu-item
+            :index="
+              router.getRoutes().filter((x) => x.name == 'data-list')[0].path
+            "
+            :route="{ name: 'data-list' }"
+          >
+            <el-icon><Notebook /></el-icon>
+            <span>Data</span></el-menu-item
+          >
+          <el-menu-item
+            :index="
+              router.getRoutes().filter((x) => x.name == 'data-import')[0].path
+            "
+            :route="{ name: 'data-import' }"
+          >
+            <el-icon><Upload /></el-icon>
+            <span>Import data</span>
+          </el-menu-item>
+        </el-sub-menu>
       </el-menu-item-group>
     </el-sub-menu>
     <el-menu-item
@@ -84,6 +108,10 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
 </template>
 
 <style scoped>
+.is-active > .el-sub-menu__title > span,
+.el-menu-item.is-active {
+  font-weight: bold;
+}
 .el-menu-vertical:not(.el-menu--collapse) {
   min-width: 200px;
   min-height: 400px;

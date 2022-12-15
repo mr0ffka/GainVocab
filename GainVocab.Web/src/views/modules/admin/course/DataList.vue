@@ -1,35 +1,36 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import {
-  getLanguageOptionsList,
-  getListCourse,
-  removeCourse,
+  getCoursesOptionsList,
+  getListCourseData,
+  removeCourseData,
 } from "@/services/admin/adminApi";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
-import { ICourseListModel, ILanguageModel } from "@/services/admin/types";
+import { ICourseDataListModel, ICourseItemModel } from "@/services/admin/types";
 import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
-import { useAdminCourseStore } from "@/store/adminCourseStore";
+import { useAdminCourseDataStore } from "@/store/adminCourseDataStore";
 
-const store = useAdminCourseStore();
-const { filter, pager, isSearching } = storeToRefs(store);
+const store = useAdminCourseDataStore();
+const { filter, pager, lastCourseSelectedPublicId, isSearching } =
+  storeToRefs(store);
 const confirmDeleteDialog = ref(false);
-const focusedItem = ref<ICourseListModel | null>();
-let entities = ref<ICourseListModel[]>();
+const selectedCourseId = ref<string>("");
+const focusedItem = ref<ICourseDataListModel | null>();
+let entities = ref<ICourseDataListModel[]>();
 let pagerValues = ref<IPager>();
-const languageOptions = ref<ILanguageModel[] | null>();
+const coursesOptions = ref<ICourseItemModel[] | null>();
 
 const getEntities = () => {
   isSearching.value = true;
-  getListCourse(filter.value, pager.value)
+  getListCourseData(selectedCourseId.value, filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;
       entities.value = data.items;
-      console.log(data);
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,
@@ -48,14 +49,14 @@ const getEntities = () => {
     });
 };
 
-const getLanguageOptions = async () => {
-  await getLanguageOptionsList()
-    .then((data: ILanguageModel[]) => {
-      let options: ILanguageModel[] = [];
+const getCoursesOptions = async () => {
+  await getCoursesOptionsList()
+    .then((data: ICourseItemModel[]) => {
+      let options: ICourseItemModel[] = [];
       data.forEach((el) => {
         options.push(el);
       });
-      languageOptions.value = options;
+      coursesOptions.value = options;
     })
     .catch((error) => {
       isSearching.value = false;
@@ -70,11 +71,11 @@ const getLanguageOptions = async () => {
 };
 
 const deleteEntity = async (id: string) =>
-  await removeCourse(id)
+  await removeCourseData(id)
     .then((data: any) => {
       ElMessage({
         showClose: true,
-        message: "Language has been deleted",
+        message: "Data entry has been deleted",
         type: "success",
       });
       getEntities();
@@ -87,17 +88,27 @@ const deleteEntity = async (id: string) =>
       });
     });
 
-onMounted(() => {
+const loadData = () => {
+  lastCourseSelectedPublicId.value = selectedCourseId.value;
   getEntities();
-  getLanguageOptions();
-});
+};
 
-const handleDeleteDialog = (row: ICourseListModel) => {
+onMounted(() => {
+  getCoursesOptions();
+  if (lastCourseSelectedPublicId.value != "") {
+    selectedCourseId.value = lastCourseSelectedPublicId.value;
+    loadData();
+  }
+});
+const handleEdit = (row: ICourseDataListModel) => {
+  router.push({ name: "data-edit", params: { publicId: row.publicId } });
+};
+const handleDeleteDialog = (row: ICourseDataListModel) => {
   focusedItem.value = row;
   confirmDeleteDialog.value = true;
 };
 const handleDelete = () => {
-  deleteEntity(focusedItem.value?.id ?? "");
+  deleteEntity(focusedItem.value?.publicId ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
@@ -114,40 +125,17 @@ const resetFilters = () => {
     <div class="grow flex flex-col p-2">
       <div class="flex">
         <div class="flex flex-row">
-          <el-input
-            v-model="filter.name"
-            class="mb-2"
-            placeholder="Course name"
-          />
+          <span class="inline-block align-middle font-bold"
+            >Select course:</span
+          >
           <el-select
-            v-model="filter.languageFrom"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            placeholder="Language from"
-            clearable
-            @clear="getEntities"
-            class="ml-2 min-w-fit"
+            v-model="selectedCourseId"
+            placeholder="Select"
+            class="ml-2"
+            @change="loadData"
           >
             <el-option
-              v-for="item in languageOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-          <el-select
-            v-model="filter.languageTo"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            placeholder="Language to"
-            clearable
-            @clear="getEntities"
-            class="ml-2 min-w-fit"
-          >
-            <el-option
-              v-for="item in languageOptions"
+              v-for="item in coursesOptions"
               :key="item.id"
               :label="item.name"
               :value="item.id"
@@ -156,104 +144,134 @@ const resetFilters = () => {
         </div>
         <div class="flex flex-row !ml-auto">
           <el-button
-            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
-            plain
-            :loading="isSearching"
-            @click="getEntities"
-            ><el-icon><Search /></el-icon>&nbsp;Search</el-button
-          >
-          <el-button
-            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
-            plain
-            type="info"
-            @click="resetFilters"
-            ><el-icon><RefreshRight /></el-icon>&nbsp;Reset filters</el-button
-          >
-          <el-button
             class="mb-2 p-3 font-bold right !ml-auto"
             type="success"
             plain
-            @click="router.push({ name: 'course-add' })"
-            ><el-icon><Plus /></el-icon>&nbsp;Add course</el-button
+            @click="router.push({ name: 'data-add' })"
+            ><el-icon><Plus /></el-icon>&nbsp;Add data</el-button
           >
         </div>
       </div>
-      <el-table
-        :data="entities ?? []"
-        :default-sort="{ prop: 'name', order: 'descending' }"
-        :flexible="true"
-        :border="true"
-        :stripe="true"
-      >
-        <el-table-column
-          label-class-name="font-black"
-          prop="name"
-          label="Course"
-          sortable
-          width=""
-        />
-        <el-table-column
-          label-class-name="font-black"
-          prop="languageFrom"
-          label="Language From"
-          sortable
-          width=""
+      <div v-if="selectedCourseId != ''">
+        <div class="flex">
+          <div class="flex flex-row">
+            <el-input
+              v-model="filter.publicId"
+              class="mb-2"
+              placeholder="Data id"
+            />
+          </div>
+          <div class="flex flex-row">
+            <el-input
+              v-model="filter.source"
+              class="mb-2 ml-2"
+              placeholder="Source text"
+            />
+          </div>
+          <div class="flex flex-row">
+            <el-input
+              v-model="filter.translation"
+              class="mb-2 ml-2"
+              placeholder="Translation text"
+            />
+          </div>
+          <div class="flex flex-row !ml-auto">
+            <el-button
+              class="mb-2 mr-2 p-3 font-bold right !ml-auto"
+              plain
+              :loading="isSearching"
+              @click="getEntities"
+              ><el-icon><Search /></el-icon>&nbsp;Search</el-button
+            >
+            <el-button
+              class="mb-2 p-3 font-bold right !ml-auto"
+              plain
+              type="info"
+              @click="resetFilters"
+              ><el-icon><RefreshRight /></el-icon>&nbsp;Reset filters</el-button
+            >
+          </div>
+        </div>
+        <el-table
+          :data="entities ?? []"
+          :default-sort="{ prop: 'name', order: 'descending' }"
+          :flexible="true"
+          :border="true"
+          :stripe="true"
         >
-        </el-table-column>
-        <el-table-column
-          label-class-name="font-black"
-          prop="languageTo"
-          label="Language To"
-          sortable
-          width=""
-        >
-        </el-table-column>
-        <el-table-column
-          label-class-name="font-black"
-          fixed="right"
-          label="Operations"
-          width=""
-          type="not-clickable"
-        >
-          <template #default="scope">
-            <div class="flex flex-row">
-              <el-button
-                size="small"
-                type="danger"
-                plain
-                @click="handleDeleteDialog(scope.row)"
-                >Delete</el-button
-              >
-            </div>
-          </template>
-        </el-table-column>
-      </el-table>
-      <div class="relative my-2">
-        <el-pagination
-          class=""
-          v-model:page-size="pager.pageSize"
-          :page-sizes="[5, 10, 15, 50]"
-          :small="false"
-          :disabled="false"
-          :background="true"
-          layout="->,total,sizes"
-          :total="pagerValues?.totalCount ?? 0"
-          @current-change="getEntities()"
-          @size-change="getEntities()"
-        />
-        <el-pagination
-          class="absolute top-0"
-          v-model:current-page="pager.pageNumber"
-          v-model:page-size="pager.pageSize"
-          :page-sizes="[5, 10, 15, 50]"
-          :small="false"
-          :disabled="false"
-          :background="true"
-          layout=",prev, pager, next"
-          :total="pagerValues?.totalCount ?? 0"
-          @current-change="getEntities()"
-          @size-change="getEntities()"
-        />
+          <el-table-column
+            label-class-name="font-black"
+            prop="publicId"
+            label="Data Id"
+            sortable
+            width=""
+          />
+          <el-table-column
+            label-class-name="font-black"
+            prop="source"
+            label="Source text"
+            sortable
+            width=""
+          >
+          </el-table-column>
+          <el-table-column
+            label-class-name="font-black"
+            prop="translation"
+            label="Translation text"
+            sortable
+            width=""
+          >
+          </el-table-column>
+          <el-table-column
+            label-class-name="font-black"
+            fixed="right"
+            label="Operations"
+            width=""
+            type="not-clickable"
+          >
+            <template #default="scope">
+              <div class="flex flex-row">
+                <el-button size="small" plain @click="handleEdit(scope.row)"
+                  >Edit</el-button
+                >
+                <el-button
+                  size="small"
+                  type="danger"
+                  plain
+                  @click="handleDeleteDialog(scope.row)"
+                  >Delete</el-button
+                >
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="relative my-2">
+          <el-pagination
+            class=""
+            v-model:page-size="pager.pageSize"
+            :page-sizes="[5, 10, 15, 50]"
+            :small="false"
+            :disabled="false"
+            :background="true"
+            layout="->,total,sizes"
+            :total="pagerValues?.totalCount ?? 0"
+            @current-change="getEntities()"
+            @size-change="getEntities()"
+          />
+          <el-pagination
+            class="absolute top-0"
+            v-model:current-page="pager.pageNumber"
+            v-model:page-size="pager.pageSize"
+            :page-sizes="[5, 10, 15, 50]"
+            :small="false"
+            :disabled="false"
+            :background="true"
+            layout=",prev, pager, next"
+            :total="pagerValues?.totalCount ?? 0"
+            @current-change="getEntities()"
+            @size-change="getEntities()"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -264,9 +282,7 @@ const resetFilters = () => {
     width="30%"
     center
   >
-    Do you really want to delete course:
-    <span class="font-bold"> {{ focusedItem?.name }}</span
-    >?
+    Do you really want to delete data entry?
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>

@@ -9,6 +9,9 @@ import {
   IUserDetailsModel,
   ICourseItemModel,
   ICourseAddModel,
+  ICourseDataAddModel,
+  ICourseDataUpdateModel,
+  ICourseDataFilterModel,
 } from "./types";
 
 import type { IPagerParams, IPagedResult } from "../common/types";
@@ -94,4 +97,34 @@ export const addCourse = async (entity: ICourseAddModel) => {
 
 export const removeCourse = async (publicId: string) => {
   return (await api.delete(`course/${publicId}`)).data;
+};
+
+export const addCourseData = async (entity: ICourseDataAddModel) => {
+  return (await api.post<GenericResponse>("course-data/add", entity)).data;
+};
+
+export const updateCourseData = async (
+  id: string,
+  model: ICourseDataUpdateModel
+) => {
+  return (await api.patch<GenericResponse>(`course-data/${id}`, model)).data;
+};
+
+export const getCourseData = async (publicId: string) => {
+  return (await api.get<ICourseDataAddModel>(`course-data/${publicId}`)).data;
+};
+
+export const getListCourseData = async (
+  coursePublicId: string,
+  filter: ICourseDataFilterModel,
+  pager: IPagerParams
+) => {
+  let request = await api.get<IPagedResult>("course-data", {
+    params: toURLSearchParams({ coursePublicId, ...filter, ...pager }),
+  });
+  return request.data;
+};
+
+export const removeCourseData = async (publicId: string) => {
+  return (await api.delete(`course-data/${publicId}`)).data;
 };
