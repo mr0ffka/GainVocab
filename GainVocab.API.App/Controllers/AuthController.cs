@@ -18,10 +18,10 @@ namespace GainVocab.API.App.Controllers
         private const string REFRESH_TOKEN_COOKIE_NAME = "X-Refresh-Token";
 
         private readonly IAuthManager AuthManager;
-        private readonly UsersService Users;
+        private readonly IUsersService Users;
         private readonly ILogger<AuthController> Logger;
 
-        public AuthController(IAuthManager authManager, UsersService users, ILogger<AuthController> logger)
+        public AuthController(IAuthManager authManager, IUsersService users, ILogger<AuthController> logger)
         {
             AuthManager = authManager;
             Users = users;

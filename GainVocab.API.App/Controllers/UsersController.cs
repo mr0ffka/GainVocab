@@ -24,11 +24,11 @@ namespace GainVocab.API.App.Controllers
     {
         private readonly IAuthManager AuthManager;
         private readonly UserManager<APIUser> UserManager;
-        private readonly UsersService Users;
+        private readonly IUsersService Users;
         private readonly ILogger<UsersController> Logger;
         private readonly IMapper Mapper;
 
-        public UsersController(IAuthManager authManager, UserManager<APIUser> userManager, ILogger<UsersController> logger, UsersService users, IMapper mapper)
+        public UsersController(IAuthManager authManager, UserManager<APIUser> userManager, ILogger<UsersController> logger, IUsersService users, IMapper mapper)
         {
             AuthManager = authManager;
             Logger = logger;
@@ -112,6 +112,15 @@ namespace GainVocab.API.App.Controllers
             await Users.Remove(id);
 
             return Ok();
+        }
+
+        [HttpGet("count")]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult GetUserCount()
+        {
+            var data = Users.GetCount();
+
+            return Ok(data);
         }
     }
 }

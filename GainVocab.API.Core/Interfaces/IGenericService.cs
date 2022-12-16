@@ -10,5 +10,6 @@ namespace GainVocab.API.Core.Interfaces
 {
     public interface IGenericService<T> where T : class
     {
+        int GetCount();
     }
 }

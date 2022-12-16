@@ -3,6 +3,7 @@ using GainVocab.API.Core.Exceptions;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.CourseData;
 using GainVocab.API.Core.Models.Pager;
+using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -71,6 +72,15 @@ namespace GainVocab.API.App.Controllers
             await CoursesData.Remove(publicId);
 
             return Ok();
+        }
+
+        [HttpGet("count")]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult GetCount()
+        {
+            var data = CoursesData.GetCount();
+
+            return Ok(data);
         }
     }
 }

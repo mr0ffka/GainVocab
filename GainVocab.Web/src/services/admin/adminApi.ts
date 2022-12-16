@@ -128,3 +128,23 @@ export const getListCourseData = async (
 export const removeCourseData = async (publicId: string) => {
   return (await api.delete(`course-data/${publicId}`)).data;
 };
+
+export const getUserCount = async () => {
+  return (await api.get<number>("users/count")).data;
+};
+
+export const getLanguageCount = async () => {
+  return (await api.get<number>("course/language/count")).data;
+};
+
+export const getCourseCount = async () => {
+  return (await api.get<number>("course/count")).data;
+};
+
+export const getCourseDataCount = async () => {
+  return (await api.get<number>("course-data/count")).data;
+};
+
+export const getSupportTicketsCount = async () => {
+  return (await api.get<number>("users/count")).data;
+};

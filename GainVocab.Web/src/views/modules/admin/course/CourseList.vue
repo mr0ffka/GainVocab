@@ -29,7 +29,6 @@ const getEntities = () => {
     .then((data: IPagedResult) => {
       isSearching.value = false;
       entities.value = data.items;
-      console.log(data);
       pagerValues.value = {
         pageNumber: data.pageNumber,
         totalCount: data.totalCount,

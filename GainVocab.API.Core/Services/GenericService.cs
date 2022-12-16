@@ -14,5 +14,10 @@ namespace GainVocab.API.Core.Services
             this.Context = context;
             this.Mapper = mapper;
         }
+
+        public int GetCount()
+        {
+            return Context.Set<T>().Count();
+        }
     }
 }

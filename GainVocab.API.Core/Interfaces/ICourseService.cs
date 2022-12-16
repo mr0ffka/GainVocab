@@ -4,7 +4,7 @@ using GainVocab.API.Data.Models;
 
 namespace GainVocab.API.Core.Interfaces
 {
-    public interface ICourseService
+    public interface ICourseService : IGenericService<Course>
     {
         Task<PagedResult<ListItemModel>> GetList(FilterModel filter, PagerParams pager);
         List<ItemModel> GetOptionsList();
