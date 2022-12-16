@@ -5,7 +5,7 @@ import {
   getCourseCount,
   getCourseDataCount,
   getLanguageCount,
-  getSupportTicketsCount,
+  getSupportIssueCount,
   getUserCount,
 } from "@/services/admin/adminApi";
 import { ElMessage } from "element-plus";
@@ -86,7 +86,7 @@ const courseDataCountGet = () => {
 };
 
 const supportNewTicketsCountGet = () => {
-  getSupportTicketsCount()
+  getSupportIssueCount()
     .then((data) => {
       console.log(data);
       supportNewTicketsCount.value = data;
@@ -128,7 +128,9 @@ onMounted(() => {
           </router-link>
         </template>
         <div class="text-center">
-          <span class="font-bold text-8xl text-red-500">{{ userCount }}</span>
+          <span class="font-bold text-8xl text-red-500">{{
+            supportNewTicketsCount
+          }}</span>
         </div>
       </el-card>
       <el-card

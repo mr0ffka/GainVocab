@@ -4,7 +4,6 @@ import {
   ICourseFilterModel,
   ILanguageAddModel,
   ILanguageFilterModel,
-  ILanguageModel,
   IUserAddModel,
   IUserDetailsModel,
   ICourseItemModel,
@@ -12,6 +11,9 @@ import {
   ICourseDataAddModel,
   ICourseDataUpdateModel,
   ICourseDataFilterModel,
+  ISupportIssueFilterModel,
+  IUserOptionModel,
+  ISupportIssueTypeOptionModel,
 } from "./types";
 
 import type { IPagerParams, IPagedResult } from "../common/types";
@@ -51,6 +53,10 @@ export const removeUser = async (id: string) => {
 
 export const updateUser = async (id: string, model: IUserAddModel) => {
   return (await api.patch<IUserAddModel>(`users/${id}`, model)).data;
+};
+
+export const getUserOptionsList = async () => {
+  return (await api.get<IUserOptionModel[]>("users/options")).data;
 };
 
 export const addLanguage = async (entity: ILanguageAddModel) => {
@@ -145,6 +151,30 @@ export const getCourseDataCount = async () => {
   return (await api.get<number>("course-data/count")).data;
 };
 
-export const getSupportTicketsCount = async () => {
-  return (await api.get<number>("users/count")).data;
+export const getSupportIssueCount = async () => {
+  return (await api.get<number>("support/count")).data;
+};
+
+export const getSupportIssueList = async (
+  filter: ISupportIssueFilterModel,
+  pager: IPagerParams
+) => {
+  let request = await api.get<IPagedResult>("support", {
+    params: toURLSearchParams({ ...filter, ...pager }),
+  });
+  return request.data;
+};
+
+export const removeSupportIssue = async (publicId: string) => {
+  return (await api.delete(`support/${publicId}`)).data;
+};
+
+export const resolveSupportIssue = async (publicId: string) => {
+  return (await api.post(`support/resolve/${publicId}`)).data;
+};
+
+export const getSupportIssuesTypesOptionsList = async () => {
+  return (
+    await api.get<ISupportIssueTypeOptionModel[]>("support/types/options")
+  ).data;
 };

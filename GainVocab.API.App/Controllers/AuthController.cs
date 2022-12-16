@@ -73,7 +73,7 @@ namespace GainVocab.API.App.Controllers
         {
             Logger.LogInformation($"Login Attempt for {loginModel.Email} ");
             var authResponse = await AuthManager.Login(loginModel);
-            var user = Users.GetAsync(authResponse.UserId);
+            var user = Users.Get(authResponse.UserId);
             Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
             Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
 
@@ -187,7 +187,7 @@ namespace GainVocab.API.App.Controllers
 
                 if (!string.IsNullOrEmpty(uid))
                 {
-                    user = Users.GetAsync(uid!);
+                    user = Users.Get(uid!);
                 }
 
                 var frontUser = new FrontUserModel

@@ -1,19 +1,9 @@
 ﻿using AutoMapper;
-using GainVocab.API.Core.Exceptions;
-using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Language;
 using GainVocab.API.Core.Models.Pager;
-using GainVocab.API.Core.Services;
-using GainVocab.API.Data.Models;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using System.Collections.Generic;
-using System.Security.Claims;
 
 namespace GainVocab.API.App.Controllers
 {

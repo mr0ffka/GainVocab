@@ -1,5 +1,6 @@
 ﻿using GainVocab.API.Data.Configurations;
 using GainVocab.API.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -23,15 +24,18 @@ namespace GainVocab.API.Data
             modelBuilder.HasPostgresExtension("uuid-ossp");
 
             base.OnModelCreating(modelBuilder);
-            //modelBuilder.ApplyConfiguration(new RoleConfiguration());
             modelBuilder.ApplyConfiguration(new LanguageConfiguration());
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
             modelBuilder.ApplyConfiguration(new APIUserCourseConfiguration());
             modelBuilder.ApplyConfiguration(new CourseDataConfiguration());
+            modelBuilder.ApplyConfiguration(new SupportIssueConfiguration());
+            modelBuilder.ApplyConfiguration(new SupportIssueTypeConfiguration());
         }
 
         public DbSet<Language> Languages { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<CourseData> CourseData { get; set; }
+        public DbSet<SupportIssue> SupportIssue { get; set; }
+        public DbSet<SupportIssueType> SupportIssueType { get; set; }
     }
 }

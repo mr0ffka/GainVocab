@@ -15,9 +15,10 @@ namespace GainVocab.API.Core.Interfaces
     {
         Task<PagedResult<APIUserModel>> GetList(FilterModel filter, PagerParams pager);
         Task<IdentityResult> Add(UserAddModel newUser);
-        APIUser GetAsync(string id);
+        APIUser Get(string id);
         Task<APIUserModel> GetUserModel(string id);
         List<string> GetRoleOptionsList();
+        List<UserOptionModel> GetUserOptionsList();
         Task<UserDetailsModel> GetDetails(string id);
         Task Remove(string id);
         Task Update(string id, UserEditModel model);

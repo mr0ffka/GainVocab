@@ -88,9 +88,18 @@ namespace GainVocab.API.App.Controllers
             return Ok(user);
         }
 
+        [HttpGet("options")]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult GetUserOptionsList()
+        {
+            var data = Users.GetUserOptionsList();
+
+            return Ok(data);
+        }
+
         [HttpGet("roles/options")]
         [Authorize(Roles = "Administrator")]
-        public ActionResult GetOptionsList()
+        public ActionResult GetRoleOptionsList()
         {
             var data = Users.GetRoleOptionsList();
 

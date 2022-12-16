@@ -62,6 +62,8 @@ namespace GainVocab.API.Core.Services
         {
             var entity = Context.Course
                 .Where(e => e.Id == id)
+                .Include(e => e.LanguageFrom)
+                .Include(e => e.LanguageTo)
                 .FirstOrDefault();
 
             if (entity == null)

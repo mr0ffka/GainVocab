@@ -60,7 +60,7 @@ namespace GainVocab.API.Core.Services
             return result;
         }
 
-        public APIUser GetAsync(string id)
+        public APIUser Get(string id)
         {
             var user = Context.Users
                 .Include(x => x.Courses)
@@ -75,7 +75,7 @@ namespace GainVocab.API.Core.Services
 
         public async Task<APIUserModel> GetUserModel(string id)
         {
-            var user = GetAsync(id);
+            var user = Get(id);
             var result = Mapper.Map<APIUser, APIUserModel>(user);
 
             return result;
@@ -146,7 +146,7 @@ namespace GainVocab.API.Core.Services
 
         public async Task Update(string id, UserEditModel model)
         {
-            var user = GetAsync(id);
+            var user = Get(id);
 
             Mapper.Map(model, user);
             await UserManager.UpdateAsync(user);
@@ -158,13 +158,13 @@ namespace GainVocab.API.Core.Services
 
         public async Task Remove(string id)
         {
-            var user = GetAsync(id);
+            var user = Get(id);
             var result = await UserManager.DeleteAsync(user);
         }
 
         public async Task<UserDetailsModel> GetDetails(string id)
         {
-            var user = GetAsync(id);
+            var user = Get(id);
             var details = Mapper.Map<UserDetailsModel>(user);
 
             return details;
@@ -176,6 +176,15 @@ namespace GainVocab.API.Core.Services
             var query = Context.Roles.ToList();
 
             var items = Mapper.Map<List<string>>(query);
+
+            return items;
+        }
+
+        public List<UserOptionModel> GetUserOptionsList()
+        {
+            var query = Context.Users.ToList();
+
+            var items = Mapper.Map<List<UserOptionModel>>(query);
 
             return items;
         }

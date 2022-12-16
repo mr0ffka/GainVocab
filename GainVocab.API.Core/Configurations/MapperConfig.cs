@@ -11,6 +11,7 @@ using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Interfaces;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using LinqKit;
+using GainVocab.API.Core.Models.SupportIssue;
 
 namespace GainVocab.API.Core.Configurations
 {
@@ -37,6 +38,7 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Source, o => o.Ignore());
             CreateMap<IdentityRole, String>()
                 .ConvertUsing(r => r.Name);
+            CreateMap<IdentityUser, UserOptionModel>();
 
             CreateMap<Models.Language.AddModel, Language>().ReverseMap();
             CreateMap<Models.Language.ListItemModel, Language>()
@@ -72,6 +74,19 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<Models.CourseData.AddModel, Models.CourseData.ItemModel>().ReverseMap();
             CreateMap<Models.CourseData.ListItemModel, CourseData>()
                 .ReverseMap();
+
+            CreateMap<Models.SupportIssue.AddModel, SupportIssue>()
+                .ForMember(d => d.IssueTypeId, o => o.MapFrom<SupportIssueTypeIdFromPublicIdResolver, string>(s => s.TypePublicId))
+                .ForMember(d => d.CreatedAt, o => o.Ignore())
+                .ForMember(d => d.UpdatedAt, o => o.Ignore());
+            CreateMap<Models.SupportIssue.ListItemModel, SupportIssue>()
+                .ReverseMap()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
+                .ForMember(d => d.TypeName, o => o.MapFrom<SupportIssueTypeNameFromIdResolver, long>(s => s.IssueTypeId))
+                .ForMember(d => d.Reporter, o => o.MapFrom<UserDetailsByIdResolver, string>(s => s.ReporterId))
+                .ForMember(d => d.IssueEntity, o => o.MapFrom<IssueEntityListItemFromDataPublicIdResolver, string>(s => s.IssueEntityId))
+                .ForMember(d => d.Message, o => o.MapFrom(s => s.IssueMessage))
+                .ForMember(d => d.IsResolved, o => o.MapFrom(s => s.IsResolved));
         }
     }
 
@@ -90,6 +105,26 @@ namespace GainVocab.API.Core.Configurations
             var userRoles = UserManager.GetRolesAsync(sourceMember).GetAwaiter();
 
             return userRoles.GetResult().ToList();
+        }
+    }
+    #endregion
+    #region UserByIdResolver
+    public class UserDetailsByIdResolver : IMemberValueResolver<object, object, string, UserDetailsModel>
+    {
+        private readonly IUsersService Users;
+        private readonly IMapper Mapper;
+
+        public UserDetailsByIdResolver(IUsersService users, IMapper mapper)
+        {
+            Users = users;
+            Mapper = mapper;
+        }
+
+        public UserDetailsModel Resolve(object source, object destination, string sourceMember, UserDetailsModel destMember, ResolutionContext context)
+        {
+            var user = Users.Get(sourceMember);
+            var mappedUser = Mapper.Map<APIUser, UserDetailsModel>(user);
+            return mappedUser;
         }
     }
     #endregion
@@ -245,6 +280,82 @@ namespace GainVocab.API.Core.Configurations
             var result = new List<string>();
             result.AddRange(sourceMember.Select(s => s.Name));
             return result;
+        }
+    }
+    #endregion
+
+    #region SupportIssueTypeIdFromPublicIdResolver
+    public class SupportIssueTypeIdFromPublicIdResolver : IMemberValueResolver<object, object, string, long>
+    {
+        public ISupportIssueTypeService SupportIssueTypes { get; }
+
+        public SupportIssueTypeIdFromPublicIdResolver(ISupportIssueTypeService types)
+        {
+            SupportIssueTypes = types;
+        }
+
+        public long Resolve(object source, object destination, string publicId,
+            long courseId, ResolutionContext context)
+        {
+            var entity = SupportIssueTypes.Get(publicId);
+
+            return entity != null ? entity.Id : -1;
+        }
+    }
+    #endregion
+
+    #region SupportIssueTypeNameFromIdResolver
+    public class SupportIssueTypeNameFromIdResolver : IMemberValueResolver<object, object, long, string>
+    {
+        public ISupportIssueTypeService SupportIssueTypes { get; }
+
+        public SupportIssueTypeNameFromIdResolver(ISupportIssueTypeService types)
+        {
+            SupportIssueTypes = types;
+        }
+
+        public string Resolve(object source, object destination, long id,
+            string name, ResolutionContext context)
+        {
+            var entity = SupportIssueTypes.Get(id);
+
+            return entity != null ? entity.Name : "";
+        }
+    }
+    #endregion
+
+    #region SupportIssueTypeNameFromIdResolver
+    public class IssueEntityListItemFromDataPublicIdResolver : IMemberValueResolver<object, object, string, IssueEntityListItemModel>
+    {
+        public ICourseService Courses { get; }
+        public ICourseDataService CourseData { get; }
+
+        public IssueEntityListItemFromDataPublicIdResolver(ICourseService courses, ICourseDataService courseData)
+        {
+            Courses = courses;
+            CourseData = courseData;
+        }
+
+        public IssueEntityListItemModel Resolve(object source, object destination, string sourceMember,
+            IssueEntityListItemModel destMember, ResolutionContext context)
+        {
+            if (!string.IsNullOrEmpty(sourceMember))
+            {
+                var courseData = CourseData.Get(sourceMember);
+                var course = Courses.Get(courseData.CourseId);
+
+                var entity = new IssueEntityListItemModel
+                {
+                    CourseName = course.Name,
+                    LanguageFrom = course.LanguageFrom.Name,
+                    LanguageTo = course.LanguageTo.Name,
+                    Source = courseData.Source,
+                    Translation = courseData.Translation
+                };
+
+                return entity;
+            }
+            return new IssueEntityListItemModel();
         }
     }
     #endregion

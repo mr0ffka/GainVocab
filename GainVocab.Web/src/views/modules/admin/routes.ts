@@ -55,7 +55,7 @@ export default [
             path: "",
             name: "support-list",
             component: () =>
-              import("@/views/modules/admin/support/SupportList.vue"),
+              import("@/views/modules/admin/support/SupportIssueList.vue"),
           },
         ],
       },

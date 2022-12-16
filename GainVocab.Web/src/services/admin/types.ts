@@ -1,4 +1,4 @@
-import { IUserAuth } from "../auth/types";
+import { DateTime } from "luxon";
 
 export interface IUserFilterModel {
   firstName: string;
@@ -32,6 +32,11 @@ export interface IUserDetailsModel {
   email: string;
   roles: string[];
   courses: [];
+}
+
+export interface IUserOptionModel {
+  id: string;
+  email: string;
 }
 
 export interface ILanguageAddModel {
@@ -107,4 +112,38 @@ export interface ICourseDataListModel {
   publicId: string;
   source: string;
   translation: string;
+}
+
+export interface ISupportIssueFilterModel {
+  isResolved: string[];
+  typeId: string[];
+  reporterId: string[];
+  createdFrom: string;
+  createdTo: string;
+  updatedFrom: string;
+  updatedTo: string;
+}
+
+export interface IIssueEntityListItemModel {
+  courseName: string;
+  languageFrom: string;
+  languageTo: string;
+  source: string;
+  translation: string;
+}
+
+export interface ISupportIssueListItemModel {
+  id: string;
+  typeName: string;
+  isResolved: boolean;
+  reporter: IUserDetailsModel;
+  issueEntity: IIssueEntityListItemModel;
+  message: string;
+  createdAt: DateTime;
+  updatedAt: DateTime;
+}
+
+export interface ISupportIssueTypeOptionModel {
+  publicId: string;
+  name: string;
 }

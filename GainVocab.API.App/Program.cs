@@ -86,6 +86,8 @@ builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<ILanguageService, LanguageService>();
 builder.Services.AddScoped<ICourseService, CourseService>();
 builder.Services.AddScoped<ICourseDataService, CourseDataService>();
+builder.Services.AddScoped<ISupportIssueService, SupportIssueService>();
+builder.Services.AddScoped<ISupportIssueTypeService, SupportIssueTypeService>();
 
 builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 
