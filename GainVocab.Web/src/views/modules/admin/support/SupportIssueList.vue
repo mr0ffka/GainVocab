@@ -36,7 +36,6 @@ const issueTypesOptions = ref<ISupportIssueTypeOptionModel[] | null>();
 
 const getEntities = async () => {
   isSearching.value = true;
-  console.log(filter);
   await getSupportIssueList(filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;

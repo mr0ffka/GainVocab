@@ -22,7 +22,6 @@ const supportNewTicketsCount = ref<number>(0);
 const userCountGet = () => {
   getUserCount()
     .then((data) => {
-      console.log(data);
       userCount.value = data;
     })
     .catch((error) => {
@@ -39,7 +38,6 @@ const userCountGet = () => {
 const languageCountGet = () => {
   getLanguageCount()
     .then((data) => {
-      console.log(data);
       languageCount.value = data;
     })
     .catch((error) => {
@@ -56,7 +54,6 @@ const languageCountGet = () => {
 const courseCountGet = () => {
   getCourseCount()
     .then((data) => {
-      console.log(data);
       courseCount.value = data;
     })
     .catch((error) => {
@@ -73,7 +70,6 @@ const courseCountGet = () => {
 const courseDataCountGet = () => {
   getCourseDataCount()
     .then((data) => {
-      console.log(data);
       courseDataCount.value = data;
     })
     .catch((error) => {
@@ -90,7 +86,6 @@ const courseDataCountGet = () => {
 const courseDataExampleCountGet = () => {
   getCourseDataExampleCount()
     .then((data) => {
-      console.log(data);
       courseDataExampleCount.value = data;
     })
     .catch((error) => {
@@ -107,7 +102,6 @@ const courseDataExampleCountGet = () => {
 const supportNewTicketsCountGet = () => {
   getSupportIssueCount()
     .then((data) => {
-      console.log(data);
       supportNewTicketsCount.value = data;
     })
     .catch((error) => {

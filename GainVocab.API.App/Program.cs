@@ -128,14 +128,14 @@ builder.Services.AddAuthentication(options =>
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "X-Access-Token";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(1);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
     options.SlidingExpiration = true;
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.Name = "X-Refresh-Token";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(40);
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(20);
     options.SlidingExpiration = true;
 });
 

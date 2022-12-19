@@ -81,7 +81,6 @@ const courseDataAdd = (entity: ICourseDataAddModel) => {
       entity.examples.push(e);
     }
   });
-  console.log(entity.examples);
   addCourseData(entity)
     .then(() => {
       ElMessage({

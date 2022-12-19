@@ -2,7 +2,6 @@
 import {
   Help,
   User,
-  Operation,
   Reading,
   Upload,
   Notebook,
@@ -13,6 +12,9 @@ import { useAuthMenuStore } from "@/store/authMenuStore";
 import { storeToRefs } from "pinia";
 import { router } from "@/router";
 import { RouteLocationNormalizedLoaded } from "vue-router";
+import { getCurrUser, refreshAccessTokenFn } from "@/services/auth/authApi";
+import { queryClient } from "@/helpers/queryClient";
+import { onMounted } from "vue";
 
 const authMenuStore = useAuthMenuStore();
 const { isMenuCollapsed } = storeToRefs(authMenuStore);
@@ -33,6 +35,11 @@ const activeRouteHandle = (route: RouteLocationNormalizedLoaded) => {
 
   return currPath;
 };
+
+onMounted(async () => {
+  await refreshAccessTokenFn();
+  queryClient.setQueryData(["authUser"], await getCurrUser());
+}),
 </script>
 
 <template>

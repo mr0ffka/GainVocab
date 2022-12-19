@@ -1,3 +1,4 @@
+import { getCurrUser, refreshAccessTokenFn } from "@/services/auth/authApi";
 import {
   createRouter,
   createWebHistory,
@@ -121,6 +122,8 @@ router.beforeEach(
   ) => {
     if (!queryClient.getQueryData(["authUser"])) {
       queryClient.invalidateQueries(["authUser"]);
+      await refreshAccessTokenFn();
+      queryClient.setQueryData(["authUser"], await getCurrUser());
     }
 
     if (!to.meta.middleware) {
