@@ -208,6 +208,7 @@ const resetFilters = () => {
             placeholder="Is resolved?"
             clearable
             class="min-w-fit"
+            @clear="getEntities"
           >
             <el-option
               v-for="item in ['true', 'false']"
@@ -224,6 +225,7 @@ const resetFilters = () => {
             placeholder="Issue type"
             clearable
             class="min-w-fit"
+            @clear="getEntities"
           >
             <el-option
               v-for="item in issueTypesOptions"
@@ -240,6 +242,7 @@ const resetFilters = () => {
             placeholder="Reporter"
             clearable
             class="min-w-fit"
+            @clear="getEntities"
           >
             <el-option
               v-for="item in usersOptions"
@@ -248,30 +251,6 @@ const resetFilters = () => {
               :value="item.id"
             />
           </el-select>
-          <!-- <el-date-picker
-            v-model="filter.createdFrom"
-            type="date"
-            class=""
-            placeholder="Created from"
-          />
-          <el-date-picker
-            v-model="filter.createdTo"
-            type="date"
-            class=""
-            placeholder="Created to"
-          />
-          <el-date-picker
-            v-model="filter.updatedFrom"
-            type="date"
-            class=""
-            placeholder="Updated from"
-          />
-          <el-date-picker
-            v-model="filter.updatedTo"
-            class=""
-            type="date"
-            placeholder="Updated to"
-          /> -->
           <el-date-picker
             v-model="filter.created"
             type="daterange"
@@ -279,6 +258,7 @@ const resetFilters = () => {
             end-placeholder="Created date to"
             class="col-span-2 min-w-fit"
             value-format="DD/MM/YYYY"
+            @clear="getEntities"
           />
           <el-date-picker
             v-model="filter.updated"
@@ -287,6 +267,7 @@ const resetFilters = () => {
             end-placeholder="Updated date to"
             class="col-span-2 min-w-fit"
             value-format="DD/MM/YYYY"
+            @clear="getEntities"
           />
         </div>
         <div class="flex flex-row !ml-auto">
@@ -548,10 +529,6 @@ const resetFilters = () => {
     width="30%"
     center
   >
-    <!-- Do you really want to delete language:
-    <span class="font-bold"> {{ focusedItem?.name }}</span
-    >? By deleting language you'll be deleting all courses using this language
-    as well. -->
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>
@@ -568,10 +545,6 @@ const resetFilters = () => {
     width="30%"
     center
   >
-    <!-- Do you really want to delete language:
-    <span class="font-bold"> {{ focusedItem?.name }}</span
-    >? By deleting language you'll be deleting all courses using this language
-    as well. -->
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>
