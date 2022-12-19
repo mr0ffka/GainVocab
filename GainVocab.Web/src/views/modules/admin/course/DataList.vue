@@ -116,6 +116,12 @@ const resetFilters = () => {
   store.resetFilters();
   getEntities();
 };
+
+const rowClick = (row: ICourseDataListModel, column: any) => {
+  if (column.type != "not-clickable") {
+    router.push({ name: "data-edit", params: { publicId: row.publicId } });
+  }
+};
 </script>
 
 <template>
@@ -198,6 +204,7 @@ const resetFilters = () => {
           :flexible="true"
           :border="true"
           :stripe="true"
+          @row-click="rowClick"
         >
           <el-table-column
             label-class-name="font-black"
