@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace GainVocab.API.Core.Models.CourseData
 {
-    public class ItemModel
+    public class ExampleEditModel
     {
+        public string? PublicId { get; set; }
         public string Source { get; set; }
         public string Translation { get; set; }
-        public string CoursePublicId { get; set; }
-        public List<ExampleEditModel>? Examples { get; set; }
     }
 }

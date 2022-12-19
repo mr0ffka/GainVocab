@@ -28,6 +28,7 @@ namespace GainVocab.API.Data
             modelBuilder.ApplyConfiguration(new CourseConfiguration());
             modelBuilder.ApplyConfiguration(new APIUserCourseConfiguration());
             modelBuilder.ApplyConfiguration(new CourseDataConfiguration());
+            modelBuilder.ApplyConfiguration(new CourseDataExampleConfiguration());
             modelBuilder.ApplyConfiguration(new SupportIssueConfiguration());
             modelBuilder.ApplyConfiguration(new SupportIssueTypeConfiguration());
         }
@@ -35,6 +36,7 @@ namespace GainVocab.API.Data
         public DbSet<Language> Languages { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<CourseData> CourseData { get; set; }
+        public DbSet<CourseDataExample> CourseDataExample { get; set; }
         public DbSet<SupportIssue> SupportIssue { get; set; }
         public DbSet<SupportIssueType> SupportIssueType { get; set; }
     }

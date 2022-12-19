@@ -27,7 +27,9 @@ namespace GainVocab.API.Core.Services
         public async Task Add(AddModel entity)
         {
             var mappedEntity = Mapper.Map<CourseData>(entity);
+            var mappedExamples = Mapper.Map<List<CourseDataExample>>(entity.Examples);
 
+            mappedEntity.Examples = mappedExamples;
             try
             {
                 await Context.AddAsync(mappedEntity);
@@ -42,11 +44,41 @@ namespace GainVocab.API.Core.Services
         public async Task Update(string id, UpdateModel model)
         {
             var entity = Get(id);
-            var mappedEntity = Mapper.Map(model, entity);
 
             try
             {
-                Context.Update(mappedEntity);
+                Context.Entry(entity).CurrentValues.SetValues(model);
+
+                foreach (var existingExample in entity.Examples.ToList())
+                {
+                    if (!model.Examples.Any(e => e.PublicId == existingExample.PublicId))
+                    {
+                        Context.CourseDataExample.Remove(existingExample);
+                    }
+                }
+
+                foreach (var exampleModel in model.Examples.ToList())
+                {
+                    var existingExample = entity.Examples
+                        .Where(e => e.PublicId == exampleModel.PublicId && e.Id != default(long))
+                        .SingleOrDefault();
+
+                    if (existingExample != null)
+                    {
+                        Context.Entry(existingExample).CurrentValues.SetValues(exampleModel);
+                    }
+                    else
+                    {
+                        var newExample = new CourseDataExample
+                        {
+                            Source = exampleModel.Source,
+                            Translation = exampleModel.Translation,
+                            CourseDataId = entity.Id,
+                        };
+                        entity.Examples.Add(newExample);
+                    }
+                }
+
                 await Context.SaveChangesAsync();
             }
             catch (Exception ex)
@@ -59,6 +91,7 @@ namespace GainVocab.API.Core.Services
         {
             var entity = Context.CourseData
                 .Where(e => e.PublicId == publicId)
+                .Include(e => e.Examples)
                 .FirstOrDefault();
 
             if (entity == null)
@@ -69,7 +102,10 @@ namespace GainVocab.API.Core.Services
 
         public ItemModel GetItemModel(string publicId)
         {
-            var query = Context.CourseData.FirstOrDefault(cd => cd.PublicId == publicId);
+            var query = Context
+                .CourseData
+                .Include(e => e.Examples)
+                .FirstOrDefault(cd => cd.PublicId == publicId);
 
             var entity = Mapper.Map<ItemModel>(query);
 
@@ -100,17 +136,15 @@ namespace GainVocab.API.Core.Services
             }
 
             var query = Context.CourseData
-                .AsExpandable()
                 .Include(c => c.Course)
-                .Where(predicate);
-
-            var entities = query
+                .Include(c => c.Examples)
+                .Where(predicate)
                 .Skip(pager.PageSize * (pager.PageNumber - 1))
                 .Take(pager.PageSize)
                 .ToList();
 
             var items = new List<ListItemModel>();
-            items = Mapper.Map<List<ListItemModel>>(entities);
+            items = Mapper.Map<List<ListItemModel>>(query);
 
             return new PagedResult<ListItemModel>
             {

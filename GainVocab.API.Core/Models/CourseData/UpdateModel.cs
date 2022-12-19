@@ -8,6 +8,7 @@ namespace GainVocab.API.Core.Models.CourseData
     {
         public string Source { get; set; }
         public string Translation { get; set; }
+        public List<ExampleEditModel>? Examples { get; set; }
 
         public IEnumerable<ValidationResult> Validate(System.ComponentModel.DataAnnotations.ValidationContext validationContext)
         {

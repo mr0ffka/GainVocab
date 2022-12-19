@@ -12,9 +12,27 @@ import {
 import { useAuthMenuStore } from "@/store/authMenuStore";
 import { storeToRefs } from "pinia";
 import { router } from "@/router";
+import { RouteLocationNormalizedLoaded } from "vue-router";
 
 const authMenuStore = useAuthMenuStore();
 const { isMenuCollapsed } = storeToRefs(authMenuStore);
+
+const activeRouteHandle = (route: RouteLocationNormalizedLoaded) => {
+  const currPath = route.matched.reverse()[0].path;
+  if (currPath.includes("/admin/users")) {
+    return "/admin/users";
+  } else if (currPath.includes("/admin/course/language")) {
+    return "/admin/course/language";
+  } else if (currPath.includes("/admin/course/data/import")) {
+    return "/admin/course/data/import";
+  } else if (currPath.includes("/admin/course/data")) {
+    return "/admin/course/data";
+  } else if (currPath.includes("/admin/course")) {
+    return "/admin/course";
+  }
+
+  return currPath;
+};
 </script>
 
 <template>
@@ -24,7 +42,7 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
     :collapse-transition="false"
     :router="true"
     active-text-color="black"
-    :default-active="$route.path"
+    :default-active="activeRouteHandle($route)"
     :default-openeds="['sm-1', 'sm-2']"
   >
     <el-menu-item
@@ -33,7 +51,6 @@ const { isMenuCollapsed } = storeToRefs(authMenuStore);
       "
       :route="{ name: 'admin-dashboard' }"
     >
-      <!-- <el-icon><operation /></el-icon> -->
       <el-icon><House /></el-icon>
       <span>Dashboard</span>
     </el-menu-item>

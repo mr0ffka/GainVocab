@@ -224,6 +224,14 @@ const resetFilters = () => {
           </el-table-column>
           <el-table-column
             label-class-name="font-black"
+            prop="noExamples"
+            label="No. examples"
+            sortable
+            width=""
+          >
+          </el-table-column>
+          <el-table-column
+            label-class-name="font-black"
             fixed="right"
             label="Operations"
             width=""

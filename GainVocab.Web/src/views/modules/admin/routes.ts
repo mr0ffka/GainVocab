@@ -96,27 +96,32 @@ export default [
           },
           {
             path: "data",
-            name: "data-list",
-            component: () =>
-              import("@/views/modules/admin/course/DataList.vue"),
-          },
-          {
-            path: "data-add",
-            name: "data-add",
-            component: () =>
-              import("@/views/modules/admin/course/DataForm.vue"),
-          },
-          {
-            path: "data-edit/:publicId",
-            name: "data-edit",
-            component: () =>
-              import("@/views/modules/admin/course/DataForm.vue"),
-          },
-          {
-            path: "data-import",
-            name: "data-import",
-            component: () =>
-              import("@/views/modules/admin/course/DataImport.vue"),
+            children: [
+              {
+                path: "",
+                name: "data-list",
+                component: () =>
+                  import("@/views/modules/admin/course/DataList.vue"),
+              },
+              {
+                path: "add",
+                name: "data-add",
+                component: () =>
+                  import("@/views/modules/admin/course/DataForm.vue"),
+              },
+              {
+                path: "edit/:publicId",
+                name: "data-edit",
+                component: () =>
+                  import("@/views/modules/admin/course/DataForm.vue"),
+              },
+              {
+                path: "import",
+                name: "data-import",
+                component: () =>
+                  import("@/views/modules/admin/course/DataImport.vue"),
+              },
+            ],
           },
         ],
       },

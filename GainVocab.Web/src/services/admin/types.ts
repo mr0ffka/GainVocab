@@ -95,11 +95,31 @@ export interface ICourseDataAddModel {
   source: string;
   translation: string;
   coursePublicId: string;
+  examples: ICourseDataExampleAddModel[];
+}
+
+export interface ICourseDataEditModel {
+  source: string;
+  translation: string;
+  coursePublicId: string;
+  examples: ICourseDataExampleEditModel[];
+}
+
+export interface ICourseDataExampleAddModel {
+  source: string;
+  translation: string;
+}
+
+export interface ICourseDataExampleEditModel {
+  publicId?: string;
+  source: string;
+  translation: string;
 }
 
 export interface ICourseDataUpdateModel {
   source: string;
   translation: string;
+  examples: ICourseDataExampleEditModel[];
 }
 
 export interface ICourseDataFilterModel {
@@ -112,6 +132,7 @@ export interface ICourseDataListModel {
   publicId: string;
   source: string;
   translation: string;
+  noExmaples: number;
 }
 
 export interface ISupportIssueFilterModel {
@@ -125,6 +146,7 @@ export interface ISupportIssueFilterModel {
 }
 
 export interface IIssueEntityListItemModel {
+  entityId: string;
   courseName: string;
   languageFrom: string;
   languageTo: string;

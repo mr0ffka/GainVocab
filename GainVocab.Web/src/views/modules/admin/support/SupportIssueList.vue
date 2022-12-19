@@ -10,6 +10,7 @@ import {
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import {
+  IIssueEntityListItemModel,
   ISupportIssueListItemModel,
   ISupportIssueTypeOptionModel,
   IUserOptionModel,
@@ -20,6 +21,7 @@ import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
 import { useSupportIssueStore } from "@/store/adminSupportIssueStore";
 import { DateTime } from "luxon";
+import router from "@/router";
 
 const store = useSupportIssueStore();
 const { filter, pager, isSearching } = storeToRefs(store);
@@ -171,6 +173,12 @@ const handleDelete = () => {
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
+const handleEdit = (row: ISupportIssueListItemModel) => {
+  router.push({
+    name: "data-edit",
+    params: { publicId: row.issueEntity.entityId },
+  });
+};
 const resetFilters = () => {
   store.resetFilters();
   getEntities();
@@ -183,7 +191,9 @@ const resetFilters = () => {
     <AdminMenu />
     <div class="grow flex flex-col p-2">
       <div class="flex">
-        <div class="grid grid-cols-3 gap-2">
+        <div
+          class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2"
+        >
           <el-select
             v-model="filter.isResolved"
             multiple
@@ -412,6 +422,13 @@ const resetFilters = () => {
                   plain
                   @click="handleResolveDialog(scope.row)"
                   >Resolve</el-button
+                >
+                <el-button
+                  v-if="scope.row.issueEntity.courseName !== null"
+                  type="info"
+                  plain
+                  @click="handleEdit(scope.row)"
+                  >Edit entity</el-button
                 >
                 <el-button
                   type="danger"

@@ -2,8 +2,11 @@
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import {
   ICourseDataAddModel,
+  ICourseDataEditModel,
   ICourseDataUpdateModel,
   ICourseItemModel,
+  ICourseDataExampleAddModel,
+  ICourseDataExampleEditModel,
 } from "@/services/admin/types";
 import {
   ElButton,
@@ -28,14 +31,19 @@ const route = useRoute();
 const formRef = ref<FormInstance>();
 const entityId = ref<string>("");
 const coursesOptions = ref<ICourseItemModel[] | null>();
+const exampleCounter = ref<number>(0);
+const examples = ref<
+  ICourseDataExampleAddModel[] | ICourseDataExampleEditModel[]
+>([]);
 
 const addModel: ICourseDataAddModel = reactive({
   source: "",
   translation: "",
   coursePublicId: "",
+  examples: [],
 });
 
-const rules = reactive({
+let rules = reactive({
   source: [{ required: true, message: "Source text is required" }],
   translation: [{ required: true, message: "Translation text is required" }],
   coursePublicId: [
@@ -67,7 +75,13 @@ const getCoursesOptions = async () => {
     });
 };
 
-const courseDataAdd = (entity: ICourseDataAddModel) =>
+const courseDataAdd = (entity: ICourseDataAddModel) => {
+  examples.value.forEach((e) => {
+    if (e.source !== "" && e.translation !== "") {
+      entity.examples.push(e);
+    }
+  });
+  console.log(entity.examples);
   addCourseData(entity)
     .then(() => {
       ElMessage({
@@ -86,8 +100,14 @@ const courseDataAdd = (entity: ICourseDataAddModel) =>
         });
       });
     });
+};
 
-const courseDataUpdate = (entity: ICourseDataUpdateModel) =>
+const courseDataUpdate = (entity: ICourseDataUpdateModel) => {
+  examples.value.forEach((e) => {
+    if (e.source !== "" && e.translation !== "") {
+      entity.examples.push(e);
+    }
+  });
   updateCourseData(entityId.value, entity)
     .then(() => {
       ElMessage({
@@ -106,13 +126,16 @@ const courseDataUpdate = (entity: ICourseDataUpdateModel) =>
         });
       });
     });
+};
 
 const courseDataGet = () =>
   getCourseData(entityId.value.toString())
-    .then((data: ICourseDataAddModel) => {
+    .then((data: ICourseDataEditModel) => {
       addModel.coursePublicId = data.coursePublicId;
       addModel.source = data.source;
       addModel.translation = data.translation;
+      examples.value = data.examples;
+      exampleCounter.value = data.examples.length;
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {
@@ -133,11 +156,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           source: addModel.source,
           translation: addModel.translation,
           coursePublicId: addModel.coursePublicId,
+          examples: addModel.examples,
         });
       } else {
         courseDataUpdate({
           source: addModel.source,
           translation: addModel.translation,
+          examples: addModel.examples,
         });
       }
     } else {
@@ -153,6 +178,17 @@ onMounted(() => {
   }
   getCoursesOptions();
 });
+
+const addNewExampleHandler = () => {
+  let example: ICourseDataExampleAddModel = { source: "", translation: "" };
+  examples.value.push(example);
+  exampleCounter.value++;
+};
+
+const removeExampleHandler = (n: number) => {
+  examples.value.splice(n, 1);
+  exampleCounter.value--;
+};
 </script>
 
 <template>
@@ -206,6 +242,54 @@ onMounted(() => {
             size="large"
           />
         </el-form-item>
+        <el-card class="box-card" shadow="never">
+          <template #header>
+            <div class="text-sm flex">
+              <span class="inline-block mt-2">Examples</span>
+              <el-button
+                type="info"
+                class="!ml-auto"
+                plain
+                @click="addNewExampleHandler"
+                >Add example</el-button
+              >
+            </div>
+          </template>
+          <div v-for="n in exampleCounter" class="grid grid-col-6 grid-rows-3">
+            <div class="row-span-2">
+              <el-form-item
+                prop="exampleSource"
+                label="Example source text"
+                class="grid-col"
+              >
+                <el-input
+                  v-model="examples[n - 1].source"
+                  placeholder="Source text"
+                  clearable
+                  size="large"
+                />
+              </el-form-item>
+              <el-form-item prop="exampleTranslation" label="Translation text">
+                <el-input
+                  v-model="examples[n - 1].translation"
+                  placeholder="Translation text"
+                  clearable
+                  size="large"
+                />
+              </el-form-item>
+            </div>
+            <div class="flex row-span-2 mb-4">
+              <el-button
+                type="danger"
+                plain
+                class="grow min-h-full ml-2"
+                @click="removeExampleHandler(n - 1)"
+                >Remove</el-button
+              >
+            </div>
+            <el-divider class="col-span-2" direction="horizontal" />
+          </div>
+        </el-card>
       </el-form>
       <div>
         <el-button

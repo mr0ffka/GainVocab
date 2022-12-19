@@ -64,16 +64,22 @@ namespace GainVocab.API.Core.Configurations
 
             CreateMap<Models.CourseData.AddModel, CourseData>()
                 .ForMember(d => d.Course, o => o.MapFrom<CourseFromPublicIdResolver, string>(s => s.CoursePublicId))
-                .ForMember(d => d.CourseId, o => o.MapFrom<CourseIdFromPublicIdResolver, string>(s => s.CoursePublicId));
+                .ForMember(d => d.CourseId, o => o.MapFrom<CourseIdFromPublicIdResolver, string>(s => s.CoursePublicId))
+                .ForMember(d => d.Examples, o => o.Ignore());
             CreateMap<Models.CourseData.ItemModel, CourseData>()
                 .ForMember(d => d.Course, o => o.MapFrom<CourseFromPublicIdResolver, string>(s => s.CoursePublicId))
                 .ForMember(d => d.CourseId, o => o.MapFrom<CourseIdFromPublicIdResolver, string>(s => s.CoursePublicId))
                 .ReverseMap()
-                .ForMember(d => d.CoursePublicId, o => o.MapFrom<CoursePublicIdFromIdResolver, long>(s => s.CourseId));
+                .ForMember(d => d.CoursePublicId, o => o.MapFrom<CoursePublicIdFromIdResolver, long>(s => s.CourseId))
+                .ForMember(d => d.Examples, o => o.MapFrom(s => s.Examples));
             CreateMap<Models.CourseData.UpdateModel, CourseData>().ReverseMap();
             CreateMap<Models.CourseData.AddModel, Models.CourseData.ItemModel>().ReverseMap();
             CreateMap<Models.CourseData.ListItemModel, CourseData>()
-                .ReverseMap();
+                .ReverseMap()
+                .ForMember(d => d.NoExamples, o => o.MapFrom(s => s.Examples.Count()));
+
+            CreateMap<Models.CourseData.ExampleAddModel, CourseDataExample>().ReverseMap();
+            CreateMap<Models.CourseData.ExampleEditModel, CourseDataExample>().ReverseMap();
 
             CreateMap<Models.SupportIssue.AddModel, SupportIssue>()
                 .ForMember(d => d.IssueTypeId, o => o.MapFrom<SupportIssueTypeIdFromPublicIdResolver, string>(s => s.TypePublicId))
@@ -346,6 +352,7 @@ namespace GainVocab.API.Core.Configurations
 
                 var entity = new IssueEntityListItemModel
                 {
+                    EntityId = courseData.PublicId,
                     CourseName = course.Name,
                     LanguageFrom = course.LanguageFrom.Name,
                     LanguageTo = course.LanguageTo.Name,

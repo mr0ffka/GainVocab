@@ -9,6 +9,7 @@ namespace GainVocab.API.Core.Models.CourseData
         public string Source { get; set; }
         public string Translation { get; set; }
         public string CoursePublicId { get; set; }
+        public List<ExampleAddModel>? Examples { get; set; }
 
         public IEnumerable<ValidationResult> Validate(System.ComponentModel.DataAnnotations.ValidationContext validationContext)
         {
