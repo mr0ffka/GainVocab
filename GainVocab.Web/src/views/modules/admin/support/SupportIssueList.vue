@@ -10,7 +10,6 @@ import {
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import {
-  IIssueEntityListItemModel,
   ISupportIssueListItemModel,
   ISupportIssueTypeOptionModel,
   IUserOptionModel,
@@ -22,7 +21,9 @@ import Header from "@/components/common/Header.vue";
 import { useSupportIssueStore } from "@/store/adminSupportIssueStore";
 import { DateTime } from "luxon";
 import router from "@/router";
+import { useRoute } from "vue-router";
 
+const route = useRoute();
 const store = useSupportIssueStore();
 const { filter, pager, isSearching } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
@@ -35,6 +36,7 @@ const issueTypesOptions = ref<ISupportIssueTypeOptionModel[] | null>();
 
 const getEntities = async () => {
   isSearching.value = true;
+  console.log(filter);
   await getSupportIssueList(filter.value, pager.value)
     .then((data: IPagedResult) => {
       isSearching.value = false;
@@ -136,6 +138,9 @@ const getIssueTypesOptions = async () => {
 };
 
 onMounted(() => {
+  if (route.query.issueId !== undefined) {
+    filter.value.publicId = route.query.issueId!.toString();
+  }
   getEntities();
   getUsersOptions();
   getIssueTypesOptions();
@@ -194,6 +199,7 @@ const resetFilters = () => {
         <div
           class="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2"
         >
+          <el-input v-model="filter.publicId" placeholder="Issue Id" />
           <el-select
             v-model="filter.isResolved"
             multiple
@@ -206,7 +212,7 @@ const resetFilters = () => {
             <el-option
               v-for="item in ['true', 'false']"
               :key="item"
-              :label="item"
+              :label="store.boolToStringHandler(item.toLowerCase() === 'true')"
               :value="item"
             />
           </el-select>
@@ -242,7 +248,7 @@ const resetFilters = () => {
               :value="item.id"
             />
           </el-select>
-          <el-date-picker
+          <!-- <el-date-picker
             v-model="filter.createdFrom"
             type="date"
             class=""
@@ -264,7 +270,23 @@ const resetFilters = () => {
             v-model="filter.updatedTo"
             class=""
             type="date"
-            placeholder="updated to"
+            placeholder="Updated to"
+          /> -->
+          <el-date-picker
+            v-model="filter.created"
+            type="daterange"
+            start-placeholder="Created date from"
+            end-placeholder="Created date to"
+            class="col-span-2 min-w-fit"
+            value-format="DD/MM/YYYY"
+          />
+          <el-date-picker
+            v-model="filter.updated"
+            type="daterange"
+            start-placeholder="Updated date from"
+            end-placeholder="Updated date to"
+            class="col-span-2 min-w-fit"
+            value-format="DD/MM/YYYY"
           />
         </div>
         <div class="flex flex-row !ml-auto">
@@ -305,9 +327,7 @@ const resetFilters = () => {
                   </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="Is resolved?">
-                  <el-tag disable-transitions>
-                    {{ scope.row.isResolved }}
-                  </el-tag>
+                  {{ store.boolToStringHandler(scope.row.isResolved) }}
                 </el-descriptions-item>
                 <el-descriptions-item label="Created at">{{
                   getTableDate(scope.row.createdAt)
@@ -466,7 +486,11 @@ const resetFilters = () => {
           label="Is resolved?"
           sortable
           width=""
-        />
+        >
+          <template #default="scope">
+            {{ store.boolToStringHandler(scope.row.isResolved) }}
+          </template>
+        </el-table-column>
         <el-table-column
           label-class-name="font-black"
           label="Issue created at"

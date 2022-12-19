@@ -2,12 +2,11 @@
 {
     public class FilterModel
     {
+        public string? PublicId { get; set; }
         public List<bool>? IsResolved { get; set; }
         public List<string>? TypeId { get; set; }
         public List<string>? ReporterId { get; set; }
-        public string? CreatedFrom { get; set; }
-        public string? CreatedTo { get; set; }
-        public string? UpdatedFrom { get; set; }
-        public string? UpdatedTo { get; set; }
+        public List<string>? Created { get; set; }
+        public List<string>? Updated { get; set; }
     }
 }

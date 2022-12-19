@@ -7,5 +7,7 @@ namespace GainVocab.API.Core.Interfaces
     {
         Task SendEmailConfirmationEmail(APIUser user, string token);
         Task SendForgotPasswordEmail(APIUser user, string token);
+        Task SendNewIssueNotificationEmail(List<string> adminEmails, string issueId);
+        Task SendResolvedIssueNotificationEmail(APIUser user);
     }
 }

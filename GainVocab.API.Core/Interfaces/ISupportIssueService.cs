@@ -15,6 +15,6 @@ namespace GainVocab.API.Core.Interfaces
         Task Add(AddModel entity);
         SupportIssue Get(string publicId);
         Task Remove(string id);
-        void Resolve(string publicId);
+        Task Resolve(string publicId);
     }
 }

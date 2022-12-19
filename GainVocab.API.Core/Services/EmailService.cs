@@ -8,6 +8,7 @@ using MimeKit.Text;
 using Microsoft.AspNetCore.Identity;
 using GainVocab.API.Data.Models;
 using System.Web;
+using NuGet.Common;
 
 namespace GainVocab.API.Core.Services
 {
@@ -74,6 +75,39 @@ namespace GainVocab.API.Core.Services
             model.Body = body;
 
             SendEmail(model);
+            return Task.CompletedTask;
+        }
+
+        public Task SendNewIssueNotificationEmail(List<string> adminEmails, string issueId)
+        {
+            var model = new EmailSendModel();
+
+            var emailBody = "New issue <a target=\"_blank\" href=\"{0}\">Click here!</a>";
+            var link = Configuration["OriginUrl"] + "/admin/support?issueId=" + issueId;
+            var body = String.Format(emailBody, link);
+
+            model.Subject = "GainVocab Support - New Issue!";
+            model.Body = body;
+            foreach (var admin in adminEmails)
+            {
+                model.To = admin;
+                SendEmail(model);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task SendResolvedIssueNotificationEmail(APIUser user)
+        {
+            var model = new EmailSendModel();
+
+            var body = "Issue has been resolved!";
+
+            model.To = user.Email;
+            model.Subject = "GainVocab Support - Your issue has been resolved!";
+            model.Body = body;
+            SendEmail(model);
+
             return Task.CompletedTask;
         }
     }

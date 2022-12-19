@@ -136,13 +136,12 @@ export interface ICourseDataListModel {
 }
 
 export interface ISupportIssueFilterModel {
+  publicId: string;
   isResolved: string[];
   typeId: string[];
   reporterId: string[];
-  createdFrom: string;
-  createdTo: string;
-  updatedFrom: string;
-  updatedTo: string;
+  created: string;
+  updated: string;
 }
 
 export interface IIssueEntityListItemModel {

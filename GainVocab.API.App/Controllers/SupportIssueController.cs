@@ -48,7 +48,7 @@ namespace GainVocab.API.App.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<ActionResult> Resolve(string publicId)
         {
-            SupportIssues.Resolve(publicId);
+            await SupportIssues.Resolve(publicId);
 
             return Ok();
         }
