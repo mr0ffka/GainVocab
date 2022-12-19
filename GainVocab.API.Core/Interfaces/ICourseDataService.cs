@@ -12,5 +12,6 @@ namespace GainVocab.API.Core.Interfaces
         CourseData Get(string publidId);
         ItemModel GetItemModel(string publicId);
         Task Remove(string id);
+        int GetExamplesCount();
     }
 }

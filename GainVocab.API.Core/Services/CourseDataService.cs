@@ -167,5 +167,10 @@ namespace GainVocab.API.Core.Services
             Context.Remove(entity);
             await Context.SaveChangesAsync();
         }
+
+        public int GetExamplesCount()
+        {
+            return Context.CourseDataExample.Count();
+        }
     }
 }

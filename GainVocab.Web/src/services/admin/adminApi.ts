@@ -151,6 +151,10 @@ export const getCourseDataCount = async () => {
   return (await api.get<number>("course-data/count")).data;
 };
 
+export const getCourseDataExampleCount = async () => {
+  return (await api.get<number>("course-data/examples/count")).data;
+};
+
 export const getSupportIssueCount = async () => {
   return (await api.get<number>("support/count")).data;
 };

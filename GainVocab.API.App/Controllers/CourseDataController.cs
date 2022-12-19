@@ -82,5 +82,14 @@ namespace GainVocab.API.App.Controllers
 
             return Ok(data);
         }
+
+        [HttpGet("examples/count")]
+        [Authorize(Roles = "Administrator")]
+        public ActionResult GetExamplesCount()
+        {
+            var data = CoursesData.GetExamplesCount();
+
+            return Ok(data);
+        }
     }
 }

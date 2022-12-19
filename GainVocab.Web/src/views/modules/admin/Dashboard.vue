@@ -4,6 +4,7 @@ import Header from "@/components/common/Header.vue";
 import {
   getCourseCount,
   getCourseDataCount,
+  getCourseDataExampleCount,
   getLanguageCount,
   getSupportIssueCount,
   getUserCount,
@@ -15,6 +16,7 @@ const userCount = ref<number>(0);
 const languageCount = ref<number>(0);
 const courseCount = ref<number>(0);
 const courseDataCount = ref<number>(0);
+const courseDataExampleCount = ref<number>(0);
 const supportNewTicketsCount = ref<number>(0);
 
 const userCountGet = () => {
@@ -85,6 +87,23 @@ const courseDataCountGet = () => {
     });
 };
 
+const courseDataExampleCountGet = () => {
+  getCourseDataExampleCount()
+    .then((data) => {
+      console.log(data);
+      courseDataExampleCount.value = data;
+    })
+    .catch((error) => {
+      error.response.data.Errors.forEach(async (e: any) => {
+        ElMessage({
+          showClose: true,
+          message: e.Title,
+          type: "error",
+        });
+      });
+    });
+};
+
 const supportNewTicketsCountGet = () => {
   getSupportIssueCount()
     .then((data) => {
@@ -107,6 +126,7 @@ onMounted(() => {
   languageCountGet();
   courseCountGet();
   courseDataCountGet();
+  courseDataExampleCountGet();
   supportNewTicketsCountGet();
 });
 </script>
@@ -189,8 +209,19 @@ onMounted(() => {
             </div>
           </router-link>
         </template>
-        <div class="text-center">
-          <span class="font-bold text-8xl">{{ courseDataCount }}</span>
+        <div class="grid grid-cols-2 text-center">
+          <div>
+            <div>
+              <span>Data</span>
+            </div>
+            <span class="font-bold text-8xl">{{ courseDataCount }}</span>
+          </div>
+          <div>
+            <div>
+              <span>Examples</span>
+            </div>
+            <span class="font-bold text-8xl">{{ courseDataExampleCount }}</span>
+          </div>
         </div>
       </el-card>
     </div>
