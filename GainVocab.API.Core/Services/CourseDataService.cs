@@ -41,6 +41,29 @@ namespace GainVocab.API.Core.Services
             }
         }
 
+        public async Task Add(List<AddModel> entities)
+        {
+            var mappedEntities = new List<CourseData>();
+
+            foreach (var entity in entities)
+            {
+                var mappedEntity = Mapper.Map<CourseData>(entity);
+                var mappedExamples = Mapper.Map<List<CourseDataExample>>(entity.Examples);
+                mappedEntity.Examples = mappedExamples;
+                mappedEntities.Add(mappedEntity);
+            }
+
+            try
+            {
+                await Context.AddRangeAsync(mappedEntities);
+                await Context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new BadRequestException("Something went wrong during database update");
+            }
+        }
+
         public async Task Update(string id, UpdateModel model)
         {
             var entity = Get(id);

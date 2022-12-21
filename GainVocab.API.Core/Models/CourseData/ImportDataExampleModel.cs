@@ -1,4 +1,5 @@
-﻿using CsvHelper.Configuration.Attributes;
+﻿using CsvHelper.Configuration;
+using CsvHelper.Configuration.Attributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,13 +10,20 @@ namespace GainVocab.API.Core.Models.CourseData
 {
     public class ImportDataExampleModel
     {
-        [Index(0)]
-        public string Id { get; set; }
-        [Index(1)]
-        public string WordId { get; set; }
-        [Index(2)]
+        public int Id { get; set; }
+        public int WordId { get; set; }
         public string Source { get; set; }
-        [Index(3)]
         public string Translation { get; set; }
+    }
+
+    public sealed class ImportDataExampleModelMap : ClassMap<ImportDataExampleModel>
+    {
+        public ImportDataExampleModelMap()
+        {
+            Map(m => m.Id);
+            Map(m => m.WordId);
+            Map(m => m.Source);
+            Map(m => m.Translation);
+        }
     }
 }

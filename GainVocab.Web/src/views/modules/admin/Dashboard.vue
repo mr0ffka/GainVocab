@@ -205,18 +205,18 @@ onMounted(() => {
             </div>
           </router-link>
         </template>
-        <div class="grid grid-cols-2 text-center">
+        <div class="text-center">
           <div>
             <div>
               <span>Data</span>
             </div>
-            <span class="font-bold text-8xl">{{ courseDataCount }}</span>
+            <span class="font-bold text-6xl">{{ courseDataCount }}</span>
           </div>
           <div>
             <div>
               <span>Examples</span>
             </div>
-            <span class="font-bold text-8xl">{{ courseDataExampleCount }}</span>
+            <span class="font-bold text-6xl">{{ courseDataExampleCount }}</span>
           </div>
         </div>
       </el-card>

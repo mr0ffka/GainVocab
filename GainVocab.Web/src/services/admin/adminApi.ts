@@ -182,3 +182,17 @@ export const getSupportIssuesTypesOptionsList = async () => {
     await api.get<ISupportIssueTypeOptionModel[]>("support/types/options")
   ).data;
 };
+
+export const deleteImportFiles = async (coursePublicId: string) => {
+  let request = await api.delete("course-data/import", {
+    params: toURLSearchParams({ coursePublicId }),
+  });
+  return request.data;
+};
+
+export const applyImportData = async (coursePublicId: string) => {
+  let request = await api.post(
+    `course-data/import/apply?coursePublicId=${coursePublicId}`
+  );
+  return request.data;
+};

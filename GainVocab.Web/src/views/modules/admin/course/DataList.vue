@@ -14,10 +14,11 @@ import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
 import { useAdminCourseDataStore } from "@/store/adminCourseDataStore";
+import { useRoute } from "vue-router";
 
 const store = useAdminCourseDataStore();
-const { filter, pager, lastCourseSelectedPublicId, isSearching } =
-  storeToRefs(store);
+const route = useRoute();
+const { filter, pager, isSearching } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
 const selectedCourseId = ref<string>("");
 const focusedItem = ref<ICourseDataListModel | null>();
@@ -89,14 +90,15 @@ const deleteEntity = async (id: string) =>
     });
 
 const loadData = () => {
-  lastCourseSelectedPublicId.value = selectedCourseId.value;
   getEntities();
 };
 
 onMounted(() => {
   getCoursesOptions();
-  if (lastCourseSelectedPublicId.value != "") {
-    selectedCourseId.value = lastCourseSelectedPublicId.value;
+  if (route.query.coursePublicId !== undefined) {
+    selectedCourseId.value = route.query.coursePublicId!.toString();
+  }
+  if (selectedCourseId.value != "") {
     loadData();
   }
 });

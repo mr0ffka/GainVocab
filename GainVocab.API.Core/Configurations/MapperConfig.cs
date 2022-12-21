@@ -1,17 +1,11 @@
 ﻿using AutoMapper;
-using GainVocab.API.Data;
-using GainVocab.API.Core.Models;
-using System.Diagnostics.Metrics;
 using GainVocab.API.Data.Models;
 using GainVocab.API.Core.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using GainVocab.API.Core.Extensions.Errors;
-using GainVocab.API.Core.Models.Language;
-using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Interfaces;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using LinqKit;
 using GainVocab.API.Core.Models.SupportIssue;
+using GainVocab.API.Core.Models.CourseData;
 
 namespace GainVocab.API.Core.Configurations
 {
@@ -95,6 +89,15 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.IssueEntity, o => o.MapFrom<IssueEntityListItemFromDataPublicIdResolver, long?>(s => s.IssueEntityId))
                 .ForMember(d => d.Message, o => o.MapFrom(s => s.IssueMessage))
                 .ForMember(d => d.IsResolved, o => o.MapFrom(s => s.IsResolved));
+
+            CreateMap<ImportDataModel, Models.CourseData.AddModel>()
+                .ForMember(d => d.Source, o => o.MapFrom(s => s.Source))
+                .ForMember(d => d.Translation, o => o.MapFrom(s => s.Translation))
+                .ForMember(d => d.CoursePublicId, o => o.Ignore())
+                .ForMember(d => d.Examples, o => o.Ignore());
+            CreateMap<ImportDataExampleModel, Models.CourseData.ExampleAddModel>()
+                .ForMember(d => d.Source, o => o.MapFrom(s => s.Source))
+                .ForMember(d => d.Translation, o => o.MapFrom(s => s.Translation));
         }
     }
 
