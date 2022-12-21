@@ -28,6 +28,13 @@ namespace GainVocab.API.Data.Configurations
 
             builder.Navigation(b => b.IssueType)
                    .AutoInclude();
+
+            builder.HasOne(e => e.IssueEntity)
+                   .WithMany(e => e.Issues)
+                   .HasForeignKey(e => e.IssueEntityId)
+                   .OnDelete(DeleteBehavior.SetNull)
+                   .HasConstraintName("FK_SupportIssue_IssueEntityId");
+
         }
     }
 }

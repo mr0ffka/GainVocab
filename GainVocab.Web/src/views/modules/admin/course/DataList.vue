@@ -297,7 +297,7 @@ const rowClick = (row: ICourseDataListModel, column: any) => {
     width="30%"
     center
   >
-    Do you really want to delete data entry?
+    Do you really want to delete data entry with all examples?
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>

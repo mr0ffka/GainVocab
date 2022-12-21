@@ -3,6 +3,7 @@ using System;
 using GainVocab.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GainVocab.API.Data.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    partial class DefaultDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221220132502_fix delete")]
+    partial class fixdelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -262,8 +264,8 @@ namespace GainVocab.API.Data.Migrations
                     b.Property<bool>("IsResolved")
                         .HasColumnType("boolean");
 
-                    b.Property<long>("IssueEntityId")
-                        .HasColumnType("bigint");
+                    b.Property<string>("IssueEntityId")
+                        .HasColumnType("text");
 
                     b.Property<string>("IssueMessage")
                         .IsRequired()
@@ -288,8 +290,6 @@ namespace GainVocab.API.Data.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IssueEntityId");
 
                     b.HasIndex("IssueTypeId");
 
@@ -525,21 +525,12 @@ namespace GainVocab.API.Data.Migrations
 
             modelBuilder.Entity("GainVocab.API.Data.Models.SupportIssue", b =>
                 {
-                    b.HasOne("GainVocab.API.Data.Models.CourseData", "IssueEntity")
-                        .WithMany("Issues")
-                        .HasForeignKey("IssueEntityId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired()
-                        .HasConstraintName("FK_SupportIssue_IssueEntityId");
-
                     b.HasOne("GainVocab.API.Data.Models.SupportIssueType", "IssueType")
                         .WithMany("Issues")
                         .HasForeignKey("IssueTypeId")
                         .OnDelete(DeleteBehavior.SetNull)
                         .IsRequired()
                         .HasConstraintName("FK_SupportIssue_IssueTypeId");
-
-                    b.Navigation("IssueEntity");
 
                     b.Navigation("IssueType");
                 });
@@ -610,8 +601,6 @@ namespace GainVocab.API.Data.Migrations
             modelBuilder.Entity("GainVocab.API.Data.Models.CourseData", b =>
                 {
                     b.Navigation("Examples");
-
-                    b.Navigation("Issues");
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.Language", b =>

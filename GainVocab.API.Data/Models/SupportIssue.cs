@@ -15,11 +15,12 @@ namespace GainVocab.API.Data.Models
         public bool IsResolved { get; set; }
         public long IssueTypeId { get; set; }
         public string ReporterId { get; set; }
-        public string? IssueEntityId { get; set; }
         public string IssueMessage { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        public virtual SupportIssueType IssueType { get; set; }
+        public virtual SupportIssueType? IssueType { get; set; }
+        public long? IssueEntityId { get; set; }
+        public virtual CourseData? IssueEntity { get; set; }
     }
 }

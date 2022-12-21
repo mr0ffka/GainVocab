@@ -18,6 +18,8 @@ api.interceptors.response.use(
     if (error.response.status === 401) {
       await refreshAccessTokenFn();
       queryClient.setQueryData(["authUser"], await getCurrUser());
+    } else {
+      return Promise.reject(error);
     }
   }
 );

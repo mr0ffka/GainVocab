@@ -47,11 +47,6 @@ namespace GainVocab.API.App.Controllers
         {
             await Languages.Add(entity);
 
-            //if (response.Errors.Any())
-            //{
-            //    throw new BadRequestException("Error while adding user", Mapper.Map<List<IdentityError>, List<ErrorEntry>>(response.Errors.ToList()));
-            //}
-
             return Ok();
         }
 

@@ -5,6 +5,7 @@ using GainVocab.API.Core.Models.CourseData;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GainVocab.API.App.Controllers
@@ -15,13 +16,15 @@ namespace GainVocab.API.App.Controllers
     public class CourseDataController : ControllerBase
     {
         private readonly ICourseDataService CoursesData;
+        private static IWebHostEnvironment WebHostEnvironment;
         private readonly ILogger<CourseDataController> Logger;
         private readonly IMapper Mapper;
 
-        public CourseDataController(ILogger<CourseDataController> logger, ICourseDataService coursesData, IMapper mapper)
+        public CourseDataController(ILogger<CourseDataController> logger, ICourseDataService coursesData, IWebHostEnvironment webHostEnvironment, IMapper mapper)
         {
             Logger = logger;
             CoursesData = coursesData;
+            WebHostEnvironment = webHostEnvironment;
             Mapper = mapper;
         }
 
@@ -91,5 +94,12 @@ namespace GainVocab.API.App.Controllers
 
             return Ok(data);
         }
+
+        //[HttpPost("import")]
+        //[Authorize(Roles = "Administrator")]
+        //public async Task ImportData([FromForm] UploadFile obj)
+        //{
+
+        //}
     }
 }

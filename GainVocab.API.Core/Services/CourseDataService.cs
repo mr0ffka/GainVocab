@@ -87,6 +87,19 @@ namespace GainVocab.API.Core.Services
             }
         }
 
+        public CourseData Get(long id)
+        {
+            var entity = Context.CourseData
+                .Where(e => e.Id == id)
+                .Include(e => e.Examples)
+                .FirstOrDefault();
+
+            if (entity == null)
+                throw new NotFoundException("CoursesData", "Entity not found");
+
+            return entity;
+        }
+
         public CourseData Get(string publicId)
         {
             var entity = Context.CourseData
@@ -114,6 +127,8 @@ namespace GainVocab.API.Core.Services
 
         public async Task<PagedResult<ListItemModel>> GetList(string coursePublicId, FilterModel filter, PagerParams pager)
         {
+            var totalCount = Context.CourseData.Count();
+
             // filtres 
             var course = Courses.Get(coursePublicId);
 
@@ -151,7 +166,7 @@ namespace GainVocab.API.Core.Services
                 Items = items,
                 PageNumber = pager.PageNumber,
                 RecordNumber = pager.PageSize,
-                TotalCount = items.Count
+                TotalCount = totalCount,
             };
         }
 

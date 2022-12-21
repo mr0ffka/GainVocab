@@ -6,7 +6,6 @@ import { ElMessage, FormInstance } from "element-plus";
 import { useQueryClient } from "@tanstack/vue-query";
 import { router } from "@/router";
 import { IUserAuthResponse } from "@/services/auth/types";
-import { CallbackTypes } from "vue3-google-login";
 
 const formRef = ref<FormInstance>();
 const queryClient = useQueryClient();
@@ -23,7 +22,7 @@ const rules = reactive({
   password: [{ required: true, message: "Password is required" }],
 });
 
-const login = (credentials: ILoginModel) =>
+const login = async (credentials: ILoginModel) =>
   loginUserFn(credentials)
     .then((data: IUserAuthResponse) => {
       ElMessage({
@@ -65,15 +64,13 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     }
   });
 };
-
-const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
-  // axios
-};
 </script>
 
 <template>
   <main class="flex justify-center items-center h-screen drop-shadow">
-    <div class="border-grey border p-10 w-2/5 shadow-md">
+    <div
+      class="border-grey border p-10 xs:w-1 sm:w-4/5 md:w-3/5 lg:w-2/5 xl:w-2/5 2xl:w-1/5 3xl:w-1/10 shadow-md"
+    >
       <div class="font-bold text-center mb-5 text-lg">
         Login into an account
       </div>
@@ -113,11 +110,10 @@ const googleLoginCallback: CallbackTypes.CredentialCallback = (response) => {
             size="large"
             :loading="isLogging"
             @click="submitForm(formRef)"
-            class="!ml-auto"
+            class="!ml-auto min-w-full"
             >Login</el-button
           >
         </el-form-item>
-        <!-- <google-login :callback="googleLoginCallback" /> -->
       </el-form>
       <div class="flex">
         <router-link :to="{ name: 'register' }">

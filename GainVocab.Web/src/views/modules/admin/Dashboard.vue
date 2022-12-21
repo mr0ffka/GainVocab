@@ -135,9 +135,11 @@ onMounted(() => {
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link :to="{ name: 'support-list' }">
+          <router-link
+            :to="{ name: 'support-list', query: { isResolved: 'false' } }"
+          >
             <div class="card-header text-center">
-              <span class="font-bold">New tickets</span>
+              <span class="font-bold">Unresolved issues</span>
             </div>
           </router-link>
         </template>

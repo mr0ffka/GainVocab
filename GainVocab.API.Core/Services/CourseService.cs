@@ -100,6 +100,8 @@ namespace GainVocab.API.Core.Services
 
         public async Task<PagedResult<ListItemModel>> GetList(FilterModel filter, PagerParams pager)
         {
+            var totalCount = Context.Course.Count();
+
             // filtres 
             var predicate = PredicateBuilder.New<Course>(true);
 
@@ -153,7 +155,7 @@ namespace GainVocab.API.Core.Services
                 Items = items,
                 PageNumber = pager.PageNumber,
                 RecordNumber = pager.PageSize,
-                TotalCount = items.Count
+                TotalCount = totalCount,
             };
         }
 

@@ -67,6 +67,8 @@ namespace GainVocab.API.Core.Services
 
         public async Task<PagedResult<ListItemModel>> GetList(FilterModel filter, PagerParams pager)
         {
+            var totalCount = Context.SupportIssue.Count();
+
             // filtres 
             var predicate = PredicateBuilder.New<SupportIssue>(true);
 
@@ -146,7 +148,7 @@ namespace GainVocab.API.Core.Services
                 Items = items,
                 PageNumber = pager.PageNumber,
                 RecordNumber = pager.PageSize,
-                TotalCount = items.Count
+                TotalCount = totalCount,
             };
         }
 
@@ -184,6 +186,11 @@ namespace GainVocab.API.Core.Services
             {
                 throw new BadRequestException("Something went wrong during database update");
             }
+        }
+
+        public override int GetCount()
+        {
+            return Context.SupportIssue.Where(i => i.IsResolved == false).Count();
         }
     }
 }

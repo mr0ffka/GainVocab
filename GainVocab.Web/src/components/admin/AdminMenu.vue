@@ -35,11 +35,6 @@ const activeRouteHandle = (route: RouteLocationNormalizedLoaded) => {
 
   return currPath;
 };
-
-onMounted(async () => {
-  await refreshAccessTokenFn();
-  queryClient.setQueryData(["authUser"], await getCurrUser());
-});
 </script>
 
 <template>

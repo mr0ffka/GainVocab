@@ -140,6 +140,10 @@ onMounted(() => {
   if (route.query.issueId !== undefined) {
     filter.value.publicId = route.query.issueId!.toString();
   }
+  if (route.query.isResolved !== undefined) {
+    filter.value.isResolved = [];
+    filter.value.isResolved.push(route.query.isResolved!.toString());
+  }
   getEntities();
   getUsersOptions();
   getIssueTypesOptions();
@@ -546,7 +550,9 @@ const resetFilters = () => {
   >
     <template #footer>
       <span class="dialog-footer">
-        <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>
+        <el-button plain @click="confirmResolveDialog = false"
+          >Cancel</el-button
+        >
         <el-button type="success" plain @click="handleResolve">
           Resolve
         </el-button>

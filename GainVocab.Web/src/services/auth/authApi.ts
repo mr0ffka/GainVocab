@@ -12,31 +12,26 @@ import type {
   IForgotPasswordModel,
 } from "./types";
 
-import { api as authApi } from "@/helpers/axios";
+import { api } from "@/helpers/axios";
 
 export const refreshAccessTokenFn = async () => {
-  const response = await authApi.post("auth/refresh");
+  const response = await api.post("auth/refresh");
   return response.data;
 };
 
 export const registerUserFn = async (user: IRegisterModel) => {
-  return (await authApi.post<IUserAuthResponse>("auth/register", user)).data;
+  return (await api.post<IUserAuthResponse>("auth/register", user)).data;
 };
 
 export const loginUserFn = async (user: ILoginModel) => {
-  return (await authApi.post<IUserAuthResponse>("auth/login", user)).data;
-};
-
-export const oAuthGoogleLoginFn = async (oauth: IOAuthLoginModel) => {
-  return (await authApi.post<IUserAuthResponse>("auth/googleLogin", oauth))
-    .data;
+  return (await api.post<IUserAuthResponse>("auth/login", user)).data;
 };
 
 export const verifyEmailFn = async (
   userId: string,
   verificationCode: string
 ) => {
-  const response = await authApi.get<GenericResponse>("auth/verifyemail", {
+  const response = await api.get<GenericResponse>("auth/verifyemail", {
     params: {
       userId: userId,
       code: verificationCode,
@@ -46,19 +41,18 @@ export const verifyEmailFn = async (
 };
 
 export const resetPasswordFn = async (form: IResetPasswordModel) => {
-  return (await authApi.post<GenericResponse>("auth/resetpassword", form)).data;
+  return (await api.post<GenericResponse>("auth/resetpassword", form)).data;
 };
 
 export const forgotPasswordFn = async (model: IForgotPasswordModel) => {
-  return (await authApi.post<GenericResponse>("auth/forgotpassword", model))
-    .data;
+  return (await api.post<GenericResponse>("auth/forgotpassword", model)).data;
 };
 
 export const logoutUserFn = async () => {
-  const response = await authApi.get<GenericResponse>("auth/logout");
+  const response = await api.get<GenericResponse>("auth/logout");
   return response.data;
 };
 
 export const getCurrUser = async () => {
-  return (await authApi.get<IUserAuth>("auth/me")).data;
+  return (await api.get<IUserAuth>("auth/me")).data;
 };

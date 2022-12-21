@@ -38,6 +38,14 @@ namespace GainVocab.API.Data.Configurations
 
             builder.Navigation(b => b.LanguageTo)
                    .AutoInclude();
+
+            builder.HasMany(e => e.Data)
+                   .WithOne(e => e.Course)
+                   .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(e => e.Users)
+                   .WithOne(e => e.Course)
+                   .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

@@ -16,12 +16,14 @@ namespace GainVocab.API.Data.Configurations
             builder
                 .HasOne(uc => uc.APIUser)
                 .WithMany(uc => uc.Courses)
-                .HasForeignKey(uc => uc.APIUserId);
+                .HasForeignKey(uc => uc.APIUserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .HasOne(uc => uc.Course)
                 .WithMany(uc => uc.Users)
-                .HasForeignKey(uc => uc.CourseId);
+                .HasForeignKey(uc => uc.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

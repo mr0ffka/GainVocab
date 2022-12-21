@@ -9,6 +9,7 @@ namespace GainVocab.API.Core.Interfaces
         Task<PagedResult<ListItemModel>> GetList(string coursePublicId, FilterModel filter, PagerParams pager);
         Task Add(AddModel entity);
         Task Update(string id, UpdateModel model);
+        CourseData Get(long id);
         CourseData Get(string publidId);
         ItemModel GetItemModel(string publicId);
         Task Remove(string id);

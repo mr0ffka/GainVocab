@@ -10,15 +10,11 @@ import VueAxios from "vue-axios";
 import axios from "axios";
 import { VueQueryPlugin } from "@tanstack/vue-query";
 import { queryClient } from "@/helpers/queryClient";
-import vue3GoogleLogin from "vue3-google-login";
 import { createPinia } from "pinia";
 
 createApp(App)
   .use(router)
   .use(createPinia())
-  .use(vue3GoogleLogin, {
-    clientId: import.meta.env.OAUTH_GOOGLE_CLIENT_ID,
-  })
   .use(ElementPlus, { zIndex: 3000 })
   .use(VueQueryPlugin, { queryClient })
   .use(VueAxios, axios)

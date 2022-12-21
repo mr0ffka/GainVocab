@@ -127,28 +127,6 @@ namespace GainVocab.API.App.Controllers
             return Ok();
         }
 
-        [HttpPost("googlelogin")]
-        public async Task<IActionResult> GoogleLogin([FromBody] OAuthLoginModel model)
-        {
-            var authResponse = await AuthManager.OAuthLogin(model);
-            //Response.Cookies.Append("X-Logged-In", true, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            Response.Cookies.Append(JWT_TOKEN_COOKIE_NAME, authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            Response.Cookies.Append(REFRESH_TOKEN_COOKIE_NAME, authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-
-            return Ok(new
-            {
-                status = "Success",
-                user = new FrontUserModel
-                {
-                    Id = authResponse.UserId,
-                    //Email = loginModel.Email,
-                    IsAuthenticated = true,
-                    IsAdmin = authResponse.Roles.Any(r => r == Enum.GetName(typeof(UserRoles), UserRoles.Administrator)),
-                    Roles = authResponse.Roles,
-                }
-            });
-        }
-
         [HttpPost]
         [Route("forgotpassword")]
         public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)

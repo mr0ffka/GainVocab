@@ -73,7 +73,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 <template>
   <main class="flex justify-center items-center h-screen drop-shadow">
-    <div class="border-grey border p-10 w-2/5 shadow-md">
+    <div
+      class="border-grey border p-10 xs:w-1 sm:w-4/5 md:w-3/5 lg:w-2/5 xl:w-2/5 2xl:w-1/5 3xl:w-1/10 shadow-md"
+    >
       <div class="font-bold text-center mb-5 text-lg">Register new account</div>
       <el-form
         label-position="top"

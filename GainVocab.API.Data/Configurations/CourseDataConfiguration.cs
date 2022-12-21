@@ -28,8 +28,16 @@ namespace GainVocab.API.Data.Configurations
             builder.HasOne(e => e.Course)
                    .WithMany(c => c.Data)
                    .HasForeignKey(c => c.CourseId)
-                   .OnDelete(DeleteBehavior.SetNull)
+                   .OnDelete(DeleteBehavior.Cascade)
                    .HasConstraintName("FK_CourseData_CourseId");
+
+            builder.HasMany(e => e.Examples)
+                   .WithOne(e => e.CourseData)
+                   .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(e => e.Issues)
+                   .WithOne(e => e.IssueEntity)
+                   .OnDelete(DeleteBehavior.SetNull);
 
             builder.Navigation(b => b.Course)
                    .AutoInclude();

@@ -48,7 +48,10 @@ namespace GainVocab.API.Core.Services
         public async Task<AuthResponseModel> Login(LoginModel model)
         {
             var user = await UserManager.FindByEmailAsync(model.Email);
-            if (user == null) return null;
+            if (user == null)
+            {
+                throw new NotFoundException("Invalid user", model.Email);
+            }
 
             bool isValidUser = await UserManager.CheckPasswordAsync(user, model.Password);
             var result = await SignInManager.PasswordSignInAsync(user, model.Password, model.RememberMe, true);
@@ -133,58 +136,6 @@ namespace GainVocab.API.Core.Services
 
             await UserManager.UpdateSecurityStampAsync(user);
             return null;
-        }
-
-        public async Task<AuthResponseModel> OAuthLogin(OAuthLoginModel oauthModel)
-        {
-            var payload = await VerifyGoogleToken(oauthModel);
-            if (payload is null)
-            {
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_InvalidLoginAttempt);
-            }
-            var info = new UserLoginInfo(oauthModel.Provider, payload.Subject, oauthModel.Provider);
-
-            var user = await UserManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
-
-            if (user == null)
-            {
-                user = await UserManager.FindByEmailAsync(payload.Email);
-                if (user == null)
-                {
-                    user = new APIUser { Email = payload.Email, UserName = payload.Email, LastName = payload.FamilyName, FirstName = payload.GivenName };
-
-                    await UserManager.CreateAsync(user);
-                    await UserManager.AddLoginAsync(user, info);
-                }
-                else
-                {
-                    await UserManager.AddLoginAsync(user, info);
-                }
-            }
-            if (user == null)
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_InvalidLoginAttempt);
-
-            var token = await GenerateToken(user);
-            var refreshToken = await CreateRefreshToken(user);
-            var rolesUserList = (await UserManager.GetRolesAsync(user)).ToList();
-
-            return new AuthResponseModel
-            {
-                Token = token,
-                UserId = user.Id,
-                Roles = rolesUserList,
-                RefreshToken = refreshToken,
-            };
-        }
-
-        public async Task<GoogleJsonWebSignature.Payload> VerifyGoogleToken(OAuthLoginModel oauthModel)
-        {
-            var settings = new GoogleJsonWebSignature.ValidationSettings()
-            {
-                Audience = new List<string>() { Configuration["OAuth2Settings:Google:ClientId"] }
-            };
-            var payload = await GoogleJsonWebSignature.ValidateAsync(oauthModel.Token, settings);
-            return payload;
         }
 
         public AuthenticationProperties ConfigureExternalAuthProp(string provider, string redirectUrl)

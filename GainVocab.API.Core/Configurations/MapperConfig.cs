@@ -83,6 +83,8 @@ namespace GainVocab.API.Core.Configurations
 
             CreateMap<Models.SupportIssue.AddModel, SupportIssue>()
                 .ForMember(d => d.IssueTypeId, o => o.MapFrom<SupportIssueTypeIdFromPublicIdResolver, string>(s => s.TypePublicId))
+                .ForMember(d => d.IssueEntity, o => o.MapFrom<CourseDataFromPublicIdResolver, string>(s => s.IssueEntityId))
+                .ForMember(d => d.IssueEntityId, o => o.Ignore())
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.UpdatedAt, o => o.Ignore());
             CreateMap<Models.SupportIssue.ListItemModel, SupportIssue>()
@@ -90,7 +92,7 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
                 .ForMember(d => d.TypeName, o => o.MapFrom<SupportIssueTypeNameFromIdResolver, long>(s => s.IssueTypeId))
                 .ForMember(d => d.Reporter, o => o.MapFrom<UserDetailsByIdResolver, string>(s => s.ReporterId))
-                .ForMember(d => d.IssueEntity, o => o.MapFrom<IssueEntityListItemFromDataPublicIdResolver, string>(s => s.IssueEntityId))
+                .ForMember(d => d.IssueEntity, o => o.MapFrom<IssueEntityListItemFromDataPublicIdResolver, long?>(s => s.IssueEntityId))
                 .ForMember(d => d.Message, o => o.MapFrom(s => s.IssueMessage))
                 .ForMember(d => d.IsResolved, o => o.MapFrom(s => s.IsResolved));
         }
@@ -331,7 +333,7 @@ namespace GainVocab.API.Core.Configurations
     #endregion
 
     #region SupportIssueTypeNameFromIdResolver
-    public class IssueEntityListItemFromDataPublicIdResolver : IMemberValueResolver<object, object, string, IssueEntityListItemModel>
+    public class IssueEntityListItemFromDataPublicIdResolver : IMemberValueResolver<object, object, long?, IssueEntityListItemModel>
     {
         public ICourseService Courses { get; }
         public ICourseDataService CourseData { get; }
@@ -342,12 +344,12 @@ namespace GainVocab.API.Core.Configurations
             CourseData = courseData;
         }
 
-        public IssueEntityListItemModel Resolve(object source, object destination, string sourceMember,
+        public IssueEntityListItemModel Resolve(object source, object destination, long? sourceMember,
             IssueEntityListItemModel destMember, ResolutionContext context)
         {
-            if (!string.IsNullOrEmpty(sourceMember))
+            if (sourceMember != null)
             {
-                var courseData = CourseData.Get(sourceMember);
+                var courseData = CourseData.Get(sourceMember.Value);
                 var course = Courses.Get(courseData.CourseId);
 
                 var entity = new IssueEntityListItemModel
@@ -363,6 +365,27 @@ namespace GainVocab.API.Core.Configurations
                 return entity;
             }
             return new IssueEntityListItemModel();
+        }
+    }
+    #endregion
+
+
+    #region CourseDataFromPublicIdResolver
+    public class CourseDataFromPublicIdResolver : IMemberValueResolver<object, object, string, CourseData>
+    {
+        public ICourseDataService CourseData { get; }
+
+        public CourseDataFromPublicIdResolver(ICourseDataService courseData)
+        {
+            CourseData = courseData;
+        }
+
+        public CourseData Resolve(object source, object destination, string publicId,
+            CourseData course, ResolutionContext context)
+        {
+            var entity = CourseData.Get(publicId);
+
+            return entity;
         }
     }
     #endregion

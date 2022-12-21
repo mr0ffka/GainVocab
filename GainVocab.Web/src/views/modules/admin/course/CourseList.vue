@@ -73,7 +73,7 @@ const deleteEntity = async (id: string) =>
     .then((data: any) => {
       ElMessage({
         showClose: true,
-        message: "Language has been deleted",
+        message: "Course with all the data has been deleted",
         type: "success",
       });
       getEntities();
@@ -263,9 +263,8 @@ const resetFilters = () => {
     width="30%"
     center
   >
-    Do you really want to delete course:
-    <span class="font-bold"> {{ focusedItem?.name }}</span
-    >?
+    Do you really want to delete course
+    <span class="font-bold"> {{ focusedItem?.name }}</span> with all its data?
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="confirmDeleteDialog = false">Cancel</el-button>
