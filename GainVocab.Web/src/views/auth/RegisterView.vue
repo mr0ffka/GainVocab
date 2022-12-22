@@ -141,7 +141,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       </el-form>
       <router-link :to="{ name: 'login' }">
         <div class="mt-5 text-center text-sm no-underline hover:underline">
-          Has an account already? Log in here!
+          Have an account already? Log in here!
         </div>
       </router-link>
     </div>

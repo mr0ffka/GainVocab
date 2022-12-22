@@ -65,7 +65,6 @@ namespace GainVocab.API.App.Controllers
         public async Task<ActionResult> Get(string id)
         {
             var user = await Users.GetUserModel(id);
-            //throw new NotFoundException("notfounexception,", id);
 
             if (user == null)
             {

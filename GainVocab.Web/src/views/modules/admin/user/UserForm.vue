@@ -24,6 +24,7 @@ const userAddModel: IUserAddModel = reactive({
   firstName: "",
   lastName: "",
   email: "",
+  emailConfirmed: false,
   password: "",
   passwordConfirm: "",
   roles: [],
@@ -39,6 +40,7 @@ const rules = reactive({
     { required: true, message: "Password confirmation is required" },
   ],
   roles: [{ required: true, message: "Select a user role" }],
+  //confirmEmail: [{ required: true, message: "Select a option" }],
 });
 
 const rulesEdit = reactive({
@@ -46,9 +48,11 @@ const rulesEdit = reactive({
   lastName: [{ required: true, message: "Last name is required" }],
   email: [{ required: true, message: "Email is required" }],
   roles: [{ required: true, message: "Select a user role" }],
+  //confirmEmail: [{ required: true, message: "Select a option" }],
 });
 
 onMounted(async () => {
+  userAddModel.emailConfirmed = false;
   if (route.params.id !== undefined) {
     userId.value = route.params.id.toString();
     userGet();
@@ -121,10 +125,13 @@ const userGet = () =>
   getUser(userId.value.toString())
     .then((data: IUserAddModel) => {
       userAddModel.email = data.email;
+      userAddModel.emailConfirmed = data.emailConfirmed;
       userAddModel.firstName = data.firstName;
       userAddModel.lastName = data.lastName;
       userAddModel.roles = data.roles;
       userAddModel.courses = data.courses;
+
+      console.log(userAddModel);
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {
@@ -164,6 +171,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           firstName: userAddModel.firstName,
           lastName: userAddModel.lastName,
           email: userAddModel.email,
+          emailConfirmed: userAddModel.emailConfirmed,
           password: userAddModel.password,
           passwordConfirm: userAddModel.passwordConfirm,
           roles: userAddModel.roles,
@@ -174,6 +182,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           firstName: userAddModel.firstName,
           lastName: userAddModel.lastName,
           email: userAddModel.email,
+          emailConfirmed: userAddModel.emailConfirmed,
           password: userAddModel.password,
           passwordConfirm: userAddModel.passwordConfirm,
           roles: userAddModel.roles,
@@ -184,6 +193,11 @@ const submitForm = async (formEl: FormInstance | undefined) => {
       console.log("error submit!", fields);
     }
   });
+};
+
+const boolToStringHandler = (value: boolean) => {
+  if (value) return "Yes";
+  return "No";
 };
 </script>
 
@@ -230,6 +244,21 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             clearable
             size="large"
           />
+        </el-form-item>
+        <el-form-item prop="confirmEmail" label="Confirm email">
+          <el-select
+            v-model="userAddModel.emailConfirmed"
+            placeholder="Confirm email address"
+            clearable
+            size="large"
+            class="grow"
+          >
+            <el-option
+              v-for="item in [true, false]"
+              :label="boolToStringHandler(item)"
+              :value="item"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item class="text-lg" prop="password" label="Password">
           <el-input

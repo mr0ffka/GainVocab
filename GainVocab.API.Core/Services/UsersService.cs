@@ -21,11 +21,13 @@ namespace GainVocab.API.Core.Services
     public class UsersService : GenericService<APIUser>, IUsersService
     {
         private readonly UserManager<APIUser> UserManager;
+        private readonly IEmailService EmailService;
         private readonly ICourseService CourseService;
 
-        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, ICourseService courseService, IMapper mapper) : base(context, mapper)
+        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, IEmailService emailService, ICourseService courseService, IMapper mapper) : base(context, mapper)
         {
             UserManager = userManager;
+            EmailService = emailService;
             CourseService = courseService;
         }
 
@@ -33,7 +35,6 @@ namespace GainVocab.API.Core.Services
         {
             var user = Mapper.Map<APIUser>(newUser);
             user.UserName = newUser.Email;
-            user.EmailConfirmed = true;
 
             var result = await UserManager.CreateAsync(user, newUser.Password);
 
@@ -55,6 +56,12 @@ namespace GainVocab.API.Core.Services
                     user.Courses = coursesResult;
                     await UserManager.UpdateAsync(user);
                 }
+            }
+
+            if (user.EmailConfirmed == false && !result.Errors.Any())
+            {
+                var token = HttpUtility.UrlEncode(await UserManager.GenerateEmailConfirmationTokenAsync(user));
+                await EmailService.SendEmailConfirmationEmail(user, token);
             }
 
             return result;

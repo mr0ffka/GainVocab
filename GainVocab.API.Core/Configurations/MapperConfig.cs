@@ -19,11 +19,14 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses));
             CreateMap<RegisterModel, APIUser>();
             CreateMap<UserAddModel, APIUser>()
+                .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.Ignore());
             CreateMap<UserEditModel, APIUser>()
+                .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.MapFrom<CoursesUserEditResolver, Tuple<string, List<string>>>(s => new Tuple<string, List<string>>(s.Email, s.Courses)));
             CreateMap<UserDetailsModel, APIUser>()
                 .ReverseMap()
+                .ForMember(d => d.EmailConfirmed, o => o.MapFrom<UserIsEmailConfirmedResolver, APIUser>(s => s))
                 .ForMember(d => d.Roles, o => o.MapFrom<UserRolesResolver, APIUser>(s => s))
                 .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses));
             CreateMap<IdentityError, ErrorEntry>()
@@ -102,6 +105,25 @@ namespace GainVocab.API.Core.Configurations
     }
 
     #region UserRolesResolver
+    public class UserIsEmailConfirmedResolver : IMemberValueResolver<object, object, APIUser, bool?>
+    {
+        private readonly UserManager<APIUser> UserManager;
+
+        public UserIsEmailConfirmedResolver(UserManager<APIUser> userManager)
+        {
+            UserManager = userManager;
+        }
+
+        public bool? Resolve(object source, object destination, APIUser sourceMember, bool? destMember, ResolutionContext context)
+        {
+            var userIsConfirmed = UserManager.IsEmailConfirmedAsync(sourceMember).GetAwaiter();
+
+            return userIsConfirmed.GetResult();
+        }
+    }
+    #endregion
+
+    #region UserRolesResolver
     public class UserRolesResolver : IMemberValueResolver<object, object, APIUser, List<string>>
     {
         private readonly UserManager<APIUser> UserManager;
@@ -119,6 +141,7 @@ namespace GainVocab.API.Core.Configurations
         }
     }
     #endregion
+
     #region UserByIdResolver
     public class UserDetailsByIdResolver : IMemberValueResolver<object, object, string, UserDetailsModel>
     {

@@ -17,6 +17,7 @@ const userDetailsModel: IUserDetailsModel = reactive({
   firstName: "",
   lastName: "",
   email: "",
+  emailConfirmed: false,
   roles: [],
   courses: [],
 });
@@ -32,6 +33,7 @@ const userGetDetails = () =>
   getUserDetails(userId.value.toString())
     .then((data: IUserDetailsModel) => {
       userDetailsModel.email = data.email;
+      userDetailsModel.emailConfirmed = data.emailConfirmed;
       userDetailsModel.firstName = data.firstName;
       userDetailsModel.lastName = data.lastName;
       userDetailsModel.roles = data.roles;
@@ -97,6 +99,11 @@ const handleDelete = () => {
         <el-descriptions-item label="Email">{{
           userDetailsModel.email
         }}</el-descriptions-item>
+        <el-descriptions-item label="Email confirmed">
+          <el-tag disable-transitions>
+            {{ userDetailsModel.emailConfirmed ? "Yes" : "No" }}
+          </el-tag>
+        </el-descriptions-item>
         <el-descriptions-item label="Roles">
           <el-tag
             v-for="role in userDetailsModel.roles"
