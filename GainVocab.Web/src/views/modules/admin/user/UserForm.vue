@@ -130,8 +130,6 @@ const userGet = () =>
       userAddModel.lastName = data.lastName;
       userAddModel.roles = data.roles;
       userAddModel.courses = data.courses;
-
-      console.log(userAddModel);
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {

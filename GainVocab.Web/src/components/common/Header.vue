@@ -109,7 +109,7 @@ const logout = () => {
       :route="{ name: 'admin-dashboard' }"
     >
       <span class="text-black font-extrabold text-xl stroke-zinc-300"
-        >GainVocab</span
+        >Gain - Admin Panel - Vocab</span
       >
     </el-menu-item>
     <el-menu-item class="!border-b-0 focus:!bg-transparent !ml-auto" index="">
