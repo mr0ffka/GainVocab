@@ -1,5 +1,5 @@
-import { ICourseDataFilterModel } from "./../services/admin/types";
-import { IPagerParams } from "../services/common/types";
+import { ICourseDataFilterModel } from "../../services/admin/types";
+import { IPagerParams } from "../../services/common/types";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 

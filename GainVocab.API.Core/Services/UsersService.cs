@@ -75,7 +75,7 @@ namespace GainVocab.API.Core.Services
                 .FirstOrDefault();
 
             if (user == null)
-                throw new NotFoundException("User", "Entity not found");
+                return null;
 
             return user;
         }
@@ -163,6 +163,19 @@ namespace GainVocab.API.Core.Services
             var userRoles = await UserManager.GetRolesAsync(user);
             await UserManager.RemoveFromRolesAsync(user, userRoles);
             await UserManager.AddToRolesAsync(user, model.Roles);
+        }
+
+        public async Task UpdateMe(string id, UserProfileEditModel model)
+        {
+            var user = Get(id);
+
+            Mapper.Map(model, user);
+            await UserManager.UpdateAsync(user);
+
+            if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.Password) && !string.IsNullOrEmpty(model.PasswordConfirm))
+            {
+                await UserManager.ChangePasswordAsync(user, model.CurrentPassword, model.Password);
+            }
         }
 
         public async Task Remove(string id)

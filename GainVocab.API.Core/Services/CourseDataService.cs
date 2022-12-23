@@ -150,10 +150,9 @@ namespace GainVocab.API.Core.Services
 
         public async Task<PagedResult<ListItemModel>> GetList(string coursePublicId, FilterModel filter, PagerParams pager)
         {
-            var totalCount = Context.CourseData.Count();
-
             // filtres 
             var course = Courses.Get(coursePublicId);
+            var totalCount = Context.CourseData.Where(d => d.CourseId == course.Id).ToList().Count();
 
             var predicate = PredicateBuilder.New<CourseData>(true);
             predicate.And(x => x.CourseId == course.Id);

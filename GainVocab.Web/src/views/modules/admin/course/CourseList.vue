@@ -13,7 +13,7 @@ import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
-import { useAdminCourseStore } from "@/store/adminCourseStore";
+import { useAdminCourseStore } from "@/store/admin/adminCourseStore";
 
 const store = useAdminCourseStore();
 const { filter, pager, isSearching } = storeToRefs(store);

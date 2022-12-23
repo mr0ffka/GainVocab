@@ -8,7 +8,7 @@ import {
   Connection,
   House,
 } from "@element-plus/icons-vue";
-import { useAuthMenuStore } from "@/store/authMenuStore";
+import { useAuthMenuStore } from "@/store/common/authMenuStore";
 import { storeToRefs } from "pinia";
 import { router } from "@/router";
 import { RouteLocationNormalizedLoaded } from "vue-router";

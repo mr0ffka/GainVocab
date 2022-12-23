@@ -16,6 +16,14 @@ export default [
         },
         component: () => import("@/views/modules/user/Dashboard.vue"),
       },
+      {
+        path: "profile",
+        name: "user-profile",
+        meta: {
+          middleware: [requireAuth],
+        },
+        component: () => import("@/views/modules/user/UserProfile.vue"),
+      },
     ],
   },
 ];

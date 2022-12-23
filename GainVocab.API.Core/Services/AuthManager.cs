@@ -60,13 +60,13 @@ namespace GainVocab.API.Core.Services
             {
                 if (!user.EmailConfirmed)
                 {
-                    throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_EmailNotConfirmed);
+                    throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_EmailNotConfirmed);
                 }
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
             }
             if (await UserManager.IsLockedOutAsync(user) && isValidUser)
             {
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_AccountLocked);
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_AccountLocked);
             }
 
             var token = await GenerateToken(user);
@@ -118,7 +118,7 @@ namespace GainVocab.API.Core.Services
 
             if (user == null)
             {
-                throw new UnauthorizedAccessException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_IncorrectCredentials);
             }
 
             var isValidRefreshToken = await UserManager.VerifyUserTokenAsync(user, loginProvider, refreshToken, request.RefreshToken);

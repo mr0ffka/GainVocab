@@ -22,5 +22,6 @@ namespace GainVocab.API.Core.Interfaces
         Task<UserDetailsModel> GetDetails(string id);
         Task Remove(string id);
         Task Update(string id, UserEditModel model);
+        Task UpdateMe(string id, UserProfileEditModel model);
     }
 }

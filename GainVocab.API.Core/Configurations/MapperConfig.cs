@@ -21,6 +21,7 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<UserAddModel, APIUser>()
                 .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.Ignore());
+            CreateMap<UserProfileEditModel, APIUser>();
             CreateMap<UserEditModel, APIUser>()
                 .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.MapFrom<CoursesUserEditResolver, Tuple<string, List<string>>>(s => new Tuple<string, List<string>>(s.Email, s.Courses)));
@@ -80,7 +81,7 @@ namespace GainVocab.API.Core.Configurations
 
             CreateMap<Models.SupportIssue.AddModel, SupportIssue>()
                 .ForMember(d => d.IssueTypeId, o => o.MapFrom<SupportIssueTypeIdFromPublicIdResolver, string>(s => s.TypePublicId))
-                .ForMember(d => d.IssueEntity, o => o.MapFrom<CourseDataFromPublicIdResolver, string>(s => s.IssueEntityId))
+                .ForMember(d => d.IssueEntity, o => o.MapFrom<CourseDataFromPublicIdResolver, string?>(s => s.IssueEntityId))
                 .ForMember(d => d.IssueEntityId, o => o.Ignore())
                 .ForMember(d => d.CreatedAt, o => o.Ignore())
                 .ForMember(d => d.UpdatedAt, o => o.Ignore());
@@ -88,7 +89,7 @@ namespace GainVocab.API.Core.Configurations
                 .ReverseMap()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
                 .ForMember(d => d.TypeName, o => o.MapFrom<SupportIssueTypeNameFromIdResolver, long>(s => s.IssueTypeId))
-                .ForMember(d => d.Reporter, o => o.MapFrom<UserDetailsByIdResolver, string>(s => s.ReporterId))
+                .ForMember(d => d.Reporter, o => o.MapFrom<UserDetailsByIdResolver, string?>(s => s.ReporterId))
                 .ForMember(d => d.IssueEntity, o => o.MapFrom<IssueEntityListItemFromDataPublicIdResolver, long?>(s => s.IssueEntityId))
                 .ForMember(d => d.Message, o => o.MapFrom(s => s.IssueMessage))
                 .ForMember(d => d.IsResolved, o => o.MapFrom(s => s.IsResolved));
@@ -143,7 +144,7 @@ namespace GainVocab.API.Core.Configurations
     #endregion
 
     #region UserByIdResolver
-    public class UserDetailsByIdResolver : IMemberValueResolver<object, object, string, UserDetailsModel>
+    public class UserDetailsByIdResolver : IMemberValueResolver<object, object, string?, UserDetailsModel>
     {
         private readonly IUsersService Users;
         private readonly IMapper Mapper;
@@ -154,11 +155,19 @@ namespace GainVocab.API.Core.Configurations
             Mapper = mapper;
         }
 
-        public UserDetailsModel Resolve(object source, object destination, string sourceMember, UserDetailsModel destMember, ResolutionContext context)
+        public UserDetailsModel? Resolve(object source, object destination, string? sourceMember, UserDetailsModel destMember, ResolutionContext context)
         {
+            if (sourceMember is null)
+                return new UserDetailsModel();
+
             var user = Users.Get(sourceMember);
-            var mappedUser = Mapper.Map<APIUser, UserDetailsModel>(user);
-            return mappedUser;
+            if (user != null)
+            {
+                var mappedUser = Mapper.Map<APIUser, UserDetailsModel>(user);
+                return mappedUser;
+            }
+
+            return new UserDetailsModel();
         }
     }
     #endregion
@@ -397,7 +406,7 @@ namespace GainVocab.API.Core.Configurations
 
 
     #region CourseDataFromPublicIdResolver
-    public class CourseDataFromPublicIdResolver : IMemberValueResolver<object, object, string, CourseData>
+    public class CourseDataFromPublicIdResolver : IMemberValueResolver<object, object, string?, CourseData>
     {
         public ICourseDataService CourseData { get; }
 
@@ -406,9 +415,12 @@ namespace GainVocab.API.Core.Configurations
             CourseData = courseData;
         }
 
-        public CourseData Resolve(object source, object destination, string publicId,
+        public CourseData Resolve(object source, object destination, string? publicId,
             CourseData course, ResolutionContext context)
         {
+            if (publicId == null)
+                return null;
+
             var entity = CourseData.Get(publicId);
 
             return entity;

@@ -5,8 +5,8 @@ import { getCurrUser, logoutUserFn } from "@/services/auth/authApi";
 import { useMutation, useQuery } from "@tanstack/vue-query";
 import { ElMenu, ElMenuItem, ElMessage } from "element-plus";
 import { queryClient } from "@/helpers/queryClient";
-import { Expand, Fold, Lock, MoreFilled } from "@element-plus/icons-vue";
-import { useAuthMenuStore } from "@/store/authMenuStore";
+import { Expand, Fold, Lock, User } from "@element-plus/icons-vue";
+import { useAuthMenuStore } from "@/store/common/authMenuStore";
 import { storeToRefs } from "pinia";
 
 const useAuthUserQuery = () => {
@@ -102,38 +102,39 @@ const logout = () => {
       </el-icon>
     </div>
     <el-menu-item
-      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent absolute top-0 left-1/2 -translate-x-1/2"
+      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent absolute left-10"
       :index="
         router.getRoutes().filter((x) => x.name == 'admin-dashboard')[0].path
       "
       :route="{ name: 'admin-dashboard' }"
     >
       <span class="text-black font-extrabold text-xl stroke-zinc-300"
-        >Gain - Admin Panel - Vocab</span
+        >GainVocab</span
+      >
+    </el-menu-item>
+    <el-menu-item
+      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent absolute top-0 left-1/2 -translate-x-1/2"
+      index=""
+    >
+      <span class="text-black font-extrabold text-xl stroke-zinc-300"
+        >Admin Panel</span
       >
     </el-menu-item>
     <el-menu-item class="!border-b-0 focus:!bg-transparent !ml-auto" index="">
-      <el-dropdown size="large">
-        <div>
+      <el-sub-menu index="h-sm-1">
+        <template #title>
           <span class="mr-5 align-middle font-bold">
             Hi, {{ isLogged.data.value?.firstName }}
             {{ isLogged.data.value?.lastName }}
           </span>
-          <el-icon class="pt-5 pb-5">
-            <more-filled />
-          </el-icon>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="logout">
-              <el-icon>
-                <Lock />
-              </el-icon>
-              Log out
-            </el-dropdown-item>
-          </el-dropdown-menu>
         </template>
-      </el-dropdown>
+        <el-menu-item index="h-sm-1-logout" @click="logout">
+          <el-icon>
+            <Lock />
+          </el-icon>
+          Log out
+        </el-menu-item>
+      </el-sub-menu>
     </el-menu-item>
   </el-menu>
 
@@ -144,25 +145,54 @@ const logout = () => {
       !isLogged.data.value?.isAdmin &&
       !isLogged.isLoading.value
     "
-    :default-active="$route.path"
-    class="flex"
+    index=""
+    class="flex shadow-md z-50"
     mode="horizontal"
     :router="true"
     :ellipsis="true"
   >
-    dupa
-    <el-menu-item
-      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent"
-      :index="router.getRoutes().filter((x) => x.name == 'home')[0].path"
+    <div
+      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent p-5 cursor-pointer"
+      @click="authMenuStore.changeMenuCollapsed()"
     >
-      <span class="text-black font-black">GainVocab</span>
+      <el-icon class="no-inherit">
+        <fold v-if="!isMenuCollapsed" />
+        <expand v-else />
+      </el-icon>
+    </div>
+    <el-menu-item
+      class="!border-b-0 hover:!bg-transparent focus:!bg-transparent absolute left-10"
+      :index="
+        router.getRoutes().filter((x) => x.name == 'user-dashboard')[0].path
+      "
+      :route="{ name: 'user-dashboard' }"
+    >
+      <span class="text-black font-extrabold text-xl stroke-zinc-300"
+        >GainVocab</span
+      >
     </el-menu-item>
-    <el-menu-item
-      class="!border-b-0 focus:!bg-transparent !ml-auto"
-      index=""
-      @click="logout"
-    >
-      <span>Logout</span>
+    <el-menu-item class="!border-b-0 focus:!bg-transparent !ml-auto" index="">
+      <el-sub-menu index="h-sm-1">
+        <template #title>
+          <span class="mr-5 align-middle font-bold">
+            Hi, {{ isLogged.data.value?.firstName }}
+            {{ isLogged.data.value?.lastName }}
+          </span>
+        </template>
+        <el-menu-item
+          index="h-sm-1-profile"
+          @click="$router.push({ name: 'user-profile' })"
+        >
+          <el-icon><User /></el-icon>
+          User profile
+        </el-menu-item>
+        <el-menu-item index="h-sm-2-logout" @click="logout">
+          <el-icon>
+            <Lock />
+          </el-icon>
+          Log out
+        </el-menu-item>
+      </el-sub-menu>
     </el-menu-item>
   </el-menu>
 </template>

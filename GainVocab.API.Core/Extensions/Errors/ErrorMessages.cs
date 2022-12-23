@@ -12,5 +12,6 @@ namespace GainVocab.API.Core.Extensions.Errors
         public static string UnauthorizedMessage_IncorrectCredentials = "Incorrect credentials";
         public static string UnauthorizedMessage_InvalidLoginAttempt = "Invalid login attempt";
         public static string UnauthorizedMessage_AccountLocked = "Account locked";
+        public static string UnauthorizedMessage_NoAccess = "You don't have access to this data";
     }
 }

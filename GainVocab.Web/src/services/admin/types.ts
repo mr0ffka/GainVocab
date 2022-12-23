@@ -27,6 +27,15 @@ export interface IUserAddModel {
   courses: string[];
 }
 
+export interface IUserEditModel {
+  firstName: string;
+  lastName: string;
+  email: string;
+  emailConfirmed: boolean;
+  roles: string[];
+  courses: string[];
+}
+
 export interface IUserDetailsModel {
   firstName: string;
   lastName: string;

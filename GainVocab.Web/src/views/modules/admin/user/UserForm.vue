@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
-import { ICourseItemModel, IUserAddModel } from "@/services/admin/types";
+import {
+  ICourseItemModel,
+  IUserAddModel,
+  IUserEditModel,
+} from "@/services/admin/types";
 import { ElMessage, FormInstance } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
@@ -141,7 +145,7 @@ const userGet = () =>
       });
     });
 
-const userUpdate = (model: IUserAddModel) =>
+const userUpdate = (model: IUserEditModel) =>
   updateUser(userId.value.toString(), model)
     .then(() => {
       ElMessage({
@@ -181,8 +185,6 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           lastName: userAddModel.lastName,
           email: userAddModel.email,
           emailConfirmed: userAddModel.emailConfirmed,
-          password: userAddModel.password,
-          passwordConfirm: userAddModel.passwordConfirm,
           roles: userAddModel.roles,
           courses: userAddModel.courses,
         });
@@ -258,7 +260,12 @@ const boolToStringHandler = (value: boolean) => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item class="text-lg" prop="password" label="Password">
+        <el-form-item
+          v-if="userId === '' || userId === null"
+          class="text-lg"
+          prop="password"
+          label="Password"
+        >
           <el-input
             v-model="userAddModel.password"
             type="password"
@@ -268,6 +275,7 @@ const boolToStringHandler = (value: boolean) => {
           />
         </el-form-item>
         <el-form-item
+          v-if="userId === '' || userId === null"
           class="text-lg"
           prop="passwordConfirm"
           label="Password confirmation"

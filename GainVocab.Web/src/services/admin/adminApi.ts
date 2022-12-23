@@ -14,6 +14,7 @@ import {
   ISupportIssueFilterModel,
   IUserOptionModel,
   ISupportIssueTypeOptionModel,
+  IUserEditModel,
 } from "./types";
 
 import type { IPagerParams, IPagedResult } from "../common/types";
@@ -51,8 +52,8 @@ export const removeUser = async (id: string) => {
   return (await api.delete(`users/${id}`)).data;
 };
 
-export const updateUser = async (id: string, model: IUserAddModel) => {
-  return (await api.patch<IUserAddModel>(`users/${id}`, model)).data;
+export const updateUser = async (id: string, model: IUserEditModel) => {
+  return (await api.patch<IUserEditModel>(`users/${id}`, model)).data;
 };
 
 export const getUserOptionsList = async () => {

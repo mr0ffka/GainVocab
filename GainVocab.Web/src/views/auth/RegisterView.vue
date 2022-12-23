@@ -84,8 +84,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         class="text-right"
         :rules="rules"
       >
-        <el-form-item prop="email">
-          <label for="Email">First name</label>
+        <el-form-item prop="firstName">
+          <label for="firstName">First name</label>
           <el-input
             v-model="registerModel.firstName"
             placeholder="First name"
@@ -93,8 +93,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
             size="large"
           />
         </el-form-item>
-        <el-form-item prop="email">
-          <label for="Email">Last name</label>
+        <el-form-item prop="lastName">
+          <label for="lastName">Last name</label>
           <el-input
             v-model="registerModel.lastName"
             placeholder="Last name"

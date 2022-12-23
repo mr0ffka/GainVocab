@@ -34,7 +34,7 @@ namespace GainVocab.API.Core.Extensions.Errors
                 ValidationException validationException => HandleValidationException(validationException),
                 BadRequestException domainException => HandleDomainException(domainException),
                 NotFoundException resourceNotFoundException => HandleResourceNotFoundException(resourceNotFoundException),
-                UnauthorizedAccessException unauthorizedException => HandleUnauthorizedException(unauthorizedException),
+                UnauthorizedException unauthorizedException => HandleUnauthorizedException(unauthorizedException),
                 _ => HandleUnhandledExceptions(ex)
             };
 
@@ -112,20 +112,20 @@ namespace GainVocab.API.Core.Extensions.Errors
             return error;
         }
 
-        private ErrorResponse HandleUnauthorizedException(UnauthorizedAccessException unauthorizedException)
+        private ErrorResponse HandleUnauthorizedException(UnauthorizedException unauthorizedException)
         {
             Logger.LogInformation(unauthorizedException, unauthorizedException.Message);
 
             var error = new ErrorResponse
             {
                 Title = unauthorizedException.Message,
-                StatusCode = HttpStatusCode.Unauthorized,
+                StatusCode = HttpStatusCode.BadRequest,
             };
 
             error.Errors = new List<ErrorEntry>();
             error.Errors.Add(new ErrorEntry
             {
-                Code = HttpStatusCode.Unauthorized.ToString(),
+                Code = ((int)HttpStatusCode.Unauthorized).ToString(),
                 Title = unauthorizedException.Message,
                 Source = ""
             });
@@ -146,7 +146,7 @@ namespace GainVocab.API.Core.Extensions.Errors
             error.Errors = new List<ErrorEntry>();
             error.Errors.Add(new ErrorEntry
             {
-                Code = HttpStatusCode.InternalServerError.ToString(),
+                Code = ((int)HttpStatusCode.InternalServerError).ToString(),
                 Title = "An unhandled error occurred while processing this request",
                 Source = ""
             });

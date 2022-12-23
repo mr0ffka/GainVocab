@@ -24,7 +24,9 @@ export const registerUserFn = async (user: IRegisterModel) => {
 };
 
 export const loginUserFn = async (user: ILoginModel) => {
-  return (await api.post<IUserAuthResponse>("auth/login", user)).data;
+  const request = await api.post("auth/login", user);
+  console.log(request);
+  return request.data;
 };
 
 export const verifyEmailFn = async (

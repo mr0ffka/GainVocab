@@ -121,7 +121,6 @@ namespace GainVocab.API.Core.Services
             }
 
             var query = Context.Course
-                .AsExpandable()
                 .Include(c => c.LanguageFrom)
                 .Include(c => c.LanguageTo)
                 .Where(predicate);

@@ -18,7 +18,7 @@ import { IPagedResult, IPager } from "@/services/common/types";
 import { RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage } from "element-plus";
 import Header from "@/components/common/Header.vue";
-import { useSupportIssueStore } from "@/store/adminSupportIssueStore";
+import { useSupportIssueStore } from "@/store/admin/adminSupportIssueStore";
 import { DateTime } from "luxon";
 import router from "@/router";
 import { useRoute } from "vue-router";

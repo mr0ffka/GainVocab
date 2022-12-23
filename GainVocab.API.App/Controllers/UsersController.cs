@@ -82,7 +82,7 @@ namespace GainVocab.API.App.Controllers
 
             if (user == null)
             {
-                return NotFound();
+                throw new NotFoundException("User", id);
             }
 
             return Ok(user);
@@ -130,6 +130,54 @@ namespace GainVocab.API.App.Controllers
             var data = Users.GetCount();
 
             return Ok(data);
+        }
+
+        [HttpGet("me/details/{id}")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult> GetMeDetails(string id)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != id)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var user = await Users.GetDetails(uid);
+
+            if (user == null)
+            {
+                throw new NotFoundException("User", id);
+            }
+
+            return Ok(user);
+        }
+
+        [HttpDelete("me/{id}")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> RemoveMe(string id)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != id)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            await AuthManager.Logout();
+
+            Response.Cookies.Append("X-Access-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
+            Response.Cookies.Append("X-Refresh-Token", "", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = DateTime.Now.AddMinutes(-60) });
+
+            await Users.Remove(id);
+
+            return Ok();
+        }
+
+        [HttpPatch("me/{id}")]
+        [Authorize(Roles = "User")]
+        public async Task<ActionResult> UpdateMe(string id, [FromBody] UserProfileEditModel model)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != id)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            await Users.UpdateMe(id, model);
+            return Ok();
         }
     }
 }

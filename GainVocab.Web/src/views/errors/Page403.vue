@@ -4,7 +4,7 @@
   <div class="max-w-4xl mx-auto flex justify-center items-center h-screen">
     <div class="text-center">
       <div class="text-5xl font-bold">403</div>
-      <div class="block text-xl font-semibold">Bad Request</div>
+      <div class="block text-xl font-semibold">Forbidden</div>
       <el-button
         size="large"
         @click="$router.go(-1)"

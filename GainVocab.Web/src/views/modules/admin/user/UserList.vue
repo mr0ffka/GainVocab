@@ -6,7 +6,7 @@ import {
   getRoleOptionsList,
   removeUser,
 } from "@/services/admin/adminApi";
-import { useAdminUserStore } from "@/store/adminUserStore";
+import { useAdminUserStore } from "@/store/admin/adminUserStore";
 import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import { ICourseItemModel, IUserModel } from "@/services/admin/types";

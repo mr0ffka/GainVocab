@@ -9,20 +9,20 @@ using GainVocab.API.Core.Extensions;
 
 namespace GainVocab.API.Core.Models.Users
 {
-    public class UserEditModel : IValidatableObject
+    public class UserProfileEditModel : IValidatableObject
     {
-        public string? Email { get; set; }
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
-        public bool? EmailConfirmed { get; set; }
-        public List<string> Roles { get; set; }
-        public List<string>? Courses { get; set; }
+        public string? CurrentPassword { get; set; }
+        public string? Password { get; set; }
+        public string? PasswordConfirm { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
-            return this.Rules<UserEditModel>(v =>
+            return this.Rules<UserProfileEditModel>(v =>
             {
-                v.RuleFor(x => x.Roles).NotEmpty().WithMessage("At least one role is required!");
+                v.RuleFor(x => x.CurrentPassword).NotNull().NotEmpty().WithMessage("Current password is required");
+                v.RuleFor(x => x.Password).Equal(p => p.PasswordConfirm).WithMessage("Passwords must be the same as password confirmation");
             })
             .Validate(this, options => options.ThrowOnFailures())
             .Result();

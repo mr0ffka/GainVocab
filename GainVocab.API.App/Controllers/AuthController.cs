@@ -119,10 +119,15 @@ namespace GainVocab.API.App.Controllers
             request.RefreshToken = Request.Cookies[REFRESH_TOKEN_COOKIE_NAME];
             request.Token = Request.Cookies[JWT_TOKEN_COOKIE_NAME];
 
-            var authResponse = await AuthManager.VerifyRefreshToken(request);
-
-            Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
-            Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+            if (request.Token != null)
+            {
+                var authResponse = await AuthManager.VerifyRefreshToken(request);
+                if (authResponse is not null)
+                {
+                    Response.Cookies.Append("X-Access-Token", authResponse.Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+                    Response.Cookies.Append("X-Refresh-Token", authResponse.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
+                }
+            }
 
             return Ok();
         }
