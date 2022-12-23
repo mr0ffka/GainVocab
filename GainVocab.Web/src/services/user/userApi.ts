@@ -1,9 +1,17 @@
 import { toURLSearchParams } from "../../helpers/axios";
 import { GenericResponse } from "../common/types";
-import { ISupportApplicationIssueModel, IUserProfileEditModel } from "./types";
+import {
+  IAddUserToCourseModel,
+  ISupportApplicationIssueModel,
+  IUserProfileEditModel,
+} from "./types";
 
 import type { IPagerParams, IPagedResult } from "../common/types";
-import type { IUserDetailsModel, IUserFilterModel } from "../admin/types";
+import type {
+  ICourseFilterModel,
+  IUserDetailsModel,
+  IUserFilterModel,
+} from "../admin/types";
 import { api } from "@/helpers/axios";
 
 export const sendSupportApplicationIssue = async (
@@ -22,4 +30,19 @@ export const getMeDetails = async (id: string) => {
 
 export const updateMe = async (id: string, model: IUserProfileEditModel) => {
   return (await api.patch(`users/me/${id}`, model)).data;
+};
+
+export const getAvailableCourseList = async (
+  userId: string,
+  filter: ICourseFilterModel
+) => {
+  return (
+    await api.get<IPagedResult>("course/me/available", {
+      params: toURLSearchParams({ userId, ...filter }),
+    })
+  ).data;
+};
+
+export const addUserToCourse = async (model: IAddUserToCourseModel) => {
+  return (await api.post<GenericResponse>("course/me/add", model)).data;
 };

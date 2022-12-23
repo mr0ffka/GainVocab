@@ -13,3 +13,8 @@ export interface IUserProfileEditModel {
   password: string;
   passwordConfirm: string;
 }
+
+export interface IAddUserToCourseModel {
+  userId: string;
+  coursePublicId: string;
+}

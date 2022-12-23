@@ -3,8 +3,9 @@ import { defineStore } from "pinia";
 import { ICourseFilterModel } from "@/services/admin/types";
 import { IPagerParams } from "@/services/common/types";
 
-export const useAdminCourseStore = defineStore("adminCourseStore", () => {
+export const useUserCourseStore = defineStore("userCourseStore", () => {
   const isSearching = ref(false);
+  const descriptionLength = ref(256);
   const pager = ref<IPagerParams>({
     pageSize: 10,
     pageNumber: 1,
@@ -23,5 +24,5 @@ export const useAdminCourseStore = defineStore("adminCourseStore", () => {
     filter.value.languageTo = "";
   }
 
-  return { pager, filter, isSearching, resetFilters };
+  return { pager, filter, descriptionLength, isSearching, resetFilters };
 });

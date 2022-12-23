@@ -11,7 +11,6 @@ import { getCurrUser } from "@/services/auth/authApi";
 import { getMeDetails, removeMe, updateMe } from "@/services/user/userApi";
 import { IUserProfileEditModel } from "@/services/user/types";
 
-const route = useRoute();
 const userId = ref<string>("");
 const hasData = ref(false);
 const confirmDeleteDialog = ref(false);

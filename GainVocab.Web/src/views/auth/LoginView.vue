@@ -24,18 +24,18 @@ const rules = reactive({
 
 const login = async (credentials: ILoginModel) =>
   loginUserFn(credentials)
-    .then((data: IUserAuthResponse) => {
+    .then(async (data: IUserAuthResponse) => {
       ElMessage({
         showClose: true,
         message: "Successfully logged in",
         type: "success",
       });
+      await queryClient.setQueryData(["authUser"], data.user);
       if (data.user.isAdmin) {
         router.push({ name: "admin-dashboard" });
       } else {
         router.push({ name: "user-dashboard" });
       }
-      queryClient.setQueryData(["authUser"], data.user);
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {

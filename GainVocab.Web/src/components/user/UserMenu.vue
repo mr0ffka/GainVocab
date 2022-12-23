@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Help, House } from "@element-plus/icons-vue";
+import { Help, House, Collection } from "@element-plus/icons-vue";
 import { useAuthMenuStore } from "@/store/common/authMenuStore";
 import { storeToRefs } from "pinia";
 import { router } from "@/router";
@@ -111,13 +111,15 @@ const submitSupportIssue = async (formEl: FormInstance | undefined) => {
       <el-icon><House /></el-icon>
       <span>Dashboard</span>
     </el-menu-item>
-    <!-- <el-menu-item
-      :index="router.getRoutes().filter((x) => x.name == 'user-list')[0].path"
-      :route="{ name: 'user-list' }"
+    <el-menu-item
+      :index="
+        router.getRoutes().filter((x) => x.name == 'user-course-list')[0].path
+      "
+      :route="{ name: 'user-course-list' }"
     >
-      <el-icon><user /></el-icon>
-      <span>Users</span>
-    </el-menu-item> -->
+      <el-icon><Collection /></el-icon>
+      <span>Available courses</span>
+    </el-menu-item>
     <el-menu-item class="mt-auto" index="" @click="supportDialog = true">
       <el-icon><Help /></el-icon>
       <span>Support</span>

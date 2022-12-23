@@ -272,10 +272,14 @@ const resetFilters = () => {
         >
           <template #default="scope">
             <el-tag
+              v-if="scope.row.courses.length > 0"
               v-for="course in scope.row.courses"
               class="mr-2"
               disable-transitions
               >{{ course }}
+            </el-tag>
+            <el-tag v-else class="mr-2" disable-transitions type="danger">
+              None
             </el-tag>
           </template>
         </el-table-column>

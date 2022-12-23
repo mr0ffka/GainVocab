@@ -33,7 +33,7 @@ namespace GainVocab.API.App.Controllers
         }
 
         [HttpGet("options")]
-        [Authorize(Roles = "Administrator")]
+        [Authorize(Roles = "Administrator, User")]
         public ActionResult GetOptionsList()
         {
             var data = Languages.GetOptionsList();

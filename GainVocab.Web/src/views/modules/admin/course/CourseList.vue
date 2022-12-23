@@ -19,6 +19,7 @@ import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
 import { ElMessage, FormInstance } from "element-plus";
 import Header from "@/components/common/Header.vue";
 import { useAdminCourseStore } from "@/store/admin/adminCourseStore";
+import { useRoute } from "vue-router";
 
 const store = useAdminCourseStore();
 const { filter, pager, isSearching } = storeToRefs(store);
@@ -117,7 +118,6 @@ const editDescription = async (id: string) =>
 
 onMounted(() => {
   getEntities();
-  console.log(entities);
   getLanguageOptions();
 });
 

@@ -311,7 +311,12 @@ const resetFilters = () => {
                   </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="Is resolved?">
-                  {{ store.boolToStringHandler(scope.row.isResolved) }}
+                  <el-tag
+                    disable-transitions
+                    :type="scope.row.isResolved ? 'success' : 'danger'"
+                  >
+                    {{ store.boolToStringHandler(scope.row.isResolved) }}
+                  </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item label="Created at">{{
                   getTableDate(scope.row.createdAt)
@@ -321,6 +326,7 @@ const resetFilters = () => {
                 }}</el-descriptions-item>
                 <el-descriptions-item label="Reporter">
                   <el-table
+                    v-if="scope.row.reporter.email != null"
                     :data="[scope.row.reporter]"
                     :border="true"
                     :stripe="true"
@@ -374,6 +380,9 @@ const resetFilters = () => {
                       </template>
                     </el-table-column>
                   </el-table>
+                  <el-tag v-else class="mr-2" disable-transitions type="danger">
+                    Deleted user
+                  </el-tag>
                 </el-descriptions-item>
                 <el-descriptions-item
                   v-if="scope.row.issueEntity.courseName !== null"
@@ -465,7 +474,16 @@ const resetFilters = () => {
           label="Reporter"
           sortable
           width=""
-        />
+        >
+          <template #default="scope">
+            <span v-if="scope.row.reporter.email != null">{{
+              scope.row.reporter.email
+            }}</span>
+            <el-tag v-else class="mr-2" disable-transitions type="danger"
+              >Deleted user
+            </el-tag>
+          </template>
+        </el-table-column>
         <el-table-column
           label-class-name="font-black"
           prop="isResolved"
@@ -474,7 +492,12 @@ const resetFilters = () => {
           width=""
         >
           <template #default="scope">
-            {{ store.boolToStringHandler(scope.row.isResolved) }}
+            <el-tag
+              disable-transitions
+              :type="scope.row.isResolved ? 'success' : 'danger'"
+            >
+              {{ store.boolToStringHandler(scope.row.isResolved) }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column

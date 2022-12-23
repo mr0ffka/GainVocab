@@ -8,6 +8,8 @@ using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -17,8 +19,11 @@ namespace GainVocab.API.Core.Services
 {
     public class CourseService : GenericService<Course>, ICourseService
     {
-        public CourseService(DefaultDbContext context, IMapper mapper) : base(context, mapper)
+        private readonly UserManager<APIUser> UserManager;
+
+        public CourseService(DefaultDbContext context, UserManager<APIUser> userManager, IMapper mapper) : base(context, mapper)
         {
+            UserManager = userManager;
         }
 
         public async Task Add(AddModel entity)
@@ -76,9 +81,7 @@ namespace GainVocab.API.Core.Services
         {
             var user = Get(publicId);
 
-            //var userRoles = await UserManager.GetRolesAsync(user);
             var result = Mapper.Map<Course, ListItemModel>(user);
-            //result.Roles = userRoles.ToList() ?? new List<string>();
 
             return result;
         }
@@ -193,6 +196,59 @@ namespace GainVocab.API.Core.Services
 
             course.Description = description;
 
+            Context.Update(course);
+            await Context.SaveChangesAsync();
+        }
+
+        public async Task<List<ListItemModel>> GetAvailableList(string userId, FilterModel filter)
+        {
+            var predicate = PredicateBuilder.New<Course>(true);
+
+            predicate.And(x => !x.Users.Any(u => u.APIUserId == userId));
+
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                predicate.And(x => x.Name.ToLower().Contains(filter.Name.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(filter.LanguageFrom))
+            {
+                predicate.And(x => x.LanguageFrom.PublicId.Equals(filter.LanguageFrom));
+            }
+
+            if (!string.IsNullOrEmpty(filter.LanguageTo))
+            {
+                predicate.And(x => x.LanguageTo.PublicId.Equals(filter.LanguageTo));
+            }
+
+            var query = Context.Course
+                .Include(c => c.LanguageFrom)
+                .Include(c => c.LanguageTo)
+                .Where(predicate)
+                .ToList();
+
+            var items = new List<ListItemModel>();
+            items = Mapper.Map<List<ListItemModel>>(query);
+
+
+            return items;
+        }
+
+        public async Task AddUser(AddUserToCourseModel entity)
+        {
+            var course = Get(entity.CoursePublicId);
+            if (course == null)
+                throw new NotFoundException("Course", entity.CoursePublicId);
+
+            var user = await UserManager.FindByIdAsync(entity.UserId);
+            if (user == null)
+                throw new NotFoundException("User", entity.UserId);
+
+            var userCourse = new APIUserCourse();
+            userCourse.APIUserId = user.Id;
+            userCourse.CourseId = course.Id;
+            
+            course.Users.Add(userCourse);
             Context.Update(course);
             await Context.SaveChangesAsync();
         }

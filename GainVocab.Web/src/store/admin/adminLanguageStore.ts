@@ -1,14 +1,10 @@
-import { IPagerParams } from "../services/common/types";
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { ILanguageFilterModel, ILanguageModel } from "@/services/admin/types";
+import { ILanguageFilterModel } from "@/services/admin/types";
+import { IPagerParams } from "@/services/common/types";
 
 export const useAdminLanguageStore = defineStore("adminLanguageStore", () => {
   const isSearching = ref(false);
-  const empty = ref<ILanguageModel>({
-    id: "",
-    name: "",
-  });
   const pager = ref<IPagerParams>({
     pageSize: 10,
     pageNumber: 1,
@@ -29,5 +25,5 @@ export const useAdminLanguageStore = defineStore("adminLanguageStore", () => {
   //     return options;
   //   }
 
-  return { pager, filter, isSearching, empty, resetFilters };
+  return { pager, filter, isSearching, resetFilters };
 });

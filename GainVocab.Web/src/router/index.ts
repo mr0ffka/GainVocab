@@ -122,6 +122,7 @@ router.beforeEach(
   ) => {
     if (!queryClient.getQueryData(["authUser"])) {
       queryClient.invalidateQueries(["authUser"]);
+      return next();
     }
 
     if (!to.meta.middleware) {

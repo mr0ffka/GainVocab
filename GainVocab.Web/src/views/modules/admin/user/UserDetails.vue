@@ -114,10 +114,14 @@ const handleDelete = () => {
         </el-descriptions-item>
         <el-descriptions-item label="Courses"
           ><el-tag
+            v-if="userDetailsModel.courses.length > 0"
             v-for="course in userDetailsModel.courses"
             class="mr-2"
             disable-transitions
             >{{ course }}
+          </el-tag>
+          <el-tag v-else class="mr-2" disable-transitions type="danger">
+            None
           </el-tag>
         </el-descriptions-item>
       </el-descriptions>

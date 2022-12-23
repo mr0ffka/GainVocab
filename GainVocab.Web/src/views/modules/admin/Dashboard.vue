@@ -131,6 +131,7 @@ onMounted(() => {
     <AdminMenu />
     <div class="grow grid lg:grid-cols-4 md:grid-cols-2 grid-rows-4 gap-2 p-2">
       <el-card
+        shadow="hover"
         class="box-card lg:col-span-4 md:col-span-2"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
@@ -150,6 +151,7 @@ onMounted(() => {
         </div>
       </el-card>
       <el-card
+        shadow="hover"
         class="box-card"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
@@ -165,6 +167,7 @@ onMounted(() => {
         </div>
       </el-card>
       <el-card
+        shadow="hover"
         class="box-card"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
@@ -180,6 +183,7 @@ onMounted(() => {
         </div>
       </el-card>
       <el-card
+        shadow="hover"
         class="box-card"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
@@ -195,6 +199,7 @@ onMounted(() => {
         </div>
       </el-card>
       <el-card
+        shadow="hover"
         class="box-card"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >

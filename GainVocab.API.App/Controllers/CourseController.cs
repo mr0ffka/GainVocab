@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
+using GainVocab.API.Core.Exceptions;
+using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Bcpg;
 
 namespace GainVocab.API.App.Controllers
 {
@@ -57,11 +60,6 @@ namespace GainVocab.API.App.Controllers
         {
             await Courses.Add(entity);
 
-            //if (response.Errors.Any())
-            //{
-            //    throw new BadRequestException("Error while adding user", Mapper.Map<List<IdentityError>, List<ErrorEntry>>(response.Errors.ToList()));
-            //}
-
             return Ok();
         }
 
@@ -95,6 +93,32 @@ namespace GainVocab.API.App.Controllers
             var data = Courses.GetCount();
 
             return Ok(data);
+        }
+
+        [HttpGet("me/available")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult> GetAvailableList([FromQuery] string userId, [FromQuery] FilterModel filter)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != userId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var items = await Courses.GetAvailableList(userId, filter);
+
+            return Ok(items);
+        }
+
+        [HttpPost("me/add")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult> AddUserToCourse([FromBody] AddUserToCourseModel entity)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != entity.UserId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            await Courses.AddUser(entity);
+
+            return Ok();
         }
     }
 }

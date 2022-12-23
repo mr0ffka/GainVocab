@@ -24,6 +24,14 @@ export default [
         },
         component: () => import("@/views/modules/user/UserProfile.vue"),
       },
+      {
+        path: "courses",
+        name: "user-course-list",
+        meta: {
+          middleware: [requireAuth],
+        },
+        component: () => import("@/views/modules/user/CourseList.vue"),
+      },
     ],
   },
 ];
