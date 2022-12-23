@@ -96,7 +96,6 @@ const loadData = () => {
 onMounted(() => {
   getCoursesOptions();
   if (route.query.coursePublicId !== undefined) {
-    console.log("dupa");
     selectedCourseId.value = route.query.coursePublicId!.toString();
   }
   if (selectedCourseId.value != "") {

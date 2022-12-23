@@ -50,7 +50,6 @@ const getLanguageOptions = async () => {
 
 onMounted(async () => {
   userId.value = auth.data.value?.id != undefined ? auth.data.value?.id : "";
-  console.log(userId.value);
   if (userId.value != "") {
     await getEntities();
   }

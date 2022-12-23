@@ -129,20 +129,19 @@ onMounted(() => {
   <Header></Header>
   <div class="flex grow">
     <AdminMenu />
-    <div class="grow grid lg:grid-cols-4 md:grid-cols-2 grid-rows-4 gap-2 p-2">
+    <div class="grow grid lg:grid-cols-4 md:grid-cols-2 grid-rows-2 gap-2 p-2">
       <el-card
+        @click="
+          $router.push({ name: 'support-list', query: { isResolved: 'false' } })
+        "
         shadow="hover"
-        class="box-card lg:col-span-4 md:col-span-2"
+        class="box-card lg:col-span-4 md:col-span-2 cursor-pointer"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link
-            :to="{ name: 'support-list', query: { isResolved: 'false' } }"
-          >
-            <div class="card-header text-center">
-              <span class="font-bold">Unresolved issues</span>
-            </div>
-          </router-link>
+          <div class="card-header text-center">
+            <span class="font-bold">Unresolved issues</span>
+          </div>
         </template>
         <div class="text-center">
           <span class="font-bold text-8xl text-red-500">{{
@@ -151,64 +150,60 @@ onMounted(() => {
         </div>
       </el-card>
       <el-card
+        @click="$router.push({ name: 'user-list' })"
         shadow="hover"
-        class="box-card"
+        class="box-card cursor-pointer"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link :to="{ name: 'user-list' }">
-            <div class="card-header text-center">
-              <span class="font-bold">Users</span>
-            </div>
-          </router-link>
+          <div class="card-header text-center">
+            <span class="font-bold">Users</span>
+          </div>
         </template>
         <div class="text-center">
           <span class="font-bold text-8xl">{{ userCount }}</span>
         </div>
       </el-card>
       <el-card
+        @click="$router.push({ name: 'language-list' })"
         shadow="hover"
-        class="box-card"
+        class="box-card cursor-pointer"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link :to="{ name: 'language-list' }">
-            <div class="card-header text-center">
-              <span class="font-bold">Languages</span>
-            </div>
-          </router-link>
+          <div class="card-header text-center">
+            <span class="font-bold">Languages</span>
+          </div>
         </template>
         <div class="text-center">
           <span class="font-bold text-8xl">{{ languageCount }}</span>
         </div>
       </el-card>
       <el-card
+        @click="$router.push({ name: 'course-list' })"
         shadow="hover"
-        class="box-card"
+        class="box-card cursor-pointer"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link :to="{ name: 'course-list' }">
-            <div class="card-header text-center">
-              <span class="font-bold">Courses</span>
-            </div>
-          </router-link>
+          <div class="card-header text-center">
+            <span class="font-bold">Courses</span>
+          </div>
         </template>
         <div class="text-center">
           <span class="font-bold text-8xl">{{ courseCount }}</span>
         </div>
       </el-card>
       <el-card
+        @click="$router.push({ name: 'data-list' })"
         shadow="hover"
-        class="box-card"
+        class="box-card cursor-pointer"
         body-style="display: flex; flex-flow:column; height: 75%; justify-content: center;"
       >
         <template #header>
-          <router-link :to="{ name: 'data-list' }">
-            <div class="card-header text-center">
-              <span class="font-bold">Course data entries</span>
-            </div>
-          </router-link>
+          <div class="card-header text-center">
+            <span class="font-bold">Course data entries</span>
+          </div>
         </template>
         <div class="text-center">
           <div>
@@ -217,6 +212,11 @@ onMounted(() => {
             </div>
             <span class="font-bold text-6xl">{{ courseDataCount }}</span>
           </div>
+          <el-divider
+            style="margin: 8px 0 !important"
+            class="col-span-2"
+            direction="horizontal"
+          />
           <div>
             <div>
               <span>Examples</span>
