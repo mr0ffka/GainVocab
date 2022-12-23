@@ -22,6 +22,7 @@ namespace GainVocab.API.Data.Models
         public string Name { get; set; }
         public long LanguageFromId { get; set; }
         public long LanguageToId { get; set; }
+        public string Description { get; set; }
 
         public virtual Language? LanguageFrom { get; set; }
         public virtual Language? LanguageTo { get; set; }

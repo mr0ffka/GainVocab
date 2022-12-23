@@ -416,9 +416,11 @@ const resetFilters = () => {
                     />
                   </el-table>
                 </el-descriptions-item>
-                <el-descriptions-item label="Message">{{
-                  scope.row.message
-                }}</el-descriptions-item>
+                <el-descriptions-item label="Message">
+                  <p v-for="text in scope.row.message.split('\n')">
+                    {{ text }}
+                  </p>
+                </el-descriptions-item>
               </el-descriptions>
               <div class="mt-2 flex flex-row">
                 <el-button

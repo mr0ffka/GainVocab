@@ -184,5 +184,17 @@ namespace GainVocab.API.Core.Services
 
             return result;
         }
+
+        public async Task Update(string publicId, string description)
+        {
+            var course = Get(publicId);
+            if (course is null)
+                throw new NotFoundException("Course", publicId);
+
+            course.Description = description;
+
+            Context.Update(course);
+            await Context.SaveChangesAsync();
+        }
     }
 }

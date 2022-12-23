@@ -10,6 +10,7 @@ namespace GainVocab.API.Core.Interfaces
         List<ItemModel> GetOptionsList();
         List<Course> GetListByPublicId(List<string> courses);
         List<Course> GetListByUser(APIUser user);
+        Task Update(string publicId, string description);
         Task Add(AddModel entity);
         Course Get(string publicId);
         Course Get(long id);

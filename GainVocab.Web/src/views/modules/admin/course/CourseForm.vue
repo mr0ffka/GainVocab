@@ -21,6 +21,7 @@ const addModel: ICourseAddModel = reactive({
   name: "",
   languageFrom: "",
   languageTo: "",
+  description: "",
 });
 
 const rules = reactive({
@@ -77,6 +78,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         name: addModel.name,
         languageFrom: addModel.languageFrom,
         languageTo: addModel.languageTo,
+        description: addModel.description,
       });
     } else {
       console.log("error submit!", fields);
@@ -144,6 +146,19 @@ onMounted(() => {
               :value="item.id"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item
+          class="text-lg"
+          prop="description"
+          label="Course Description"
+        >
+          <el-input
+            v-model="addModel.description"
+            placeholder="Course description"
+            size="large"
+            class="grow"
+            type="textarea"
+          />
         </el-form-item>
       </el-form>
       <div>

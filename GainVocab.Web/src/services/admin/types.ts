@@ -74,6 +74,7 @@ export interface ICourseAddModel {
   name: string;
   languageFrom: string;
   languageTo: string;
+  description: string;
 }
 
 export interface ICourseItemModel {
@@ -81,11 +82,16 @@ export interface ICourseItemModel {
   name: string;
 }
 
+export interface ICourseDescriptionEditModel {
+  description: string;
+}
+
 export interface ICourseModel {
   id: string;
   name: string;
   languageFrom: ILanguageModel;
   languageTo: ILanguageModel;
+  description: string;
 }
 
 export interface ICourseListModel {
@@ -93,6 +99,7 @@ export interface ICourseListModel {
   name: string;
   languageFrom: ILanguageModel;
   languageTo: ILanguageModel;
+  description: string;
   studentAmnt: number;
 }
 

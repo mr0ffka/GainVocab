@@ -33,6 +33,14 @@ namespace GainVocab.API.App.Controllers
             return Ok(data);
         }
 
+        [HttpPatch("{publicId}")]
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> Update(string publicId, [FromBody] string description)
+        {
+            await Courses.Update(publicId, description);
+
+            return Ok();
+        }
 
         [HttpGet("options")]
         [Authorize(Roles = "Administrator")]

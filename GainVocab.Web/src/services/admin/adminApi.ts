@@ -106,6 +106,14 @@ export const removeCourse = async (publicId: string) => {
   return (await api.delete(`course/${publicId}`)).data;
 };
 
+export const editCourseDescription = async (
+  publicId: string,
+  description: string
+) => {
+  return (await api.patch<GenericResponse>(`course/${publicId}`, description))
+    .data;
+};
+
 export const addCourseData = async (entity: ICourseDataAddModel) => {
   return (await api.post<GenericResponse>("course-data/add", entity)).data;
 };

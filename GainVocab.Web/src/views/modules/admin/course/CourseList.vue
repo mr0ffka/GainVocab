@@ -1,27 +1,38 @@
 <script setup lang="ts">
 import AdminMenu from "@/components/admin/AdminMenu.vue";
 import {
+  editCourseDescription,
   getLanguageOptionsList,
   getListCourse,
   removeCourse,
 } from "@/services/admin/adminApi";
 import { storeToRefs } from "pinia";
-import { onMounted, ref } from "vue";
-import { ICourseListModel, ILanguageModel } from "@/services/admin/types";
+import { onMounted, reactive, ref } from "vue";
+import {
+  ICourseDescriptionEditModel,
+  ICourseListModel,
+  ILanguageModel,
+} from "@/services/admin/types";
 import { IPagedResult, IPager } from "@/services/common/types";
 import router from "@/router";
 import { Plus, RefreshRight, Search } from "@element-plus/icons-vue";
-import { ElMessage } from "element-plus";
+import { ElMessage, FormInstance } from "element-plus";
 import Header from "@/components/common/Header.vue";
 import { useAdminCourseStore } from "@/store/admin/adminCourseStore";
 
 const store = useAdminCourseStore();
 const { filter, pager, isSearching } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
+const editDescriptionDialog = ref(false);
 const focusedItem = ref<ICourseListModel | null>();
 let entities = ref<ICourseListModel[]>();
 let pagerValues = ref<IPager>();
 const languageOptions = ref<ILanguageModel[] | null>();
+
+const formEditCourseDescriptionRef = ref<FormInstance>();
+const courseDescriptionModel: ICourseDescriptionEditModel = reactive({
+  description: "",
+});
 
 const getEntities = () => {
   isSearching.value = true;
@@ -86,8 +97,27 @@ const deleteEntity = async (id: string) =>
       });
     });
 
+const editDescription = async (id: string) =>
+  await editCourseDescription(id, courseDescriptionModel.description)
+    .then((data: any) => {
+      ElMessage({
+        showClose: true,
+        message: "Course description has been updated",
+        type: "success",
+      });
+      getEntities();
+    })
+    .catch((error: any) => {
+      ElMessage({
+        showClose: true,
+        message: error.response.data.Title,
+        type: "error",
+      });
+    });
+
 onMounted(() => {
   getEntities();
+  console.log(entities);
   getLanguageOptions();
 });
 
@@ -95,14 +125,37 @@ const handleDeleteDialog = (row: ICourseListModel) => {
   focusedItem.value = row;
   confirmDeleteDialog.value = true;
 };
+
 const handleDelete = () => {
   deleteEntity(focusedItem.value?.id ?? "");
   confirmDeleteDialog.value = false;
   focusedItem.value = null;
 };
+
 const resetFilters = () => {
   store.resetFilters();
   getEntities();
+};
+
+const handleEditDescriptionDialog = (row: ICourseListModel) => {
+  focusedItem.value = row;
+  courseDescriptionModel.description = row.description;
+  editDescriptionDialog.value = true;
+};
+
+const submitCourseDescriptionEdit = async (
+  formEl: FormInstance | undefined
+) => {
+  if (!formEl) return;
+  await formEl.validate((valid, fields) => {
+    if (valid) {
+      editDescription(focusedItem.value?.id ?? "");
+      editDescriptionDialog.value = false;
+      focusedItem.value = null;
+    } else {
+      console.log("error submit!", fields);
+    }
+  });
 };
 </script>
 
@@ -184,6 +237,36 @@ const resetFilters = () => {
         :border="true"
         :stripe="true"
       >
+        <el-table-column type="expand">
+          <template #default="scope">
+            <div class="mx-2">
+              <el-descriptions
+                v-if="scope.row.description != ''"
+                :column="1"
+                :border="true"
+                class="mt-2"
+              >
+                <el-descriptions-item label="Course description">
+                  <p v-for="text in scope.row.description.split('\n')">
+                    {{ text }}
+                  </p>
+                </el-descriptions-item>
+              </el-descriptions>
+              <div class="mt-2 flex flex-row">
+                <el-button
+                  type="info"
+                  plain
+                  @click="handleEditDescriptionDialog(scope.row)"
+                >
+                  <span v-if="scope.row.description != ''"
+                    >Edit description</span
+                  >
+                  <span v-else>Add description</span>
+                </el-button>
+              </div>
+            </div>
+          </template>
+        </el-table-column>
         <el-table-column
           label-class-name="font-black"
           prop="name"
@@ -271,6 +354,50 @@ const resetFilters = () => {
         <el-button type="danger" plain @click="handleDelete">
           Delete
         </el-button>
+      </span>
+    </template>
+  </el-dialog>
+
+  <el-dialog
+    v-model="editDescriptionDialog"
+    title="Edit course description"
+    width="70%"
+    center
+  >
+    <el-form
+      class="my-2"
+      label-position="left"
+      label-width="auto"
+      ref="formEditCourseDescriptionRef"
+      :model="courseDescriptionModel"
+    >
+      <span class="font-bold text-lg"
+        >Send application issue to system administrators</span
+      >
+      <el-form-item
+        class="text-lg mt-2"
+        prop="description"
+        label="Course description"
+      >
+        <el-input
+          v-model="courseDescriptionModel.description"
+          type="textarea"
+          placeholder="Describe an issue/issues with application"
+          autosize
+        />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button plain @click="editDescriptionDialog = false"
+          >Cancel</el-button
+        >
+        <el-button
+          type="success"
+          plain
+          @click="submitCourseDescriptionEdit(formEditCourseDescriptionRef)"
+          >Edit</el-button
+        >
       </span>
     </template>
   </el-dialog>
