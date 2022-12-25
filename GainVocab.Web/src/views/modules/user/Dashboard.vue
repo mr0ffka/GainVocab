@@ -221,7 +221,7 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
                 </div>
               </div>
               <div
-                class="bg-slate-100 grid grid-col-2 gap-2 text-center items-center"
+                class="bg-slate-100 grid grid-col-2 gap-2 text-center items-center mb-5"
               >
                 <div
                   class="flex h-full border-2 border-neutral-300 items-center justify-center"
