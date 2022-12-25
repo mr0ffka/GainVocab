@@ -21,7 +21,8 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<UserAddModel, APIUser>()
                 .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.Ignore());
-            CreateMap<UserProfileEditModel, APIUser>();
+            CreateMap<UserProfileEditModel, APIUser>()
+                .ForMember(d => d.Courses, o => o.Ignore());
             CreateMap<UserEditModel, APIUser>()
                 .ForMember(d => d.EmailConfirmed, o => o.MapFrom(s => s.EmailConfirmed))
                 .ForMember(d => d.Courses, o => o.MapFrom<CoursesUserEditResolver, Tuple<string, List<string>>>(s => new Tuple<string, List<string>>(s.Email, s.Courses)));

@@ -15,7 +15,6 @@ namespace GainVocab.API.Data.Models
         public APIUser APIUser { get; set; }
         public long CourseId { get; set; }
         public Course Course { get; set; }
-        //public long CourseProgressId { get; set; }
         public CourseProgress CourseProgress { get; set; }
     }
 }

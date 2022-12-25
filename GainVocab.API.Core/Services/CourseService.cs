@@ -77,6 +77,22 @@ namespace GainVocab.API.Core.Services
             return entity;
         }
 
+        public Course GetByName(string name)
+        {
+            var entity = Context.Course
+                .Where(e => e.Name == name)
+                .Include(e => e.LanguageFrom)
+                .Include(e => e.LanguageTo)
+                .Include(e => e.Users)
+                    .ThenInclude(e => e.CourseProgress)
+                .FirstOrDefault();
+
+            if (entity == null)
+                throw new NotFoundException("Courses", "Entity not found");
+
+            return entity;
+        }
+
         public ListItemModel GetListModel(string publicId)
         {
             var user = Get(publicId);

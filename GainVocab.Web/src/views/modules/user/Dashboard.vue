@@ -126,139 +126,158 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
       <div class="flex">
         <span class="font-bold text-xl">Active courses</span>
       </div>
-      <div class="flex mt-2">
-        <div class="flex flex-row">
-          <el-input
-            v-model="filter.name"
-            class="mb-2"
-            placeholder="Course name"
-          />
-          <el-select
-            v-model="filter.languageFrom"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            placeholder="Language from"
-            clearable
-            @clear="getEntities"
-            class="ml-2 min-w-fit"
-          >
-            <el-option
-              v-for="item in languageOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
+      <div v-if="entities !== undefined && entities.length > 0">
+        <div class="flex mt-2">
+          <div class="flex flex-row">
+            <el-input
+              v-model="filter.name"
+              class="mb-2"
+              placeholder="Course name"
             />
-          </el-select>
-          <el-select
-            v-model="filter.languageTo"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            placeholder="Language to"
-            clearable
-            @clear="getEntities"
-            class="ml-2 min-w-fit"
-          >
-            <el-option
-              v-for="item in languageOptions"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
+            <el-select
+              v-model="filter.languageFrom"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              placeholder="Language from"
+              clearable
+              @clear="getEntities"
+              class="ml-2 min-w-fit"
+            >
+              <el-option
+                v-for="item in languageOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+            <el-select
+              v-model="filter.languageTo"
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              placeholder="Language to"
+              clearable
+              @clear="getEntities"
+              class="ml-2 min-w-fit"
+            >
+              <el-option
+                v-for="item in languageOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+          </div>
+          <div class="flex flex-row !ml-auto">
+            <el-button
+              class="mb-2 mr-2 p-3 font-bold right !ml-auto"
+              plain
+              :loading="isSearching"
+              @click="getEntities"
+              ><el-icon><Search /></el-icon>&nbsp;Search</el-button
+            >
+            <el-button
+              class="mb-2 mr-2 p-3 font-bold right !ml-auto"
+              plain
+              type="info"
+              @click="resetFilters"
+              ><el-icon><RefreshRight /></el-icon>&nbsp;Reset filters</el-button
+            >
+          </div>
         </div>
-        <div class="flex flex-row !ml-auto">
-          <el-button
-            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
-            plain
-            :loading="isSearching"
-            @click="getEntities"
-            ><el-icon><Search /></el-icon>&nbsp;Search</el-button
+        <div class="grow grid lg:grid-cols-2 md:grid-cols-1 grid-rows-2 gap-2">
+          <el-card
+            v-for="course in entities"
+            shadow="hover"
+            class="box-card"
+            body-style="display: flex; flex-flow:column; height: 85%;"
           >
-          <el-button
-            class="mb-2 mr-2 p-3 font-bold right !ml-auto"
-            plain
-            type="info"
-            @click="resetFilters"
-            ><el-icon><RefreshRight /></el-icon>&nbsp;Reset filters</el-button
-          >
+            <template #header>
+              <div class="card-header text-center">
+                <span class="font-bold">{{ course.name }}</span>
+              </div>
+            </template>
+            <div class="grid grid-cols-2 h-full">
+              <div class="">
+                <div class="font-bold">
+                  <span>Languages:</span>
+                </div>
+                <span>{{ course.languageFrom }} - {{ course.languageTo }}</span>
+                <el-divider
+                  style="margin: 8px 8px 0 -10px !important"
+                  class="col-span-2"
+                  direction="horizontal"
+                />
+                <div
+                  v-if="course.description !== ''"
+                  class="cursor-pointer"
+                  @click="handleDescriptionDialog(course)"
+                >
+                  <div class="font-bold">
+                    <span>Description:</span>
+                  </div>
+                  <span>{{ cutDescription(course.description) }}</span>
+                </div>
+              </div>
+              <div
+                class="bg-slate-100 grid grid-col-2 gap-2 text-center items-center"
+              >
+                <div
+                  class="flex h-full border-2 border-neutral-300 items-center justify-center"
+                >
+                  <div>
+                    <div>
+                      <span>Completed</span>
+                    </div>
+                    <div>
+                      <span class="font-bold text-4xl h-full"
+                        >{{ course.percentProgress }}%</span
+                      >
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="flex h-full border-2 border-rose-500 items-center justify-center"
+                >
+                  <div>
+                    <div>
+                      <span>Amount of errors so far</span>
+                    </div>
+                    <span class="font-bold text-red-600 text-4xl">{{
+                      course.amountOfErrors
+                    }}</span>
+                  </div>
+                </div>
+                <div class="col-span-2 h-full">
+                  <el-button
+                    class="min-w-full min-h-full text-xl"
+                    type="success"
+                    plain
+                    @click=""
+                  >
+                    Learn
+                  </el-button>
+                </div>
+              </div>
+            </div>
+          </el-card>
         </div>
       </div>
-      <div class="grow grid lg:grid-cols-2 md:grid-cols-1 grid-rows-2 gap-2">
+      <div v-else>
         <el-card
-          v-for="course in entities"
-          shadow="hover"
-          class="box-card"
+          shadow="never"
+          class="box-card mt-2"
           body-style="display: flex; flex-flow:column; height: 85%;"
         >
-          <template #header>
-            <div class="card-header text-center">
-              <span class="font-bold">{{ course.name }}</span>
-            </div>
-          </template>
-          <div class="grid grid-cols-2 h-full">
-            <div class="">
-              <div class="font-bold">
-                <span>Languages:</span>
-              </div>
-              <span>{{ course.languageFrom }} - {{ course.languageTo }}</span>
-              <el-divider
-                style="margin: 8px 8px 0 -10px !important"
-                class="col-span-2"
-                direction="horizontal"
-              />
-              <div
-                v-if="course.description !== ''"
-                class="cursor-pointer"
-                @click="handleDescriptionDialog(course)"
-              >
-                <div class="font-bold">
-                  <span>Description:</span>
-                </div>
-                <span>{{ cutDescription(course.description) }}</span>
-              </div>
-            </div>
-            <div
-              class="bg-slate-100 grid grid-col-2 gap-2 text-center items-center"
+          <div class="text-center text-2xl">You didn't join any course.</div>
+          <div class="text-center text-xl">
+            You can search available courses
+            <router-link
+              class="text-blue-500 underline"
+              :to="{ name: 'user-course-list' }"
+              >here</router-link
             >
-              <div
-                class="flex h-full border-2 border-neutral-300 items-center justify-center"
-              >
-                <div>
-                  <div>
-                    <span>Completed</span>
-                  </div>
-                  <div>
-                    <span class="font-bold text-4xl h-full"
-                      >{{ course.percentProgress }}%</span
-                    >
-                  </div>
-                </div>
-              </div>
-              <div
-                class="flex h-full border-2 border-rose-500 items-center justify-center"
-              >
-                <div>
-                  <div>
-                    <span>Amount of errors so far</span>
-                  </div>
-                  <span class="font-bold text-red-600 text-4xl">{{
-                    course.amountOfErrors
-                  }}</span>
-                </div>
-              </div>
-              <div class="col-span-2 h-full">
-                <el-button
-                  class="min-w-full min-h-full text-xl"
-                  type="success"
-                  plain
-                  @click=""
-                >
-                  Learn
-                </el-button>
-              </div>
-            </div>
           </div>
         </el-card>
       </div>

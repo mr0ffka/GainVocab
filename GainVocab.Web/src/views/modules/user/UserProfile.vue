@@ -5,7 +5,6 @@ import { ElMessage, FormInstance } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
 import Header from "@/components/common/Header.vue";
-import { useRoute } from "vue-router";
 import { useQuery } from "@tanstack/vue-query";
 import { getCurrUser } from "@/services/auth/authApi";
 import { getMeDetails, removeMe, updateMe } from "@/services/user/userApi";
@@ -51,6 +50,7 @@ const userProfileEditModel: IUserProfileEditModel = reactive({
   currentPassword: "",
   password: "",
   passwordConfirm: "",
+  courses: [],
 });
 
 onMounted(() => {
@@ -110,6 +110,7 @@ const handleDelete = () => {
 const handleEditDialog = () => {
   userProfileEditModel.firstName = userDetailsModel.firstName;
   userProfileEditModel.lastName = userDetailsModel.lastName;
+  userProfileEditModel.courses = userDetailsModel.courses;
   userProfileEditDialog.value = true;
 };
 
@@ -144,6 +145,7 @@ const submitEditProfile = async (formEl: FormInstance | undefined) => {
         currentPassword: userProfileEditModel.currentPassword,
         password: userProfileEditModel.password,
         passwordConfirm: userProfileEditModel.passwordConfirm,
+        courses: userProfileEditModel.courses,
       });
     } else {
       console.log("error submit!", fields);
@@ -271,6 +273,24 @@ const submitEditProfile = async (formEl: FormInstance | undefined) => {
           clearable
           size="large"
         />
+      </el-form-item>
+      <el-form-item class="text-lg" prop="courses" label="Courses">
+        <el-select
+          v-model="userProfileEditModel.courses"
+          multiple
+          collapse-tags-tooltip
+          placeholder="Courses"
+          size="large"
+          clearable
+          class="grow"
+        >
+          <el-option
+            v-for="item in userDetailsModel.courses"
+            :key="item"
+            :label="item"
+            :value="item"
+          />
+        </el-select>
       </el-form-item>
       <el-checkbox
         v-model="changePassword"

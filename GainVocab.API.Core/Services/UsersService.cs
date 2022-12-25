@@ -68,6 +68,8 @@ namespace GainVocab.API.Core.Services
         {
             var user = Context.Users
                 .Include(x => x.Courses)
+                    .ThenInclude(x => x.Course)
+                .Include(x => x.Courses)
                     .ThenInclude(x => x.CourseProgress)
                 .Where(u => u.Id == id)
                 .FirstOrDefault();
@@ -179,7 +181,10 @@ namespace GainVocab.API.Core.Services
         {
             var user = Get(id);
 
+            user.Courses = user.Courses.Where(x => model.Courses.Contains(x.Course.Name)).ToList();
+
             Mapper.Map(model, user);
+
             await UserManager.UpdateAsync(user);
 
             if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.Password) && !string.IsNullOrEmpty(model.PasswordConfirm))

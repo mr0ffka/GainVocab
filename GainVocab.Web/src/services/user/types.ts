@@ -12,6 +12,7 @@ export interface IUserProfileEditModel {
   currentPassword: string;
   password: string;
   passwordConfirm: string;
+  courses: string[];
 }
 
 export interface IAddUserToCourseModel {
