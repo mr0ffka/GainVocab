@@ -5,7 +5,7 @@ import {
   IUserAddModel,
   IUserEditModel,
 } from "@/services/admin/types";
-import { ElMessage, FormInstance } from "element-plus";
+import { ElMessage, FormInstance, roleTypes } from "element-plus";
 import { onMounted, reactive, ref } from "vue";
 import router from "@/router";
 import {
@@ -44,7 +44,6 @@ const rules = reactive({
     { required: true, message: "Password confirmation is required" },
   ],
   roles: [{ required: true, message: "Select a user role" }],
-  //confirmEmail: [{ required: true, message: "Select a option" }],
 });
 
 const rulesEdit = reactive({
@@ -52,17 +51,16 @@ const rulesEdit = reactive({
   lastName: [{ required: true, message: "Last name is required" }],
   email: [{ required: true, message: "Email is required" }],
   roles: [{ required: true, message: "Select a user role" }],
-  //confirmEmail: [{ required: true, message: "Select a option" }],
 });
 
 onMounted(async () => {
+  getRolesOptions();
+  getCoursesOptions();
   userAddModel.emailConfirmed = false;
   if (route.params.id !== undefined) {
     userId.value = route.params.id.toString();
     userGet();
   }
-  getRolesOptions();
-  getCoursesOptions();
 });
 
 const getRolesOptions = async () => {
@@ -133,7 +131,11 @@ const userGet = () =>
       userAddModel.firstName = data.firstName;
       userAddModel.lastName = data.lastName;
       userAddModel.roles = data.roles;
-      userAddModel.courses = data.courses;
+      data.courses.forEach((c) => {
+        userAddModel.courses.push(
+          coursesOptions.value?.find((o) => o.name == c)?.id ?? ""
+        );
+      });
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {

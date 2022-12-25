@@ -39,6 +39,10 @@ namespace GainVocab.API.Data.Configurations
                    .WithOne(e => e.IssueEntity)
                    .OnDelete(DeleteBehavior.SetNull);
 
+            builder.HasMany(e => e.Progresses)
+                   .WithOne(e => e.CurrentCourseData)
+                   .OnDelete(DeleteBehavior.SetNull);
+
             builder.Navigation(b => b.Course)
                    .AutoInclude();
         }

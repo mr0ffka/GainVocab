@@ -11,18 +11,21 @@ namespace GainVocab.API.Data.Configurations
             builder.ToTable("APIUserCourse");
 
             builder
-                .HasKey(uc => new { uc.APIUserId, uc.CourseId });
-
-            builder
                 .HasOne(uc => uc.APIUser)
-                .WithMany(uc => uc.Courses)
+                .WithMany(u => u.Courses)
                 .HasForeignKey(uc => uc.APIUserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             builder
                 .HasOne(uc => uc.Course)
-                .WithMany(uc => uc.Users)
+                .WithMany(c => c.Users)
                 .HasForeignKey(uc => uc.CourseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder
+                .HasOne(uc => uc.CourseProgress)
+                .WithOne(cp => cp.UserCourse)
+                .HasForeignKey<CourseProgress>(cp => cp.UserCourseId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

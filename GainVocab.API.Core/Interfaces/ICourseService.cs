@@ -9,6 +9,7 @@ namespace GainVocab.API.Core.Interfaces
     {
         Task<PagedResult<ListItemModel>> GetList(FilterModel filter, PagerParams pager);
         Task<List<ListItemModel>> GetAvailableList(string userId, FilterModel filter);
+        Task<List<ActiveListItemModel>> GetActiveList(string userId, FilterModel filter);
         List<ItemModel> GetOptionsList();
         List<Course> GetListByPublicId(List<string> courses);
         List<Course> GetListByUser(APIUser user);

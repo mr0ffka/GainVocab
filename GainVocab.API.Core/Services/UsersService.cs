@@ -1,7 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
-using GainVocab.API.Core.Exceptions;
-using GainVocab.API.Core.Extensions;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Pager;
 using GainVocab.API.Core.Models.Users;
@@ -9,10 +6,7 @@ using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Web;
 
@@ -23,12 +17,14 @@ namespace GainVocab.API.Core.Services
         private readonly UserManager<APIUser> UserManager;
         private readonly IEmailService EmailService;
         private readonly ICourseService CourseService;
+        private readonly ICourseProgressService CourseProgressService;
 
-        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, IEmailService emailService, ICourseService courseService, IMapper mapper) : base(context, mapper)
+        public UsersService(DefaultDbContext context, UserManager<APIUser> userManager, IEmailService emailService, ICourseService courseService, ICourseProgressService courseProgressService, IMapper mapper) : base(context, mapper)
         {
             UserManager = userManager;
             EmailService = emailService;
             CourseService = courseService;
+            CourseProgressService = courseProgressService;
         }
 
         public async Task<IdentityResult> Add(UserAddModel newUser)
@@ -51,6 +47,7 @@ namespace GainVocab.API.Core.Services
                         var temp = new APIUserCourse();
                         temp.APIUserId = user.Id;
                         temp.CourseId = course.Id;
+                        //temp.CourseProgressId = CourseProgressService.Add(new Core.Models.CourseProgress.AddModel { PercentProgress = 0 }).Result.Id;
                         coursesResult.Add(temp);
                     }
                     user.Courses = coursesResult;
@@ -71,6 +68,7 @@ namespace GainVocab.API.Core.Services
         {
             var user = Context.Users
                 .Include(x => x.Courses)
+                    .ThenInclude(x => x.CourseProgress)
                 .Where(u => u.Id == id)
                 .FirstOrDefault();
 
@@ -157,8 +155,20 @@ namespace GainVocab.API.Core.Services
         {
             var user = Get(id);
 
+            foreach (var course in user.Courses)
+            {
+                await CourseProgressService.Remove(course.Id);
+            }
+
             Mapper.Map(model, user);
+
             await UserManager.UpdateAsync(user);
+
+            user = Get(id);
+            foreach (var course in user.Courses)
+            {
+                await CourseProgressService.Add(new Models.CourseProgress.AddModel(course));
+            }
 
             var userRoles = await UserManager.GetRolesAsync(user);
             await UserManager.RemoveFromRolesAsync(user, userRoles);

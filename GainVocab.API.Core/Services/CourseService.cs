@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using GainVocab.API.Core.Exceptions;
-using GainVocab.API.Core.Extensions.Errors;
 using GainVocab.API.Core.Interfaces;
 using GainVocab.API.Core.Models.Course;
 using GainVocab.API.Core.Models.Pager;
@@ -9,21 +8,20 @@ using GainVocab.API.Data;
 using GainVocab.API.Data.Models;
 using LinqKit;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using System.Net;
 
 namespace GainVocab.API.Core.Services
 {
     public class CourseService : GenericService<Course>, ICourseService
     {
         private readonly UserManager<APIUser> UserManager;
+        private readonly ICourseProgressService CoursesProgress;
 
-        public CourseService(DefaultDbContext context, UserManager<APIUser> userManager, IMapper mapper) : base(context, mapper)
+        public CourseService(DefaultDbContext context, UserManager<APIUser> userManager, ICourseProgressService coursesProgress, IMapper mapper) : base(context, mapper)
         {
             UserManager = userManager;
+            CoursesProgress = coursesProgress;
         }
 
         public async Task Add(AddModel entity)
@@ -69,6 +67,8 @@ namespace GainVocab.API.Core.Services
                 .Where(e => e.Id == id)
                 .Include(e => e.LanguageFrom)
                 .Include(e => e.LanguageTo)
+                .Include(e => e.Users)
+                    .ThenInclude(e => e.CourseProgress)
                 .FirstOrDefault();
 
             if (entity == null)
@@ -247,10 +247,57 @@ namespace GainVocab.API.Core.Services
             var userCourse = new APIUserCourse();
             userCourse.APIUserId = user.Id;
             userCourse.CourseId = course.Id;
-            
+
+
             course.Users.Add(userCourse);
             Context.Update(course);
             await Context.SaveChangesAsync();
+
+            userCourse = Context.APIUserCourse.OrderByDescending(i => i.Id).FirstOrDefault();
+
+            await CoursesProgress.Add(new Models.CourseProgress.AddModel(userCourse));
+        }
+
+        public async Task<List<ActiveListItemModel>> GetActiveList(string userId, FilterModel filter)
+        {
+            var predicate = PredicateBuilder.New<Course>(true);
+
+            predicate.And(x => x.Users.Any(u => u.APIUserId == userId));
+
+            if (!string.IsNullOrEmpty(filter.Name))
+            {
+                predicate.And(x => x.Name.ToLower().Contains(filter.Name.ToLower()));
+            }
+
+            if (!string.IsNullOrEmpty(filter.LanguageFrom))
+            {
+                predicate.And(x => x.LanguageFrom.PublicId.Equals(filter.LanguageFrom));
+            }
+
+            if (!string.IsNullOrEmpty(filter.LanguageTo))
+            {
+                predicate.And(x => x.LanguageTo.PublicId.Equals(filter.LanguageTo));
+            }
+
+            var query = Context.Course
+                .Include(c => c.LanguageFrom)
+                .Include(c => c.LanguageTo)
+                .Include(c => c.Users)
+                    .ThenInclude(c => c.CourseProgress)
+                .Where(predicate)
+                .ToList();
+
+            var items = new List<ActiveListItemModel>();
+            items = Mapper.Map<List<ActiveListItemModel>>(query);
+
+            foreach (var item in items)
+            {
+                var progress = query.FirstOrDefault(x => x.PublicId == item.Id).Users.FirstOrDefault(u => u.APIUserId == userId).CourseProgress;
+                item.PercentProgress = progress.PercentProgress;
+                item.AmountOfErrors = progress.AmountOfErrors;
+            }
+
+            return items;
         }
     }
 }

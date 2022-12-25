@@ -12,6 +12,7 @@ namespace GainVocab.API.Core.Interfaces
         Task Update(string id, UpdateModel model);
         CourseData Get(long id);
         CourseData Get(string publidId);
+        CourseData? GetFirstFromCourse(long coursePublicId);
         ItemModel GetItemModel(string publicId);
         Task Remove(string id);
         int GetExamplesCount();

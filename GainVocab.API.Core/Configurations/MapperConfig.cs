@@ -56,6 +56,13 @@ namespace GainVocab.API.Core.Configurations
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
                 .ForMember(d => d.LanguageFrom, o => o.MapFrom(s => s.LanguageFrom.Name))
                 .ForMember(d => d.LanguageTo, o => o.MapFrom(s => s.LanguageTo.Name));
+            CreateMap<Models.Course.ActiveListItemModel, Course>()
+                .ReverseMap()
+                .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId))
+                .ForMember(d => d.LanguageFrom, o => o.MapFrom(s => s.LanguageFrom.Name))
+                .ForMember(d => d.LanguageTo, o => o.MapFrom(s => s.LanguageTo.Name))
+                .ForMember(d => d.PercentProgress, o => o.Ignore())
+                .ForMember(d => d.AmountOfErrors, o => o.Ignore());
             CreateMap<Models.Course.ItemModel, Course>()
                 .ReverseMap()
                 .ForMember(d => d.Id, o => o.MapFrom(s => s.PublicId));
@@ -102,6 +109,9 @@ namespace GainVocab.API.Core.Configurations
             CreateMap<ImportDataExampleModel, Models.CourseData.ExampleAddModel>()
                 .ForMember(d => d.Source, o => o.MapFrom(s => s.Source))
                 .ForMember(d => d.Translation, o => o.MapFrom(s => s.Translation));
+
+            CreateMap<Models.CourseProgress.AddModel, CourseProgress>()
+                .ForMember(d => d.CurrentCourseData, o => o.MapFrom<CourseDataFromUserCourseResolver, APIUserCourse>(s => s.UserCourse));
         }
     }
 
@@ -218,6 +228,7 @@ namespace GainVocab.API.Core.Configurations
             var user = userAwaiter.GetResult();
             var courses = new List<Course>();
             sourceMember.Item2.ForEach(cpid => courses.Add(Courses.Get(cpid)));
+
             var result = new List<APIUserCourse>();
             foreach (var course in courses)
             {
@@ -422,6 +433,29 @@ namespace GainVocab.API.Core.Configurations
                 return null;
 
             var entity = CourseData.Get(publicId);
+
+            return entity;
+        }
+    }
+    #endregion
+
+    #region CourseDataFromUserCourseResolver
+    public class CourseDataFromUserCourseResolver : IMemberValueResolver<object, object, APIUserCourse?, CourseData?>
+    {
+        public ICourseDataService CourseData { get; }
+
+        public CourseDataFromUserCourseResolver(ICourseDataService courseData)
+        {
+            CourseData = courseData;
+        }
+
+        public CourseData? Resolve(object source, object destination, APIUserCourse? sourceMember,
+            CourseData? destMember, ResolutionContext context)
+        {
+            if (sourceMember == null)
+                return null;
+
+            var entity = CourseData.GetFirstFromCourse(sourceMember.CourseId);
 
             return entity;
         }

@@ -209,5 +209,14 @@ namespace GainVocab.API.Core.Services
         {
             return Context.CourseDataExample.Count();
         }
+
+        public CourseData? GetFirstFromCourse(long coursePublicId)
+        {
+            var data = Context.CourseData.FirstOrDefault(d => d.CourseId == coursePublicId);
+            if (data is not null)
+                return data;
+
+            return null;
+        }
     }
 }

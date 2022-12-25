@@ -120,5 +120,18 @@ namespace GainVocab.API.App.Controllers
 
             return Ok();
         }
+
+        [HttpGet("me/active")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult> GetActiveList([FromQuery] string userId, [FromQuery] FilterModel filter)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != userId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var items = await Courses.GetActiveList(userId, filter);
+
+            return Ok(items);
+        }
     }
 }

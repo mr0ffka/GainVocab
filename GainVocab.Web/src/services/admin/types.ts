@@ -103,6 +103,16 @@ export interface ICourseListModel {
   studentAmnt: number;
 }
 
+export interface ICourseActiveListModel {
+  id: string;
+  name: string;
+  languageFrom: ILanguageModel;
+  languageTo: ILanguageModel;
+  description: string;
+  amountOfErrors: number;
+  percentProgress: number;
+}
+
 export interface ICourseFilterModel {
   name: string;
   languageFrom: string;

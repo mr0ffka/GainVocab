@@ -64,6 +64,7 @@ const addToCourse = (model: IAddUserToCourseModel) => {
         message: `You joined course "${focusedItem.value?.name}" successfuly`,
         type: "success",
       });
+      getEntities();
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {
@@ -183,7 +184,9 @@ const handleJoiningToCourse = (course: ICourseListModel) => {
           >
         </div>
       </div>
-      <div class="grow grid lg:grid-cols-4 md:grid-cols-2 grid-rows-2 gap-2">
+      <div
+        class="grow grid 2xl:grid-cols-4 xl:grid-cols-3 md:grid-cols-2 grid-rows-2 gap-2"
+      >
         <el-card
           v-for="course in entities"
           shadow="hover"

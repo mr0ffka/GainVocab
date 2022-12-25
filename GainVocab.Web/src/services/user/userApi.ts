@@ -46,3 +46,14 @@ export const getAvailableCourseList = async (
 export const addUserToCourse = async (model: IAddUserToCourseModel) => {
   return (await api.post<GenericResponse>("course/me/add", model)).data;
 };
+
+export const getActiveCourseList = async (
+  userId: string,
+  filter: ICourseFilterModel
+) => {
+  return (
+    await api.get<IPagedResult>("course/me/active", {
+      params: toURLSearchParams({ userId, ...filter }),
+    })
+  ).data;
+};

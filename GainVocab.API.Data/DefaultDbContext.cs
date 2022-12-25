@@ -31,13 +31,16 @@ namespace GainVocab.API.Data
             modelBuilder.ApplyConfiguration(new CourseDataExampleConfiguration());
             modelBuilder.ApplyConfiguration(new SupportIssueConfiguration());
             modelBuilder.ApplyConfiguration(new SupportIssueTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new CourseProgressConfiguration());
         }
 
         public DbSet<Language> Languages { get; set; }
         public DbSet<Course> Course { get; set; }
         public DbSet<CourseData> CourseData { get; set; }
+        public DbSet<APIUserCourse> APIUserCourse { get; set; }
         public DbSet<CourseDataExample> CourseDataExample { get; set; }
         public DbSet<SupportIssue> SupportIssue { get; set; }
         public DbSet<SupportIssueType> SupportIssueType { get; set; }
+        public DbSet<CourseProgress> CourseProgress { get; set; }
     }
 }

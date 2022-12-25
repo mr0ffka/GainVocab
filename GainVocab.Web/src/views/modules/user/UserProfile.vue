@@ -211,7 +211,7 @@ const submitEditProfile = async (formEl: FormInstance | undefined) => {
           plain
           class="mr-2 text-center !ml-auto"
         >
-          Edit
+          Settings
         </el-button>
         <el-button
           v-if="hasData"
@@ -244,7 +244,7 @@ const submitEditProfile = async (formEl: FormInstance | undefined) => {
 
   <el-dialog
     v-model="userProfileEditDialog"
-    title="Edit your profile"
+    title="Settings"
     width="30%"
     center
   >
