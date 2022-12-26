@@ -133,5 +133,44 @@ namespace GainVocab.API.App.Controllers
 
             return Ok(items);
         }
+
+        [HttpGet("get-learn")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult<LearnCourseModel>> GetLearnData([FromQuery] LearnCourseGetModel model)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != model.UserId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var data = await Courses.GetLearnData(model);
+
+            return Ok(data);
+        }
+
+        [HttpPost("learn/check")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult<LearnCourseCheckResponseModel>> CheckLearnWord([FromBody] LearnCourseCheckModel model)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != model.UserId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var data = await Courses.CheckLearnWord(model);
+
+            return Ok(data);
+        }
+
+        [HttpGet("learn/next")]
+        [Authorize(Roles = "Administrator, User")]
+        public async Task<ActionResult<LearnCourseNextResponseModel>> CheckLearnWord([FromQuery] LearnCourseNextModel model)
+        {
+            var uid = User.Claims.FirstOrDefault(c => c.Type == "uid")?.Value;
+            if (uid != model.UserId)
+                throw new UnauthorizedException(ErrorMessages.UnauthorizedMessage_NoAccess);
+
+            var data = await Courses.GetNextWord(model);
+
+            return Ok(data);
+        }
     }
 }

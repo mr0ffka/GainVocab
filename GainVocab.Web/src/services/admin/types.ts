@@ -43,6 +43,12 @@ export interface IUserDetailsModel {
   emailConfirmed: boolean;
   roles: string[];
   courses: [];
+  coursesDone: IUserCourseDoneModel[];
+}
+
+export interface IUserCourseDoneModel {
+  courseName: string;
+  amountOfErrors: number;
 }
 
 export interface IUserOptionModel {

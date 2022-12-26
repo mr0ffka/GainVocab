@@ -20,5 +20,6 @@ namespace GainVocab.API.Data.Models
         public ICollection<CourseDataExample>? Examples { get; set; }
         public ICollection<SupportIssue>? Issues { get; set; }
         public ICollection<CourseProgress>? Progresses { get; set; }
+        public ICollection<CourseProgressDataDone>? ProgressesDone { get; set; }
     }
 }

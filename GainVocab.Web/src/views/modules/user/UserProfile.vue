@@ -42,6 +42,7 @@ const userDetailsModel: IUserDetailsModel = reactive({
   emailConfirmed: false,
   roles: [],
   courses: [],
+  coursesDone: [],
 });
 
 const userProfileEditModel: IUserProfileEditModel = reactive({
@@ -69,6 +70,7 @@ const userGetDetails = () =>
       userDetailsModel.lastName = data.lastName;
       userDetailsModel.roles = data.roles;
       userDetailsModel.courses = data.courses;
+      userDetailsModel.coursesDone = data.coursesDone;
       hasData.value = true;
     })
     .catch((error: any) => {
@@ -189,6 +191,18 @@ const submitEditProfile = async (formEl: FormInstance | undefined) => {
             class="mr-2"
             disable-transitions
             >{{ course }}
+          </el-tag>
+          <el-tag v-else type="danger">None</el-tag>
+        </el-descriptions-item>
+        <el-descriptions-item label="Finished courses"
+          ><el-tag
+            v-if="userDetailsModel.coursesDone.length > 0"
+            v-for="course in userDetailsModel.coursesDone"
+            class="mr-2"
+            type="success"
+            disable-transitions
+            >'{{ course.courseName }}' with
+            <span class="text-red-500">{{ course.amountOfErrors }} errors</span>
           </el-tag>
           <el-tag v-else type="danger">None</el-tag>
         </el-descriptions-item>

@@ -3,6 +3,7 @@ using System;
 using GainVocab.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace GainVocab.API.Data.Migrations
 {
     [DbContext(typeof(DefaultDbContext))]
-    partial class DefaultDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221226024703_APIUserCourse PublicId added")]
+    partial class APIUserCoursePublicIdadded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,24 +246,6 @@ namespace GainVocab.API.Data.Migrations
                     b.ToTable("CourseDataExample", (string)null);
                 });
 
-            modelBuilder.Entity("GainVocab.API.Data.Models.CourseDone", b =>
-                {
-                    b.Property<string>("APIUserId")
-                        .HasColumnType("text");
-
-                    b.Property<long>("CourseId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("AmountOfErrors")
-                        .HasColumnType("integer");
-
-                    b.HasKey("APIUserId", "CourseId");
-
-                    b.HasIndex("CourseId");
-
-                    b.ToTable("CoursesDone", (string)null);
-                });
-
             modelBuilder.Entity("GainVocab.API.Data.Models.CourseProgress", b =>
                 {
                     b.Property<long>("Id")
@@ -301,21 +285,6 @@ namespace GainVocab.API.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("CourseProgress", (string)null);
-                });
-
-            modelBuilder.Entity("GainVocab.API.Data.Models.CourseProgressDataDone", b =>
-                {
-                    b.Property<long>("CourseProgressId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("CourseDataId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("CourseProgressId", "CourseDataId");
-
-                    b.HasIndex("CourseDataId");
-
-                    b.ToTable("CourseProgressDataDone", (string)null);
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.Language", b =>
@@ -621,25 +590,6 @@ namespace GainVocab.API.Data.Migrations
                     b.Navigation("CourseData");
                 });
 
-            modelBuilder.Entity("GainVocab.API.Data.Models.CourseDone", b =>
-                {
-                    b.HasOne("GainVocab.API.Data.Models.APIUser", "APIUser")
-                        .WithMany("CoursesDone")
-                        .HasForeignKey("APIUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GainVocab.API.Data.Models.Course", "Course")
-                        .WithMany("UsersDone")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("APIUser");
-
-                    b.Navigation("Course");
-                });
-
             modelBuilder.Entity("GainVocab.API.Data.Models.CourseProgress", b =>
                 {
                     b.HasOne("GainVocab.API.Data.Models.CourseData", "CurrentCourseData")
@@ -657,25 +607,6 @@ namespace GainVocab.API.Data.Migrations
                     b.Navigation("CurrentCourseData");
 
                     b.Navigation("UserCourse");
-                });
-
-            modelBuilder.Entity("GainVocab.API.Data.Models.CourseProgressDataDone", b =>
-                {
-                    b.HasOne("GainVocab.API.Data.Models.CourseData", "CourseData")
-                        .WithMany("ProgressesDone")
-                        .HasForeignKey("CourseDataId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("GainVocab.API.Data.Models.CourseProgress", "CourseProgress")
-                        .WithMany("DataDone")
-                        .HasForeignKey("CourseProgressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CourseData");
-
-                    b.Navigation("CourseProgress");
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.SupportIssue", b =>
@@ -752,8 +683,6 @@ namespace GainVocab.API.Data.Migrations
             modelBuilder.Entity("GainVocab.API.Data.Models.APIUser", b =>
                 {
                     b.Navigation("Courses");
-
-                    b.Navigation("CoursesDone");
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.APIUserCourse", b =>
@@ -767,8 +696,6 @@ namespace GainVocab.API.Data.Migrations
                     b.Navigation("Data");
 
                     b.Navigation("Users");
-
-                    b.Navigation("UsersDone");
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.CourseData", b =>
@@ -778,13 +705,6 @@ namespace GainVocab.API.Data.Migrations
                     b.Navigation("Issues");
 
                     b.Navigation("Progresses");
-
-                    b.Navigation("ProgressesDone");
-                });
-
-            modelBuilder.Entity("GainVocab.API.Data.Models.CourseProgress", b =>
-                {
-                    b.Navigation("DataDone");
                 });
 
             modelBuilder.Entity("GainVocab.API.Data.Models.Language", b =>

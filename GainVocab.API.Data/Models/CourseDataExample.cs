@@ -17,5 +17,6 @@ namespace GainVocab.API.Data.Models
 
         public long CourseDataId { get; set; }
         public virtual CourseData? CourseData { get; set; }
+
     }
 }

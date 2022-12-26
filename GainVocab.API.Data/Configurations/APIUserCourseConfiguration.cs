@@ -10,6 +10,16 @@ namespace GainVocab.API.Data.Configurations
         {
             builder.ToTable("APIUserCourse");
 
+            builder.HasIndex(x => x.PublicId, "IX_APIUserCourse_PublicId")
+                   .IsUnique();
+
+            builder.Property(e => e.Id).UseIdentityAlwaysColumn();
+
+            builder.Property(e => e.PublicId)
+                   .HasMaxLength(36)
+                   .HasDefaultValueSql("uuid_generate_v4()")
+                   .IsFixedLength();
+
             builder
                 .HasOne(uc => uc.APIUser)
                 .WithMany(u => u.Courses)

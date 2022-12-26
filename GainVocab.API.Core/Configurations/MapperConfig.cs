@@ -30,7 +30,8 @@ namespace GainVocab.API.Core.Configurations
                 .ReverseMap()
                 .ForMember(d => d.EmailConfirmed, o => o.MapFrom<UserIsEmailConfirmedResolver, APIUser>(s => s))
                 .ForMember(d => d.Roles, o => o.MapFrom<UserRolesResolver, APIUser>(s => s))
-                .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses));
+                .ForMember(d => d.Courses, o => o.MapFrom<UserCoursesResolver, ICollection<APIUserCourse>>(s => s.Courses))
+                .ForMember(d => d.CoursesDone, o => o.MapFrom<UserCourseDoneResolver, ICollection<CourseDone>>(s => s.CoursesDone));
             CreateMap<IdentityError, ErrorEntry>()
                 .ForMember(d => d.Title, o => o.MapFrom(s => s.Description))
                 .ForMember(d => d.Code, o => o.MapFrom(s => s.Code))
@@ -86,6 +87,7 @@ namespace GainVocab.API.Core.Configurations
 
             CreateMap<Models.CourseData.ExampleAddModel, CourseDataExample>().ReverseMap();
             CreateMap<Models.CourseData.ExampleEditModel, CourseDataExample>().ReverseMap();
+            CreateMap<Models.CourseData.ExampleModel, CourseDataExample>().ReverseMap();
 
             CreateMap<Models.SupportIssue.AddModel, SupportIssue>()
                 .ForMember(d => d.IssueTypeId, o => o.MapFrom<SupportIssueTypeIdFromPublicIdResolver, string>(s => s.TypePublicId))
@@ -113,6 +115,14 @@ namespace GainVocab.API.Core.Configurations
 
             CreateMap<Models.CourseProgress.AddModel, CourseProgress>()
                 .ForMember(d => d.CurrentCourseData, o => o.MapFrom<CourseDataFromUserCourseResolver, APIUserCourse>(s => s.UserCourse));
+
+            CreateMap<APIUserCourse, Models.Course.LearnCourseModel>()
+                .ForMember(d => d.UserCoursePublicId, o => o.MapFrom(s => s.PublicId))
+                .ForMember(d => d.Name, o => o.MapFrom(s => s.Course.Name))
+                .ForMember(d => d.LanguageFrom, o => o.MapFrom(s => s.Course.LanguageFrom.Name))
+                .ForMember(d => d.LanguageTo, o => o.MapFrom(s => s.Course.LanguageTo.Name))
+                .ForMember(d => d.PercentProgress, o => o.MapFrom(s => s.CourseProgress.PercentProgress))
+                .ForMember(d => d.Source, o => o.Ignore());
         }
     }
 
@@ -207,6 +217,32 @@ namespace GainVocab.API.Core.Configurations
                 coursesNames.AddRange(courses.Select(c => c.Name));
             }
             return coursesNames;
+        }
+    }
+    #endregion
+
+    #region UserCourseDoneResolver
+    public class UserCourseDoneResolver : IMemberValueResolver<object, object, ICollection<CourseDone>, List<UserCourseDoneModel>>
+    {
+        private readonly ICourseService Courses;
+
+        public UserCourseDoneResolver(ICourseService courses)
+        {
+            Courses = courses;
+        }
+
+        public List<UserCourseDoneModel> Resolve(object source, object destination, ICollection<CourseDone> sourceMember, List<UserCourseDoneModel> destMember, ResolutionContext context)
+        {
+            var coursesDone = new List<UserCourseDoneModel>();
+            foreach (var entity in sourceMember)
+            {
+                coursesDone.Add(new UserCourseDoneModel
+                {
+                    CourseName = entity.Course.Name,
+                    AmountOfErrors = entity.AmountOfErrors
+                });
+            }
+            return coursesDone;
         }
     }
     #endregion

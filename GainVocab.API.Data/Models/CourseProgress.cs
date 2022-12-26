@@ -18,5 +18,7 @@ namespace GainVocab.API.Data.Models
         public APIUserCourse UserCourse { get; set; }
         public long? CurrentCourseDataId { get; set; }
         public CourseData? CurrentCourseData { get; set; }
+        public virtual ICollection<CourseProgressDataDone>? DataDone { get; set; }
+
     }
 }

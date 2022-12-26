@@ -14,6 +14,7 @@ namespace GainVocab.API.Data.Models
         {
             Users = new HashSet<APIUserCourse>();
             Data = new HashSet<CourseData>();
+            UsersDone = new HashSet<CourseDone>();
         }
 
         [Key]
@@ -28,5 +29,6 @@ namespace GainVocab.API.Data.Models
         public virtual Language? LanguageTo { get; set; }
         public ICollection<APIUserCourse> Users { get; set; }
         public ICollection<CourseData> Data { get; set; }
+        public ICollection<CourseDone> UsersDone { get; set; }
     }
 }

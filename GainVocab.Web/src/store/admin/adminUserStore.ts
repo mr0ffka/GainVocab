@@ -1,4 +1,4 @@
-import { IPagerParams } from "../services/common/types";
+import { IPagerParams } from "@/services/common/types";
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import { IUserFilterModel } from "@/services/admin/types";

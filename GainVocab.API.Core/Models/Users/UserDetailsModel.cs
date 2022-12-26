@@ -14,5 +14,6 @@ namespace GainVocab.API.Core.Models.Users
         public bool? EmailConfirmed { get; set; }
         public List<string>? Roles { get; set; }
         public List<string>? Courses { get; set; }
+        public List<UserCourseDoneModel>? CoursesDone { get; set; }
     }
 }

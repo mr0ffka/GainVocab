@@ -61,26 +61,6 @@ onMounted(async () => {
   getLanguageOptions();
 });
 
-const addToCourse = (model: IAddUserToCourseModel) => {
-  addUserToCourse(model)
-    .then(() => {
-      ElMessage({
-        showClose: true,
-        message: `You joined course "${focusedItem.value?.name}" successfuly`,
-        type: "success",
-      });
-    })
-    .catch((error: any) => {
-      error.response.data.Errors.forEach(async (e: any) => {
-        ElMessage({
-          showClose: true,
-          message: e.Title,
-          type: "error",
-        });
-      });
-    });
-};
-
 const getEntities = () => {
   isSearching.value = true;
   getActiveCourseList(userId.value, filter.value)
@@ -199,7 +179,7 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
               </div>
             </template>
             <div class="grid grid-cols-2 h-full">
-              <div class="">
+              <div class="mr-2">
                 <div class="font-bold">
                   <span>Languages:</span>
                 </div>
@@ -220,11 +200,9 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
                   <span>{{ cutDescription(course.description) }}</span>
                 </div>
               </div>
-              <div
-                class="bg-slate-100 grid grid-col-2 gap-2 text-center items-center mb-5"
-              >
+              <div class="grid grid-col-2 gap-2 text-center items-center mb-5">
                 <div
-                  class="flex h-full border-2 border-neutral-300 items-center justify-center"
+                  class="flex h-full border-2 bg-slate-100 border-neutral-300 items-center justify-center"
                 >
                   <div>
                     <div>
@@ -238,23 +216,28 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
                   </div>
                 </div>
                 <div
-                  class="flex h-full border-2 border-rose-500 items-center justify-center"
+                  class="flex h-full border-2 bg-slate-100 border-rose-500 items-center justify-center"
                 >
                   <div>
                     <div>
-                      <span>Amount of errors so far</span>
+                      <span>Amount of errors</span>
                     </div>
                     <span class="font-bold text-red-600 text-4xl">{{
                       course.amountOfErrors
                     }}</span>
                   </div>
                 </div>
-                <div class="col-span-2 h-full">
+                <div class="col-span-2 h-full bg-slate-100">
                   <el-button
                     class="min-w-full min-h-full text-xl"
                     type="success"
                     plain
-                    @click=""
+                    @click="
+                      $router.push({
+                        name: 'user-learn',
+                        params: { id: course.id },
+                      })
+                    "
                   >
                     Learn
                   </el-button>
@@ -270,7 +253,7 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
           class="box-card mt-2"
           body-style="display: flex; flex-flow:column; height: 85%;"
         >
-          <div class="text-center text-2xl">You didn't join any course.</div>
+          <div class="text-center text-2xl">You didn't join any courses.</div>
           <div class="text-center text-xl">
             You can search available courses
             <router-link

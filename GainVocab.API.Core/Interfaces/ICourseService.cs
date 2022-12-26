@@ -21,5 +21,8 @@ namespace GainVocab.API.Core.Interfaces
         Course GetByName(string name);
         ListItemModel GetListModel(string publicId);
         Task Remove(string id);
+        Task<LearnCourseModel> GetLearnData(LearnCourseGetModel model);
+        Task<LearnCourseCheckResponseModel> CheckLearnWord(LearnCourseCheckModel model);
+        Task<LearnCourseNextResponseModel> GetNextWord(LearnCourseNextModel model); 
     }
 }

@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { defineStore, mapActions, mapState, mapStores } from "pinia";
+import { defineStore } from "pinia";
 
 export const useAuthMenuStore = defineStore("authMenuStore", () => {
   const isMenuCollapsed = ref(false);

@@ -20,6 +20,7 @@ const userDetailsModel: IUserDetailsModel = reactive({
   emailConfirmed: false,
   roles: [],
   courses: [],
+  coursesDone: [],
 });
 
 onMounted(async () => {

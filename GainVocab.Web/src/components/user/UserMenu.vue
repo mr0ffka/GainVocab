@@ -7,7 +7,7 @@ import { queryClient } from "@/helpers/queryClient";
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage, FormInstance } from "element-plus";
 import { ISupportApplicationIssueModel } from "@/services/user/types";
-import { sendSupportApplicationIssue } from "@/services/user/userApi";
+import { sendSupportIssue } from "@/services/user/userApi";
 import { IUserAuth } from "@/services/auth/types";
 import { getSupportIssuesTypesOptionsList } from "@/services/admin/adminApi";
 import { ISupportIssueTypeOptionModel } from "@/services/admin/types";
@@ -15,6 +15,7 @@ import { ISupportIssueTypeOptionModel } from "@/services/admin/types";
 const authMenuStore = useAuthMenuStore();
 const { isMenuCollapsed } = storeToRefs(authMenuStore);
 const supportDialog = ref<boolean>(false);
+const isSending = ref<boolean>(false);
 const issueTypesOptions = ref<ISupportIssueTypeOptionModel[] | null>();
 const auth = queryClient.getQueryData(["authUser"]) as IUserAuth;
 
@@ -34,7 +35,7 @@ const supportApplicationIssueRules = reactive({
 });
 
 const sendIssue = (model: ISupportApplicationIssueModel) => {
-  sendSupportApplicationIssue(model)
+  sendSupportIssue(model)
     .then(() => {
       ElMessage({
         showClose: true,
@@ -42,6 +43,7 @@ const sendIssue = (model: ISupportApplicationIssueModel) => {
         type: "success",
       });
       supportDialog.value = false;
+      isSending.value = false;
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {
@@ -78,6 +80,7 @@ const submitSupportIssue = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   await formEl.validate((valid, fields) => {
     if (valid) {
+      isSending.value = true;
       const typePublicId = issueTypesOptions.value?.find(
         (type) => type.name == "ApplicationIssue"
       )?.publicId;
@@ -120,15 +123,15 @@ const submitSupportIssue = async (formEl: FormInstance | undefined) => {
       <el-icon><Collection /></el-icon>
       <span>Available courses</span>
     </el-menu-item>
-    <el-menu-item class="mt-auto" index="" @click="supportDialog = true">
+    <el-menu-item index="" @click="supportDialog = true">
       <el-icon><Help /></el-icon>
-      <span>Support</span>
+      <span>Help</span>
     </el-menu-item>
   </el-menu>
 
   <el-dialog
     v-model="supportDialog"
-    title="Support - report a bug"
+    title="Report a bug with application"
     width="30%"
     center
   >
@@ -140,9 +143,7 @@ const submitSupportIssue = async (formEl: FormInstance | undefined) => {
       :model="supportApplicationIssueModel"
       :rules="supportApplicationIssueRules"
     >
-      <span class="font-bold text-lg"
-        >Send application issue to system administrators</span
-      >
+      <span>Send issue with application to system administrators</span>
       <el-form-item class="text-lg mt-2" prop="issueMessage" label="Message">
         <el-input
           v-model="supportApplicationIssueModel.issueMessage"
@@ -155,7 +156,11 @@ const submitSupportIssue = async (formEl: FormInstance | undefined) => {
     <template #footer>
       <span class="dialog-footer">
         <el-button plain @click="supportDialog = false">Cancel</el-button>
-        <el-button type="success" plain @click="submitSupportIssue(formRef)"
+        <el-button
+          type="success"
+          :loading="isSending"
+          plain
+          @click="submitSupportIssue(formRef)"
           >Send</el-button
         >
       </span>

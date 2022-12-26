@@ -19,7 +19,7 @@ import { IAddUserToCourseModel } from "@/services/user/types";
 
 const store = useUserCourseStore();
 const userId = ref<string>("");
-const { filter, pager, isSearching, descriptionLength } = storeToRefs(store);
+const { filter, isSearching, descriptionLength } = storeToRefs(store);
 const languageOptions = ref<ILanguageModel[] | null>();
 const focusedItem = ref<ICourseListModel>();
 let entities = ref<ICourseListModel[]>();
@@ -195,7 +195,7 @@ const handleJoiningToCourse = (course: ICourseListModel) => {
             v-for="course in entities"
             shadow="hover"
             class="box-card"
-            body-style="display: flex; flex-flow:column; height: 85%;"
+            body-style="display: flex; flex-flow:column; height: 83%;"
           >
             <template #header>
               <div class="card-header text-center">

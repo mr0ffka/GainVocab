@@ -32,6 +32,14 @@ export default [
         },
         component: () => import("@/views/modules/user/CourseList.vue"),
       },
+      {
+        path: "learn/:id",
+        name: "user-learn",
+        meta: {
+          middleware: [requireAuth],
+        },
+        component: () => import("@/views/modules/user/LearnVocab.vue"),
+      },
     ],
   },
 ];

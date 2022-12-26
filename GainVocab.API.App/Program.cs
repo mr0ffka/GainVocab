@@ -88,6 +88,7 @@ builder.Services.AddScoped<ICourseDataService, CourseDataService>();
 builder.Services.AddScoped<ISupportIssueService, SupportIssueService>();
 builder.Services.AddScoped<ISupportIssueTypeService, SupportIssueTypeService>();
 builder.Services.AddScoped<ICourseProgressService, CourseProgressService>();
+builder.Services.AddScoped<IUserCourseService, UserCourseService>();
 
 builder.Services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 

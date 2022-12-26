@@ -47,13 +47,19 @@ namespace GainVocab.API.Core.Services
                         var temp = new APIUserCourse();
                         temp.APIUserId = user.Id;
                         temp.CourseId = course.Id;
-                        //temp.CourseProgressId = CourseProgressService.Add(new Core.Models.CourseProgress.AddModel { PercentProgress = 0 }).Result.Id;
                         coursesResult.Add(temp);
                     }
                     user.Courses = coursesResult;
                     await UserManager.UpdateAsync(user);
                 }
+
+                user = GetByEmail(newUser.Email);
+                foreach (var course in user.Courses)
+                {
+                    await CourseProgressService.Add(new Models.CourseProgress.AddModel(course));
+                }
             }
+
 
             if (user.EmailConfirmed == false && !result.Errors.Any())
             {
@@ -69,9 +75,26 @@ namespace GainVocab.API.Core.Services
             var user = Context.Users
                 .Include(x => x.Courses)
                     .ThenInclude(x => x.Course)
+                .Include(x => x.CoursesDone)
                 .Include(x => x.Courses)
                     .ThenInclude(x => x.CourseProgress)
                 .Where(u => u.Id == id)
+                .FirstOrDefault();
+
+            if (user == null)
+                return null;
+
+            return user;
+        }
+
+        public APIUser GetByEmail(string email)
+        {
+            var user = Context.Users
+                .Include(x => x.Courses)
+                    .ThenInclude(x => x.Course)
+                .Include(x => x.Courses)
+                    .ThenInclude(x => x.CourseProgress)
+                .Where(u => u.Email == email)
                 .FirstOrDefault();
 
             if (user == null)
