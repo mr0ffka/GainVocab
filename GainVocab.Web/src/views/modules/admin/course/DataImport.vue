@@ -18,6 +18,7 @@ import {
 import { onMounted, ref } from "vue";
 
 const withExamples = ref<boolean>(false);
+const isAddingData = ref<boolean>(false);
 const uploadSucceeded = ref<boolean>(false);
 const coursesOptions = ref<ICourseItemModel[] | null>();
 const uploadRef = ref<UploadInstance>();
@@ -94,6 +95,7 @@ const applyImport = async (id: string) =>
         message: "Data has been applied",
         type: "success",
       });
+      isAddingData.value = false;
       router.push({
         name: "data-list",
         query: { coursePublicId: selectedCourseId.value },
@@ -112,6 +114,7 @@ const submitUpload = () => {
 };
 
 const applyChanges = () => {
+  isAddingData.value = true;
   applyImport(selectedCourseId.value);
 };
 
@@ -195,7 +198,12 @@ const deleteFiles = () => {
               Upload files to server
             </el-button>
             <div v-if="uploadSucceeded">
-              <el-button type="success" plain @click="applyChanges">
+              <el-button
+                :loading="isAddingData"
+                type="success"
+                plain
+                @click="applyChanges"
+              >
                 Apply changes
               </el-button>
               <el-button type="danger" plain @click="deleteFiles">

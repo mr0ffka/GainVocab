@@ -53,9 +53,10 @@ const resetPassword = (form: IResetPasswordModel) =>
     .then(() => {
       ElMessage({
         showClose: true,
-        message: "Something went wrong",
-        type: "error",
+        message: "Password has been changed",
+        type: "success",
       });
+      router.push({ name: "login" });
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {

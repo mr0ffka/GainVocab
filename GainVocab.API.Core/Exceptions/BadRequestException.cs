@@ -1,4 +1,5 @@
 ﻿using GainVocab.API.Core.Extensions.Errors;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,26 @@ namespace GainVocab.API.Core.Exceptions
             Errors = new List<ErrorEntry>();
             var error = new ErrorEntry
             {
-                Code = HttpStatusCode.BadRequest.ToString(),
+                Code = ((int)HttpStatusCode.BadRequest).ToString(),
                 Title = message,
                 Source = ""
             };
             Errors.Add(error);
+        }
+
+        public BadRequestException(List<IdentityError> errors) : base("Identity error")
+        {
+            Errors = new List<ErrorEntry>();
+            foreach (var error in errors)
+            {
+                var temp = new ErrorEntry
+                { 
+                    Code = error.Code,
+                    Title = error.Description,
+                    Source = ""
+                };
+                Errors.Add(temp);
+            }
         }
 
         public BadRequestException(string message, List<ErrorEntry> errors) : base(message)

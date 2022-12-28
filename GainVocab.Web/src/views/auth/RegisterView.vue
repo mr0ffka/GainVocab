@@ -36,12 +36,7 @@ const register = (credentials: IRegisterModel) =>
         message: "Registration successful",
         type: "success",
       });
-      if (data.user.isAdmin) {
-        router.push({ name: "admin-dashboard" });
-      } else {
-        router.push({ name: "user-dashboard" });
-      }
-      queryClient.setQueryData(["authUser"], data.user);
+      router.push({ name: "login" });
     })
     .catch((error: any) => {
       error.response.data.Errors.forEach(async (e: any) => {

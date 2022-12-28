@@ -42,7 +42,7 @@ namespace GainVocab.API.App.Controllers
 
             if (errors.Any())
             {
-                return BadRequest(errors);
+                throw new BadRequestException(errors.ToList());
             }
 
             return Ok();
@@ -55,7 +55,7 @@ namespace GainVocab.API.App.Controllers
         {
             if (userId == null || code == null)
             {
-                return BadRequest("Invalid email confirmation url");
+                throw new BadRequestException("Invalid email confirmation url");
             }
 
             var status = await AuthManager.ConfirmEmailAddress(userId, code);

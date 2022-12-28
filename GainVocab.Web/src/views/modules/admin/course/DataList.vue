@@ -18,9 +18,8 @@ import { useRoute } from "vue-router";
 
 const store = useAdminCourseDataStore();
 const route = useRoute();
-const { filter, pager, isSearching } = storeToRefs(store);
+const { filter, pager, isSearching, selectedCourseId } = storeToRefs(store);
 const confirmDeleteDialog = ref(false);
-const selectedCourseId = ref<string>("");
 const focusedItem = ref<ICourseDataListModel | null>();
 let entities = ref<ICourseDataListModel[]>();
 let pagerValues = ref<IPager>();
@@ -295,7 +294,7 @@ const rowClick = (row: ICourseDataListModel, column: any) => {
 
   <el-dialog
     v-model="confirmDeleteDialog"
-    title="Delete language"
+    title="Delete data entry"
     width="30%"
     center
   >

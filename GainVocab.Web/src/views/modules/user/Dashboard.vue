@@ -106,7 +106,7 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
       <div class="flex">
         <span class="font-bold text-xl">Active courses</span>
       </div>
-      <div v-if="entities !== undefined && entities.length > 0">
+      <div>
         <div class="flex mt-2">
           <div class="flex flex-row">
             <el-input
@@ -166,7 +166,10 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
             >
           </div>
         </div>
-        <div class="grow grid lg:grid-cols-2 md:grid-cols-1 grid-rows-2 gap-2">
+        <div
+          v-if="entities !== undefined && entities.length > 0"
+          class="grow grid lg:grid-cols-2 md:grid-cols-1 grid-rows-2 gap-2"
+        >
           <el-card
             v-for="course in entities"
             shadow="hover"
@@ -246,23 +249,23 @@ const handleDescriptionDialog = (course: ICourseActiveListModel) => {
             </div>
           </el-card>
         </div>
-      </div>
-      <div v-else>
-        <el-card
-          shadow="never"
-          class="box-card mt-2"
-          body-style="display: flex; flex-flow:column; height: 85%;"
-        >
-          <div class="text-center text-2xl">You didn't join any courses.</div>
-          <div class="text-center text-xl">
-            You can search available courses
-            <router-link
-              class="text-blue-500 underline"
-              :to="{ name: 'user-course-list' }"
-              >here</router-link
-            >
-          </div>
-        </el-card>
+        <div v-else>
+          <el-card
+            shadow="never"
+            class="box-card mt-2"
+            body-style="display: flex; flex-flow:column; height: 85%;"
+          >
+            <div class="text-center text-2xl">You didn't join any courses.</div>
+            <div class="text-center text-xl">
+              You can search available courses
+              <router-link
+                class="text-blue-500 underline"
+                :to="{ name: 'user-course-list' }"
+                >here</router-link
+              >
+            </div>
+          </el-card>
+        </div>
       </div>
     </div>
   </div>

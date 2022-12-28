@@ -27,7 +27,7 @@ namespace GainVocab.API.Core.Models.Users
                 v.RuleFor(x => x.FirstName).NotEmpty().WithMessage("First Name is required");
                 v.RuleFor(x => x.LastName).NotEmpty().WithMessage("Last Name is required");
                 v.RuleFor(x => x.Password).NotEmpty().Equal(p => p.PasswordConfirm).WithMessage("Passwords must be the same");
-                v.RuleFor(x => x.Password).Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$").WithMessage("Incorrect password");
+                v.RuleFor(x => x.Password).Matches(@"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$").WithMessage("Password must have at least 8 characters including special characters and numbers!");
                 v.RuleFor(x => x.Email).NotEmpty().WithMessage("Email is required");
                 v.RuleFor(x => x.Email).EmailAddress().WithMessage("Incorrect email address");
                 v.RuleFor(x => x.Roles).NotEmpty().WithMessage("User role is required");

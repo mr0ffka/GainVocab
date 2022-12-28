@@ -7,6 +7,7 @@ export const useAdminCourseDataStore = defineStore(
   "adminCourseDataStore",
   () => {
     const isSearching = ref(false);
+    const selectedCourseId = ref<string>("");
     const pager = ref<IPagerParams>({
       pageSize: 10,
       pageNumber: 1,
@@ -29,6 +30,7 @@ export const useAdminCourseDataStore = defineStore(
       pager,
       filter,
       isSearching,
+      selectedCourseId,
       resetFilters,
     };
   }

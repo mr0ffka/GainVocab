@@ -38,10 +38,10 @@ namespace GainVocab.API.Core.Services
                 throw new BadRequestException($"Course '{mappedEntity.Name}' already exists!");
             }
 
-            if (Context.Course.Where(c => c.LanguageFromId == mappedEntity.LanguageFrom.Id && c.LanguageToId == mappedEntity.LanguageTo.Id).Any())
-            {
-                throw new BadRequestException($"Course with identical languages already exists!");
-            }
+            //if (Context.Course.Where(c => c.LanguageFromId == mappedEntity.LanguageFrom.Id && c.LanguageToId == mappedEntity.LanguageTo.Id).Any())
+            //{
+            //    throw new BadRequestException($"Course with identical languages already exists!");
+            //}
 
             try
             {
@@ -234,6 +234,7 @@ namespace GainVocab.API.Core.Services
 
             predicate.And(x => !x.Users.Any(u => u.APIUserId == userId));
             predicate.And(x => x.Data.Any());
+            predicate.And(x => !x.UsersDone.Any(u => u.APIUserId == userId));
 
             if (!string.IsNullOrEmpty(filter.Name))
             {
@@ -389,6 +390,7 @@ namespace GainVocab.API.Core.Services
                         APIUserId = data.APIUserId,
                         AmountOfErrors = data.CourseProgress.AmountOfErrors
                     });
+                    Context.APIUserCourse.Remove(data);
                 }
 
                 Context.CourseProgressDataDone.Add(new CourseProgressDataDone

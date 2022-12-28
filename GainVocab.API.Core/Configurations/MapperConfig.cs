@@ -236,9 +236,10 @@ namespace GainVocab.API.Core.Configurations
             var coursesDone = new List<UserCourseDoneModel>();
             foreach (var entity in sourceMember)
             {
+                var course = Courses.Get(entity.CourseId);
                 coursesDone.Add(new UserCourseDoneModel
                 {
-                    CourseName = entity.Course.Name,
+                    CourseName = course.Name,
                     AmountOfErrors = entity.AmountOfErrors
                 });
             }

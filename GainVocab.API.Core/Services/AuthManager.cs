@@ -148,34 +148,42 @@ namespace GainVocab.API.Core.Services
 
         }
 
-        public async Task<IdentityResult> ConfirmEmailAddress(string userId, string code)
+        public async Task<bool> ConfirmEmailAddress(string userId, string code)
         {
             var user = await UserManager.FindByIdAsync(userId);
             if (user == null)
-                return IdentityResult.Failed();
+                throw new NotFoundException("User", userId);
 
-            return await UserManager.ConfirmEmailAsync(user, code);
+            var result = await UserManager.ConfirmEmailAsync(user, code);
+            if (result.Errors.Any())
+                throw new BadRequestException(result.Errors.ToList());
+
+            return result.Succeeded;
         }
 
-        public async Task<IdentityResult> ForgotPassword(string email)
+        public async Task<bool> ForgotPassword(string email)
         {
             var user = await UserManager.FindByEmailAsync(email);
             if (user == null)
-                return IdentityResult.Failed();
+                throw new NotFoundException("User", email);
 
             var token = HttpUtility.UrlEncode(await UserManager.GeneratePasswordResetTokenAsync(user));
             await EmailService.SendForgotPasswordEmail(user, token);
 
-            return IdentityResult.Success;
+            return true;
         }
 
-        public async Task<IdentityResult> ResetPassword(ResetPasswordModel resetPassword)
+        public async Task<bool> ResetPassword(ResetPasswordModel resetPassword)
         {
             var user = await UserManager.FindByIdAsync(resetPassword.UserId);
             if (user == null)
-                return IdentityResult.Failed();
+                throw new NotFoundException("User", resetPassword.UserId);
 
-            return await UserManager.ResetPasswordAsync(user, resetPassword.ResetToken, resetPassword.NewPassword);
+            var result = await UserManager.ResetPasswordAsync(user, resetPassword.ResetToken, resetPassword.NewPassword);
+            if (result.Errors.Any())
+                throw new BadRequestException(result.Errors.ToList());
+
+            return result.Succeeded;
         }
 
         private async Task<string> CreateRefreshToken(APIUser user)
