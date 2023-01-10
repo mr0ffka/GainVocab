@@ -17,7 +17,7 @@ namespace Scraper
                 file.Close();
                 foreach (var prop in typeof(T).GetProperties())
                 {
-                    header += prop.Name + "; ";
+                    header += prop.Name + ";";
                 }
                 header = header.Substring(0, header.Length - 2);
                 sb.AppendLine(header);
@@ -31,7 +31,7 @@ namespace Scraper
                 var line = "";
                 foreach (var prop in info)
                 {
-                    line += prop.GetValue(obj, null) + "; ";
+                    line += prop.GetValue(obj, null) + ";";
                 }
                 line = line.Substring(0, line.Length - 2);
                 sb.AppendLine(line);

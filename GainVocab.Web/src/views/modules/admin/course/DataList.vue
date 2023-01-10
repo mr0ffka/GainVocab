@@ -163,15 +163,8 @@ const rowClick = (row: ICourseDataListModel, column: any) => {
         <div class="flex">
           <div class="flex flex-row">
             <el-input
-              v-model="filter.publicId"
-              class="mb-2"
-              placeholder="Data id"
-            />
-          </div>
-          <div class="flex flex-row">
-            <el-input
               v-model="filter.source"
-              class="mb-2 ml-2"
+              class="mb-2"
               placeholder="Source text"
             />
           </div>
@@ -207,13 +200,6 @@ const rowClick = (row: ICourseDataListModel, column: any) => {
           :stripe="true"
           @row-click="rowClick"
         >
-          <el-table-column
-            label-class-name="font-black"
-            prop="publicId"
-            label="Data Id"
-            sortable
-            width=""
-          />
           <el-table-column
             label-class-name="font-black"
             prop="source"

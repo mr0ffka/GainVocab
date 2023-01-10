@@ -412,8 +412,8 @@ namespace GainVocab.API.Core.Services
                         result.WordIndexError = 0;
                         break;
                     }
-
-                    if (progress.CurrentCourseData.Translation[i] != model.Translation[i])
+                    
+                    if (i > model.Translation.Length - 1 || progress.CurrentCourseData.Translation[i] != model.Translation[i])
                     {
                         result.WordIndexError = i;
                         break;
