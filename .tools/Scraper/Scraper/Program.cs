@@ -22,7 +22,6 @@ void Menu()
         Console.Clear();
         Console.WriteLine(" --- bab.la scraper --- \n");
         Console.WriteLine(" 1. Get data for POL-ENG");
-        Console.WriteLine(" 2. Get data for ENG-POL");
         if (hasData)
         {
             Console.WriteLine(" 3. Export data to .csv");
@@ -39,11 +38,6 @@ void Menu()
                 doc = web.Load("https://pl.bab.la/slownik/polski-angielski/");
                 type = "POL-ENG";
                 GetData(3);
-                break;
-            case "2":
-                doc = web.Load("https://en.bab.la/dictionary/english-polish");
-                type = "ENG-POL";
-                GetData(0);
                 break;
             case "q":
                 Environment.Exit(0);

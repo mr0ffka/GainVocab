@@ -161,7 +161,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors(builder =>
 {
     builder
-    .WithOrigins(new string[] { "http://localhost:4000", "http://localhost:4001" })
+    .WithOrigins(new string[] { "http://localhost:4000", "http://127.0.0.1:4000" })
     .AllowAnyMethod()
     .AllowAnyHeader()
     .AllowCredentials();

@@ -38,11 +38,6 @@ namespace GainVocab.API.Core.Services
                 throw new BadRequestException($"Course '{mappedEntity.Name}' already exists!");
             }
 
-            //if (Context.Course.Where(c => c.LanguageFromId == mappedEntity.LanguageFrom.Id && c.LanguageToId == mappedEntity.LanguageTo.Id).Any())
-            //{
-            //    throw new BadRequestException($"Course with identical languages already exists!");
-            //}
-
             try
             {
                 await Context.AddAsync(mappedEntity);
