@@ -28,10 +28,3 @@ h. P@ssword1
 Użytkownik:
 l. test@example.com
 h. P@ssword1
-
-Do przechwytywania wysyłanych maili skorzystano z darmowego serwisu do testowania maili - https://ethereal.email
-Konto: 
-l. melvin74@ethereal.email,
-h. 2J5txMXExMJtKe4YP7
-
-Konto jest czasowe, jeżeli wygaśnie trzeba zrobić nowe za pośrednictwem przycisku "Create Ethereal Account" oraz podmienić dane logowania w pliku appsettings.json znajdującego się w folderze GainVocab.API.App\bin\Release\net6.0\publish 
